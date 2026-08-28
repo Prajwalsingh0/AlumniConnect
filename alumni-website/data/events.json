@@ -1,0 +1,126 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "title": "Annual Alumni Gala 2024",
+      "description": "Join us for an elegant evening celebrating our alumni achievements, networking opportunities, and fundraising for student scholarships. Dress code: Black tie optional.",
+      "date": "2026-12-15",
+      "time": "18:00",
+      "location": "Grand Ballroom, Downtown Hotel",
+      "category": "Networking",
+      "image": "https://images.unsplash.com/photo-1511578314322-379afb476865?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 300,
+      "price": 75
+    },
+    {
+      "id": 2,
+      "title": "Tech Innovation Summit",
+      "description": "Explore the latest trends in technology with leading alumni in the tech industry. Panel discussions, workshops, and networking sessions included.",
+      "date": "2026-11-22",
+      "time": "09:00",
+      "location": "University Conference Center",
+      "category": "Professional Development",
+      "image": "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 150,
+      "price": 25
+    },
+    {
+      "id": 3,
+      "title": "Young Alumni Mixer",
+      "description": "Casual networking event for recent graduates (2019-2024). Connect with peers, share experiences, and build lasting professional relationships.",
+      "date": "2026-10-30",
+      "time": "19:00",
+      "location": "Rooftop Bar, City Center",
+      "category": "Networking",
+      "image": "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 80,
+      "price": 15
+    },
+    {
+      "id": 4,
+      "title": "Leadership Workshop Series",
+      "description": "Three-part workshop series focusing on executive leadership skills, change management, and strategic thinking. Led by senior alumni executives.",
+      "date": "2026-11-08",
+      "time": "14:00",
+      "location": "Business School Auditorium",
+      "category": "Professional Development",
+      "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 50,
+      "price": 40
+    },
+    {
+      "id": 5,
+      "title": "Healthcare Alumni Reunion",
+      "description": "Special reunion for alumni working in healthcare and medical fields. Share experiences from the pandemic and discuss future healthcare innovations.",
+      "date": "2026-11-12",
+      "time": "17:30",
+      "location": "Medical Center Alumni Hall",
+      "category": "Reunion",
+      "image": "https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 100,
+      "price": 30
+    },
+    {
+      "id": 6,
+      "title": "Homecoming Weekend Celebration",
+      "description": "Join us for the annual homecoming festivities! Campus tours, game viewing party, and class reunion gatherings throughout the weekend.",
+      "date": "2026-10-25",
+      "time": "10:00",
+      "location": "University Campus",
+      "category": "Reunion",
+      "image": "https://images.unsplash.com/photo-1523050854058-8df90110c9d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 500,
+      "price": 20
+    },
+    {
+      "id": 7,
+      "title": "Entrepreneur Meetup & Pitch Night",
+      "description": "Monthly meetup for alumni entrepreneurs and those interested in starting their own business. Features startup pitches and mentorship opportunities.",
+      "date": "2026-11-05",
+      "time": "18:30",
+      "location": "Innovation Hub, Tech District",
+      "category": "Networking",
+      "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 75,
+      "price": 10
+    },
+    {
+      "id": 8,
+      "title": "Women in Leadership Forum",
+      "description": "Empowering women alumni through leadership discussions, mentorship connections, and professional development opportunities.",
+      "date": "2026-10-28",
+      "time": "13:00",
+      "location": "Executive Conference Room",
+      "category": "Professional Development",
+      "image": "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 60,
+      "price": 25
+    },
+    {
+      "id": 9,
+      "title": "Class of 2014 Ten Year Reunion",
+      "description": "Celebrating a decade since graduation! Reconnect with classmates, tour campus updates, and share your post-graduation journey.",
+      "date": "2024-09-15",
+      "time": "16:00",
+      "location": "Alumni Center",
+      "category": "Reunion",
+      "image": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 120,
+      "price": 35,
+      "isPast": true
+    },
+    {
+      "id": 10,
+      "title": "Summer Alumni Golf Tournament",
+      "description": "Annual charity golf tournament to raise funds for student scholarships. Includes breakfast, 18 holes, cart, and awards dinner.",
+      "date": "2024-08-10",
+      "time": "08:00",
+      "location": "Riverside Golf Club",
+      "category": "Social",
+      "image": "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+      "capacity": 80,
+      "price": 125,
+      "isPast": true
+    }
+  ]
+}

@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Alumni Network</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/admin-auth.js"></script>
+  <script>document.documentElement.style.visibility = 'hidden';</script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    /* Active nav item */
+    .nav-item.active { background: #2563EB; color: #fff !important; }
+    .nav-item.active i { color: #fff !important; }
+
+    /* Section panels */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 14px; font-weight: 600; color: #fff;
+      z-index: 9999; transform: translateY(80px); opacity: 0;
+      transition: all 0.35s cubic-bezier(.16,1,.3,1);
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { background: #059669; }
+    #toast.error   { background: #DC2626; }
+    #toast.info    { background: #2563EB; }
+
+    /* Skeleton loader */
+    .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 6px; }
+    @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+    /* Confirm modal */
+    #confirmModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+    #confirmModal.show { display: flex; }
+
+    /* Stats count-up animation */
+    .stat-val { transition: opacity 0.3s; }
+  </style>
+</head>
+
+<body class="bg-gray-100 flex h-screen overflow-hidden">
+
+  <!-- ── Auth check ──────────────────────────────────────────────────── -->
+  <script>
+    (async () => {
+      const adminUser = await checkAdminAccess();
+      if (!adminUser) return;
+      document.documentElement.style.visibility = 'visible';
+      const nameEl   = document.getElementById('adminName');
+      const avatarEl = document.getElementById('adminAvatar');
+      if (nameEl)   nameEl.textContent = adminUser.name || 'Admin';
+      if (avatarEl) avatarEl.src = adminUser.profilePicture ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(adminUser.name||'Admin')}&background=4F46E5&color=fff`;
+    })();
+  </script>
+
+  <!-- ── Toast ──────────────────────────────────────────────────────── -->
+  <div id="toast"><i id="toastIcon" class="fas fa-check"></i><span id="toastMsg"></span></div>
+
+  <!-- ── Confirm Modal ──────────────────────────────────────────────── -->
+  <div id="confirmModal">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4">
+      <div class="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 text-center mb-2" id="confirmTitle">Are you sure?</h3>
+      <p class="text-sm text-gray-500 text-center mb-6" id="confirmBody">This action cannot be undone.</p>
+      <div class="flex gap-3">
+        <button onclick="closeConfirm()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition">Cancel</button>
+        <button id="confirmBtn" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SIDEBAR                                                            -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <aside class="w-64 bg-slate-900 text-white flex flex-col flex-shrink-0">
+    <div class="p-6 border-b border-slate-800">
+      <h1 class="text-xl font-bold flex items-center gap-2">
+        <i class="fas fa-shield-alt text-blue-500"></i> Admin Panel
+      </h1>
+    </div>
+    <nav class="flex-1 p-4 space-y-1 mt-2">
+      <a href="#" onclick="switchSection('dashboard')" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-xl text-white transition" id="nav-dashboard">
+        <i class="fas fa-chart-line"></i> Dashboard
+      </a>
+      <a href="#" onclick="switchSection('users')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-users">
+        <i class="fas fa-users"></i> Manage Users
+        <span class="ml-auto bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full" id="userCountBadge">—</span>
+      </a>
+      <a href="#" onclick="switchSection('events')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-events">
+        <i class="fas fa-calendar-alt"></i> Events
+        <span class="ml-auto bg-green-600 text-white text-xs px-2 py-0.5 rounded-full" id="eventCountBadge">—</span>
+      </a>
+      <a href="#" onclick="switchSection('jobs')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-jobs">
+        <i class="fas fa-briefcase"></i> Job Board
+        <span class="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full" id="jobCountBadge">—</span>
+      </a>
+      <a href="#" onclick="switchSection('campaigns')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-campaigns">
+        <i class="fas fa-donate"></i> Campaigns
+        <span class="ml-auto bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full" id="campaignCountBadge">—</span>
+      </a>
+    </nav>
+    <div class="p-4 border-t border-slate-800 space-y-1">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition">
+        <i class="fas fa-home"></i> Back to Site
+      </a>
+      <button onclick="adminLogout()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-900/20 transition border-0 bg-transparent cursor-pointer">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- MAIN                                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Top Header -->
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-8 flex-shrink-0">
+      <h2 class="text-xl font-bold text-gray-800" id="pageTitle">System Overview</h2>
+      <div class="flex items-center gap-4">
+        <button class="relative p-2 text-gray-400 hover:text-gray-600 transition">
+          <i class="fas fa-bell"></i>
+          <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
+        <div class="flex items-center gap-3 ml-2">
+          <img src="https://ui-avatars.com/api/?name=Admin&background=4F46E5&color=fff"
+            id="adminAvatar" class="w-10 h-10 rounded-full border-2 border-indigo-200 object-cover">
+          <div class="hidden md:block text-left">
+            <p class="text-sm font-bold text-gray-900 leading-none" id="adminName">Admin</p>
+            <p class="text-xs text-gray-500 mt-0.5">Super Admin</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scrollable content area -->
+    <div class="flex-1 overflow-y-auto p-8">
+
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <!-- DASHBOARD SECTION                                           -->
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <div class="section active" id="section-dashboard">
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <!-- Total Users -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+              <i class="fas fa-users"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Total Users</p>
+              <p class="text-2xl font-bold stat-val" id="statUsers">—</p>
+            </div>
+          </div>
+          <!-- Active Events -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-xl">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Active Events</p>
+              <p class="text-2xl font-bold stat-val" id="statEvents">—</p>
+            </div>
+          </div>
+          <!-- Open Jobs -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+              <i class="fas fa-briefcase"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Open Jobs</p>
+              <p class="text-2xl font-bold stat-val" id="statJobs">—</p>
+            </div>
+          </div>
+          <!-- Donations -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+              <i class="fas fa-donate"></i>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm">Donations</p>
+              <p class="text-2xl font-bold stat-val" id="statDonations">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart + Quick links -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- User Growth Chart -->
+          <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="font-bold text-gray-800 mb-6">User Growth (Last 6 Months)</h3>
+            <canvas id="userChart" height="160"></canvas>
+          </div>
+          <!-- Quick Actions -->
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="font-bold text-gray-800 mb-4">Quick Actions</h3>
+            <div class="space-y-3">
+              <button onclick="switchSection('users')"
+                class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 text-left transition group">
+                <div class="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition">
+                  <i class="fas fa-users text-sm"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-800">Manage Users</p>
+                  <p class="text-xs text-gray-500">View, ban, or delete users</p>
+                </div>
+              </button>
+              <div class="w-full flex items-center gap-3 p-3 rounded-xl bg-gray-50 opacity-60 cursor-not-allowed">
+                <div class="w-9 h-9 rounded-lg bg-green-100 text-green-600 flex items-center justify-center">
+                  <i class="fas fa-calendar-plus text-sm"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-800">Create Event</p>
+                  <p class="text-xs text-gray-500">Coming soon</p>
+                </div>
+              </div>
+              <div class="w-full flex items-center gap-3 p-3 rounded-xl bg-gray-50 opacity-60 cursor-not-allowed">
+                <div class="w-9 h-9 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+                  <i class="fas fa-plus-circle text-sm"></i>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold text-gray-800">Post Job</p>
+                  <p class="text-xs text-gray-500">Coming soon</p>
+                </div>
+              </div>
+            </div>
+            <!-- User status summary -->
+            <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>Active</span>
+                <span class="font-semibold text-gray-800" id="statActiveUsers">—</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-500 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span>Banned</span>
+                <span class="font-semibold text-gray-800" id="statBannedUsers">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <!-- MANAGE USERS SECTION                                        -->
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <div class="section" id="section-users">
+
+        <!-- Toolbar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div class="flex flex-col md:flex-row gap-4">
+            <!-- Search -->
+            <div class="relative flex-1">
+              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input type="text" id="userSearch" placeholder="Search by name, email or department…"
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            <!-- Role filter -->
+            <select id="roleFilter" onchange="loadUsers()"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[140px]">
+              <option value="">All Roles</option>
+              <option value="alumni">Alumni</option>
+              <option value="student">Student</option>
+              <option value="admin">Admin</option>
+            </select>
+            <!-- Status filter -->
+            <select id="statusFilter" onchange="loadUsers()"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[140px]">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="banned">Banned</option>
+            </select>
+            <!-- Refresh -->
+            <button onclick="loadUsers()" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-2">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Table card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">User</th>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Joined</th>
+                  <th class="text-center px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody" class="divide-y divide-gray-50">
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Empty state -->
+          <div id="usersEmpty" class="hidden py-20 text-center">
+            <i class="fas fa-users text-4xl text-gray-200 mb-4"></i>
+            <p class="text-gray-400 font-medium">No users found</p>
+            <p class="text-gray-300 text-sm">Try changing the search or filters</p>
+          </div>
+
+          <!-- Pagination -->
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-sm text-gray-500" id="paginationInfo">—</p>
+            <div class="flex gap-2" id="paginationBtns"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <!-- EVENTS MANAGEMENT SECTION                                   -->
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <div class="section" id="section-events">
+
+        <!-- Toolbar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="relative flex-1">
+              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input type="text" id="eventSearch" placeholder="Search events by title, description or city…"
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            <select id="eventStatusFilter" onchange="loadEvents()"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500 min-w-[160px]">
+              <option value="">All Status</option>
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="completed">Completed</option>
+            </select>
+            <button onclick="openEventModal(null)" class="px-5 py-2.5 rounded-xl bg-green-600 text-white text-sm font-semibold hover:bg-green-700 transition flex items-center gap-2">
+              <i class="fas fa-plus"></i> New Event
+            </button>
+            <button onclick="loadEvents()" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-2">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Events Table -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Event</th>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Attendees</th>
+                  <th class="text-center px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="eventsTableBody" class="divide-y divide-gray-50"></tbody>
+            </table>
+          </div>
+          <div id="eventsEmpty" class="hidden py-20 text-center">
+            <i class="fas fa-calendar-times text-4xl text-gray-200 mb-4"></i>
+            <p class="text-gray-400 font-medium">No events found</p>
+            <p class="text-gray-300 text-sm">Create your first event using the button above</p>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p class="text-sm text-gray-500" id="eventPaginationInfo">—</p>
+            <div class="flex gap-2" id="eventPaginationBtns"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <!-- JOB BOARD SECTION                                               -->
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <div class="section" id="section-jobs">
+        <!-- Toolbar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="relative flex-1">
+              <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+              <input type="text" id="jobSearch" placeholder="Search by title, company…"
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                oninput="clearTimeout(jobDebounceTimer); jobDebounceTimer = setTimeout(loadJobs, 350)">
+            </div>
+            <select id="jobStatusFilter" onchange="loadJobs()"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500 min-w-[150px]">
+              <option value="">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="closed">Closed</option>
+              <option value="filled">Filled</option>
+            </select>
+            <select id="jobTypeFilter" onchange="loadJobs()"
+              class="px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-yellow-500 min-w-[150px]">
+              <option value="">All Types</option>
+              <option value="full-time">Full-time</option>
+              <option value="part-time">Part-time</option>
+              <option value="contract">Contract</option>
+              <option value="internship">Internship</option>
+              <option value="freelance">Freelance</option>
+              <option value="remote">Remote</option>
+            </select>
+            <button onclick="loadJobs()" class="px-4 py-2.5 rounded-xl bg-yellow-500 text-white text-sm font-semibold hover:bg-yellow-600 transition flex items-center gap-2">
+              <i class="fas fa-sync-alt"></i> Refresh
+            </button>
+            <button onclick="openJobModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition flex items-center gap-2">
+              <i class="fas fa-plus"></i> Post Job
+            </button>
+          </div>
+        </div>
+
+        <!-- Mini stats -->
+        <div id="jobStatsRow" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6"></div>
+
+        <!-- Table Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-900">All Job Listings</h3>
+            <span id="jobPaginationInfo" class="text-sm text-gray-500"></span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Job / Company</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Type</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Posted By</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Applicants</th>
+                  <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="jobsTableBody" class="divide-y divide-gray-50"></tbody>
+            </table>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+            <span id="jobPaginationInfo2" class="text-sm text-gray-500"></span>
+            <div id="jobPaginationBtns" class="flex gap-2"></div>
+          </div>
+        </div>
+      </div><!-- /section-jobs -->
+
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <!-- CAMPAIGNS SECTION                                            -->
+      <!-- ════════════════════════════════════════════════════════════ -->
+      <div class="section" id="section-campaigns">
+        <!-- Toolbar -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
+            <div class="flex items-center gap-4">
+              <button onclick="loadCampaigns()" class="px-4 py-2.5 rounded-xl bg-purple-500 text-white text-sm font-semibold hover:bg-purple-600 transition flex items-center gap-2">
+                <i class="fas fa-sync-alt"></i> Refresh
+              </button>
+            </div>
+            <button onclick="openCampaignModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition flex items-center gap-2">
+              <i class="fas fa-plus"></i> Create Campaign
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="font-semibold text-gray-900">Donation Campaigns</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Campaign</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Category</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Goal Amount</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Raised</th>
+                  <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="campaignsTableBody" class="divide-y divide-gray-50"></tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /section-campaigns -->
+
+    </div><!-- end scrollable -->
+  </main>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- EVENT MODAL                                                        -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div id="eventModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px;backdrop-filter:blur(4px)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto my-4">
+      <div class="flex items-center justify-between p-6 border-b border-gray-100">
+        <h3 class="text-lg font-bold text-gray-900" id="eventModalTitle">Create Event</h3>
+        <button onclick="closeEventModal()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 transition">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="eventForm" class="p-6 space-y-5">
+        <input type="hidden" id="eventId">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Event Title *</label>
+            <input type="text" id="evTitle" required placeholder="Annual Alumni Meet 2026"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Description *</label>
+            <textarea id="evDesc" required rows="3" placeholder="Event description…"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Start Date & Time *</label>
+            <input type="datetime-local" id="evStartDate" required
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">End Date & Time *</label>
+            <input type="datetime-local" id="evEndDate" required
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Event Type</label>
+            <select id="evType" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="networking">Networking</option>
+              <option value="workshop">Workshop</option>
+              <option value="seminar">Seminar</option>
+              <option value="reunion">Reunion</option>
+              <option value="career">Career</option>
+              <option value="social">Social</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Status</label>
+            <select id="evStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-green-500">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Venue</label>
+            <input type="text" id="evVenue" placeholder="Conference Hall A"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">City</label>
+            <input type="text" id="evCity" placeholder="Mumbai"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Max Attendees</label>
+            <input type="number" id="evMaxAttendees" min="1" placeholder="100"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Price (₹)</label>
+            <input type="number" id="evPrice" min="0" placeholder="0 for free"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Event Cover Image</label>
+            <input type="file" id="evImageFile" accept="image/*"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+            <input type="hidden" id="evImageBase64">
+            <img id="evImagePreview" class="mt-4 h-32 w-full object-cover rounded-xl border border-gray-200 hidden" />
+          </div>
+          <div class="md:col-span-2 flex items-center gap-3">
+            <input type="checkbox" id="evVirtual" class="w-4 h-4 rounded accent-green-600">
+            <label for="evVirtual" class="text-sm font-medium text-gray-700">Virtual / Online Event</label>
+          </div>
+          <div class="md:col-span-2" id="virtualLinkWrap" style="display:none">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Virtual Link</label>
+            <input type="url" id="evVirtualLink" placeholder="https://meet.google.com/..."
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+          </div>
+        </div>
+        <div id="eventFormError" class="hidden text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl"></div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeEventModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition">Cancel</button>
+          <button type="submit" id="eventSubmitBtn" class="flex-1 py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition flex items-center justify-center gap-2">
+            <i class="fas fa-check"></i> <span id="eventSubmitLabel">Create Event</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- JOB POST MODAL                                                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div id="jobModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px;backdrop-filter:blur(4px)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto my-4">
+      <div class="flex items-center justify-between p-6 border-b border-gray-100">
+        <h3 class="text-lg font-bold text-gray-900">Post a New Job</h3>
+        <button onclick="closeJobModal()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 transition">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="jobForm" class="p-6 space-y-5" onsubmit="submitJob(event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Job Title *</label>
+            <input type="text" id="jbTitle" required placeholder="e.g. Software Engineer"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Company Name *</label>
+            <input type="text" id="jbCompany" required placeholder="e.g. Infosys"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Company Website</label>
+            <input type="url" id="jbWebsite" placeholder="https://company.com"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Job Type *</label>
+            <select id="jbType" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="full-time">Full-time</option>
+              <option value="part-time">Part-time</option>
+              <option value="contract">Contract</option>
+              <option value="internship">Internship</option>
+              <option value="freelance">Freelance</option>
+              <option value="remote">Remote</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Location / City</label>
+            <input type="text" id="jbLocation" placeholder="e.g. Bangalore"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Min Experience (years)</label>
+            <input type="number" id="jbExperience" min="0" max="30" placeholder="0"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Salary Min (₹/yr)</label>
+            <input type="number" id="jbSalaryMin" min="0" placeholder="e.g. 500000"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Salary Max (₹/yr)</label>
+            <input type="number" id="jbSalaryMax" min="0" placeholder="e.g. 1200000"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Status</label>
+            <select id="jbStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="published">Published (live)</option>
+              <option value="draft">Draft (hidden)</option>
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Job Description *</label>
+            <textarea id="jbDescription" required rows="4" placeholder="Describe the role, responsibilities, work environment…"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Requirements *</label>
+            <textarea id="jbRequirements" required rows="3" placeholder="Qualifications, skills, must-haves…"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+          </div>
+        </div>
+        <div id="jobFormError" class="hidden text-sm text-red-600 bg-red-50 px-4 py-3 rounded-xl"></div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeJobModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold hover:bg-gray-50 transition">Cancel</button>
+          <button type="submit" id="jobSubmitBtn" class="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+            <i class="fas fa-paper-plane"></i> Post Job
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- CAMPAIGN MODAL                                                     -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <div id="campaignModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px;backdrop-filter:blur(4px)">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-auto my-4">
+      <div class="flex items-center justify-between p-6 border-b border-gray-100">
+        <h3 class="text-lg font-bold text-gray-900">Create Campaign</h3>
+        <button onclick="closeCampaignModal()" class="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-400 transition">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <form id="campaignForm" class="p-6 space-y-5" onsubmit="submitCampaign(event)">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Campaign Title *</label>
+            <input type="text" id="cmpTitle" required placeholder="Library Fund"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Category *</label>
+            <select id="cmpCategory" required class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="scholarship">Scholarship</option>
+              <option value="infrastructure">Infrastructure</option>
+              <option value="research">Research</option>
+              <option value="event">Event</option>
+              <option value="emergency">Emergency</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Status</label>
+            <select id="cmpStatus" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+              <option value="active">Active</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Goal Amount (₹) *</label>
+            <input type="number" id="cmpGoal" required min="100" placeholder="50000"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">End Date *</label>
+            <input type="date" id="cmpEndDate" required
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Description *</label>
+            <textarea id="cmpDesc" required rows="3" placeholder="Explain the purpose of this campaign..."
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
+          </div>
+        </div>
+        <div id="campaignFormError" class="hidden p-3 rounded-lg bg-red-50 text-red-600 text-sm border border-red-100"></div>
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
+          <button type="button" onclick="closeCampaignModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition">Cancel</button>
+          <button type="submit" id="campaignSubmitBtn" class="px-5 py-2.5 rounded-xl bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 transition flex items-center gap-2">
+            <i class="fas fa-paper-plane"></i> Create Campaign
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- SCRIPTS                                                            -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <script>
+    const TOKEN = () => localStorage.getItem('token') || sessionStorage.getItem('token');
+    let currentPage = 1;
+    let eventCurrentPage = 1;
+    let debounceTimer;
+    let eventDebounceTimer;
+    let confirmCallback = null;
+
+    // ── Section switcher ─────────────────────────────────────────────
+    function switchSection(name) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => {
+        n.classList.remove('active', 'bg-blue-600', 'text-white');
+        n.classList.add('text-slate-400');
+      });
+      document.getElementById('section-' + name).classList.add('active');
+      const navEl = document.getElementById('nav-' + name);
+      if (navEl) { navEl.classList.add('active'); navEl.classList.remove('text-slate-400'); }
+
+      const titles = { dashboard: 'System Overview', users: 'Manage Users', events: 'Event Management', jobs: 'Job Board Management' };
+      document.getElementById('pageTitle').textContent = titles[name] || name;
+
+      if (name === 'users')  loadUsers();
+      if (name === 'events') loadEvents();
+      if (name === 'jobs')   loadJobs();
+      return false;
+    }
+
+    // ── Toast ────────────────────────────────────────────────────────
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      const icons = { success: 'fa-check', error: 'fa-times-circle', info: 'fa-info-circle' };
+      t.className = `show ${type}`;
+      document.getElementById('toastIcon').className = `fas ${icons[type] || 'fa-check'}`;
+      document.getElementById('toastMsg').textContent = msg;
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ── Confirm modal ────────────────────────────────────────────────
+    function showConfirm(title, body, onConfirm) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmBody').textContent = body;
+      confirmCallback = onConfirm;
+      document.getElementById('confirmModal').classList.add('show');
+    }
+    function closeConfirm() { document.getElementById('confirmModal').classList.remove('show'); }
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+      closeConfirm();
+      if (confirmCallback) confirmCallback();
+    });
+
+    // ── Load dashboard stats ─────────────────────────────────────────
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/admin/stats', {
+          headers: { Authorization: `Bearer ${TOKEN()}` }
+        });
+        if (!res.ok) return;
+        const d = await res.json();
+        document.getElementById('statUsers').textContent   = d.users?.toLocaleString() ?? '—';
+        document.getElementById('statEvents').textContent  = d.events?.toLocaleString() ?? '—';
+        document.getElementById('statJobs').textContent    = d.jobs?.toLocaleString() ?? '—';
+        document.getElementById('statDonations').textContent = d.donations ? '$' + d.donations.toLocaleString() : '$0';
+        document.getElementById('statActiveUsers').textContent = d.activeUsers?.toLocaleString() ?? '—';
+        document.getElementById('statBannedUsers').textContent = d.bannedUsers?.toLocaleString() ?? '—';
+        if (d.users) document.getElementById('userCountBadge').textContent = d.users;
+      } catch (_) {}
+    }
+
+    // ── Chart ────────────────────────────────────────────────────────
+    const ctx = document.getElementById('userChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'],
+        datasets: [{
+          label: 'New Users',
+          data: [120, 210, 180, 320, 480, 540],
+          borderColor: '#4F46E5', tension: 0.4, fill: true,
+          backgroundColor: 'rgba(79,70,229,0.08)',
+          pointBackgroundColor: '#4F46E5', pointRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } }
+      }
+    });
+
+    // ── Load users table ─────────────────────────────────────────────
+    async function loadUsers(page = 1) {
+      currentPage = page;
+      const search = document.getElementById('userSearch').value.trim();
+      const role   = document.getElementById('roleFilter').value;
+      const status = document.getElementById('statusFilter').value;
+
+      const params = new URLSearchParams({ page, limit: 12, search, role, status });
+      const tbody  = document.getElementById('usersTableBody');
+      const empty  = document.getElementById('usersEmpty');
+
+      // Skeleton
+      tbody.innerHTML = Array(5).fill(0).map(() => `
+        <tr>
+          <td class="px-6 py-4"><div class="flex items-center gap-3">
+            <div class="skeleton w-10 h-10 rounded-full"></div>
+            <div><div class="skeleton h-3 w-28 mb-2"></div><div class="skeleton h-2.5 w-36"></div></div>
+          </div></td>
+          <td class="px-6 py-4"><div class="skeleton h-3 w-16"></div></td>
+          <td class="px-6 py-4"><div class="skeleton h-5 w-16 rounded-full"></div></td>
+          <td class="px-6 py-4"><div class="skeleton h-3 w-20"></div></td>
+          <td class="px-6 py-4"><div class="skeleton h-8 w-24 rounded-lg mx-auto"></div></td>
+        </tr>`).join('');
+      empty.classList.add('hidden');
+
+      try {
+        const res = await fetch(`/api/admin/users?${params}`, {
+          headers: { Authorization: `Bearer ${TOKEN()}` }
+        });
+        const data = await res.json();
+
+        if (!res.ok) { showToast(data.error || 'Failed to load users', 'error'); tbody.innerHTML = ''; return; }
+
+        const { users, pagination } = data;
+        if (users.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); renderPagination(pagination); return; }
+
+        tbody.innerHTML = users.map(u => {
+          const avatar = u.profile?.profileImage ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=4F46E5&color=fff&size=80`;
+          const joined = new Date(u.createdAt).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+          const roleBadge = {
+            admin: 'bg-purple-100 text-purple-700',
+            alumni: 'bg-blue-100 text-blue-700',
+            student: 'bg-teal-100 text-teal-700'
+          }[u.role] || 'bg-gray-100 text-gray-600';
+
+          const isActive = u.isActive !== false;
+          return `
+            <tr class="hover:bg-gray-50 transition" id="row-${u._id}">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-gray-200" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=e2e8f0&color=64748b'">
+                  <div>
+                    <p class="font-semibold text-gray-900">${u.name}</p>
+                    <p class="text-xs text-gray-400">${u.email}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <select onchange="changeRole('${u._id}', this.value, this)"
+                  class="text-xs font-semibold px-3 py-1.5 rounded-lg ${roleBadge} border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  <option value="alumni"  ${u.role==='alumni'  ? 'selected':''}>Alumni</option>
+                  <option value="student" ${u.role==='student' ? 'selected':''}>Student</option>
+                  <option value="admin"   ${u.role==='admin'   ? 'selected':''}>Admin</option>
+                </select>
+              </td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}">
+                  <span class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-500' : 'bg-red-500'}"></span>
+                  ${isActive ? 'Active' : 'Banned'}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">${joined}</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center gap-2">
+                  <button onclick="toggleBan('${u._id}', ${isActive})"
+                    title="${isActive ? 'Ban user' : 'Unban user'}"
+                    class="p-2 rounded-lg ${isActive ? 'text-orange-500 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50'} transition">
+                    <i class="fas ${isActive ? 'fa-ban' : 'fa-check-circle'}"></i>
+                  </button>
+                  <button onclick="deleteUser('${u._id}', '${u.name.replace(/'/g, "\\'")}')"
+                    title="Delete user permanently"
+                    class="p-2 rounded-lg text-red-500 hover:bg-red-50 transition">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>`;
+        }).join('');
+
+        renderPagination(pagination);
+
+      } catch (err) {
+        showToast('Network error loading users', 'error');
+        tbody.innerHTML = '';
+      }
+    }
+
+    // ── Pagination ───────────────────────────────────────────────────
+    function renderPagination({ page, pages, total, limit }) {
+      const start = (page - 1) * limit + 1;
+      const end   = Math.min(page * limit, total);
+      document.getElementById('paginationInfo').textContent =
+        total ? `Showing ${start}–${end} of ${total} users` : '0 users';
+
+      const container = document.getElementById('paginationBtns');
+      container.innerHTML = '';
+      for (let i = 1; i <= pages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `w-9 h-9 rounded-lg text-sm font-semibold transition ${i === page
+          ? 'bg-blue-600 text-white'
+          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`;
+        btn.onclick = () => loadUsers(i);
+        container.appendChild(btn);
+      }
+    }
+
+    // ── Change role ──────────────────────────────────────────────────
+    async function changeRole(userId, newRole, selectEl) {
+      const prev = [...selectEl.options].find(o => o.selected)?.value;
+      try {
+        const res = await fetch(`/api/admin/users/${userId}/role`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${TOKEN()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: newRole })
+        });
+        const data = await res.json();
+        if (!res.ok) { showToast(data.error || 'Failed to change role', 'error'); selectEl.value = prev; return; }
+        showToast(`Role updated to ${newRole}`, 'success');
+        loadUsers(currentPage);
+      } catch { showToast('Network error', 'error'); selectEl.value = prev; }
+    }
+
+    // ── Toggle ban ───────────────────────────────────────────────────
+    async function toggleBan(userId, isCurrentlyActive) {
+      const action = isCurrentlyActive ? 'ban' : 'unban';
+      showConfirm(
+        isCurrentlyActive ? 'Ban this user?' : 'Unban this user?',
+        isCurrentlyActive
+          ? 'The user will not be able to log in.'
+          : 'The user will regain access to the platform.',
+        async () => {
+          try {
+            const res = await fetch(`/api/admin/users/${userId}/ban`, {
+              method: 'PATCH',
+              headers: { Authorization: `Bearer ${TOKEN()}` }
+            });
+            const data = await res.json();
+            if (!res.ok) { showToast(data.error || 'Failed', 'error'); return; }
+            showToast(data.message, 'success');
+            loadUsers(currentPage);
+          } catch { showToast('Network error', 'error'); }
+        }
+      );
+    }
+
+    // ── Delete user ──────────────────────────────────────────────────
+    async function deleteUser(userId, name) {
+      showConfirm(
+        `Delete "${name}"?`,
+        'This will permanently delete the user and all their data. This cannot be undone.',
+        async () => {
+          try {
+            const res = await fetch(`/api/admin/users/${userId}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${TOKEN()}` }
+            });
+            const data = await res.json();
+            if (!res.ok) { showToast(data.error || 'Failed to delete', 'error'); return; }
+            showToast('User deleted permanently', 'success');
+            loadUsers(currentPage);
+            loadStats();
+          } catch { showToast('Network error', 'error'); }
+        }
+      );
+    }
+
+    // ── Events: Load table ─────────────────────────────────────────────
+    async function loadEvents(page = 1) {
+      eventCurrentPage = page;
+      const search = document.getElementById('eventSearch')?.value.trim() || '';
+      const status = document.getElementById('eventStatusFilter')?.value || '';
+      const params = new URLSearchParams({ page, limit: 10, search, status });
+      const tbody = document.getElementById('eventsTableBody');
+      const empty = document.getElementById('eventsEmpty');
+
+      tbody.innerHTML = Array(4).fill(0).map(() => `
+        <tr><td class="px-6 py-4" colspan="6">
+          <div class="flex gap-4 items-center">
+            <div class="skeleton h-10 w-10 rounded-lg"></div>
+            <div class="flex-1"><div class="skeleton h-3 w-48 mb-2"></div><div class="skeleton h-2.5 w-32"></div></div>
+            <div class="skeleton h-5 w-20 rounded-full"></div>
+          </div></td></tr>`).join('');
+      empty.classList.add('hidden');
+
+      try {
+        const res = await fetch(`/api/admin/events?${params}`, {
+          headers: { Authorization: `Bearer ${TOKEN()}` }
+        });
+        const data = await res.json();
+        if (!res.ok) { showToast(data.error || 'Failed to load events', 'error'); tbody.innerHTML = ''; return; }
+
+        const { events, pagination } = data;
+        const badge = document.getElementById('eventCountBadge');
+        if (badge) badge.textContent = pagination.total || '0';
+
+        if (!events.length) { tbody.innerHTML = ''; empty.classList.remove('hidden'); renderEventsPagination(pagination); return; }
+
+        const statusCfg = {
+          draft:     { cls: 'bg-gray-100 text-gray-700',   icon: 'fa-file-alt' },
+          published: { cls: 'bg-green-100 text-green-700', icon: 'fa-check-circle' },
+          cancelled: { cls: 'bg-red-100 text-red-600',    icon: 'fa-ban' },
+          completed: { cls: 'bg-blue-100 text-blue-700',  icon: 'fa-flag-checkered' }
+        };
+        const typeCfg = {
+          networking:'bg-purple-50 text-purple-700', workshop:'bg-yellow-50 text-yellow-700',
+          seminar:'bg-teal-50 text-teal-700', reunion:'bg-pink-50 text-pink-700',
+          career:'bg-orange-50 text-orange-700', social:'bg-indigo-50 text-indigo-700', other:'bg-gray-50 text-gray-600'
+        };
+
+        tbody.innerHTML = events.map(ev => {
+          const s = statusCfg[ev.status] || statusCfg.draft;
+          const t = typeCfg[ev.type] || typeCfg.other;
+          const startDate = ev.startDate ? new Date(ev.startDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+          const attendeeCount = ev.attendees?.length || 0;
+          const maxStr = ev.maxAttendees ? `/ ${ev.maxAttendees}` : '';
+          return `
+            <tr class="hover:bg-gray-50 transition">
+              <td class="px-6 py-4">
+                <p class="font-semibold text-gray-900 truncate max-w-xs">${ev.title}</p>
+                <p class="text-xs text-gray-400 mt-0.5">${ev.location?.city || 'Online'} ${ev.isVirtual ? '🌐' : '📍'}</p>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${startDate}</td>
+              <td class="px-6 py-4">
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-lg ${t} capitalize">${ev.type}</span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${s.cls}">
+                  <i class="fas ${s.icon} text-xs"></i> ${ev.status}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-600">${attendeeCount}${maxStr}</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center justify-center gap-2">
+                  <button onclick="openEventModal(${JSON.stringify(ev).replace(/"/g,'&quot;')})"
+                    title="Edit event" class="p-2 rounded-lg text-blue-500 hover:bg-blue-50 transition">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button onclick="deleteEvent('${ev._id}','${ev.title.replace(/'/g,"\\'")}')"
+                    title="Delete event" class="p-2 rounded-lg text-red-500 hover:bg-red-50 transition">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>`;
+        }).join('');
+
+        renderEventsPagination(pagination);
+      } catch (err) {
+        showToast('Network error loading events', 'error');
+        tbody.innerHTML = '';
+      }
+    }
+
+    function renderEventsPagination({ page, pages, total, limit }) {
+      const start = (page - 1) * limit + 1;
+      const end   = Math.min(page * limit, total);
+      document.getElementById('eventPaginationInfo').textContent =
+        total ? `Showing ${start}–${end} of ${total} events` : '0 events';
+      const c = document.getElementById('eventPaginationBtns');
+      c.innerHTML = '';
+      for (let i = 1; i <= pages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `w-9 h-9 rounded-lg text-sm font-semibold transition ${i===page?'bg-green-600 text-white':'bg-gray-100 text-gray-600 hover:bg-gray-200'}`;
+        btn.onclick = () => loadEvents(i);
+        c.appendChild(btn);
+      }
+    }
+
+    // ── Events: Modal ─────────────────────────────────────────────────
+    function openEventModal(ev) {
+      document.getElementById('eventModalTitle').textContent  = ev ? 'Edit Event' : 'Create Event';
+      document.getElementById('eventSubmitLabel').textContent = ev ? 'Save Changes' : 'Create Event';
+      document.getElementById('eventId').value       = ev?._id || '';
+      document.getElementById('evTitle').value        = ev?.title || '';
+      document.getElementById('evDesc').value         = ev?.description || '';
+      document.getElementById('evType').value         = ev?.type || 'other';
+      document.getElementById('evStatus').value       = ev?.status || 'draft';
+      document.getElementById('evVenue').value        = ev?.location?.venue || '';
+      document.getElementById('evCity').value         = ev?.location?.city || '';
+      document.getElementById('evMaxAttendees').value = ev?.maxAttendees || '';
+      document.getElementById('evPrice').value        = ev?.price ?? '';
+      document.getElementById('evVirtual').checked    = ev?.isVirtual || false;
+      document.getElementById('evVirtualLink').value  = ev?.virtualLink || '';
+      document.getElementById('virtualLinkWrap').style.display = ev?.isVirtual ? 'block' : 'none';
+      if (ev?.startDate) document.getElementById('evStartDate').value = new Date(ev.startDate).toISOString().slice(0,16);
+      else document.getElementById('evStartDate').value = '';
+      if (ev?.endDate) document.getElementById('evEndDate').value = new Date(ev.endDate).toISOString().slice(0,16);
+      else document.getElementById('evEndDate').value = '';
+      
+      document.getElementById('evImageFile').value = '';
+      const imgPreview = document.getElementById('evImagePreview');
+      if (ev?.images && ev.images.length > 0) {
+        document.getElementById('evImageBase64').value = ev.images[0];
+        imgPreview.src = ev.images[0];
+        imgPreview.classList.remove('hidden');
+      } else {
+        document.getElementById('evImageBase64').value = '';
+        imgPreview.src = '';
+        imgPreview.classList.add('hidden');
+      }
+
+      document.getElementById('eventFormError').classList.add('hidden');
+      const m = document.getElementById('eventModal');
+      m.style.display = 'flex';
+    }
+
+    function closeEventModal() {
+      document.getElementById('eventModal').style.display = 'none';
+    }
+
+    // virtual checkbox toggle
+    document.getElementById('evVirtual').addEventListener('change', function() {
+      document.getElementById('virtualLinkWrap').style.display = this.checked ? 'block' : 'none';
+    });
+
+    // image file change
+    document.getElementById('evImageFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('evImagePreview');
+      const hiddenBase64 = document.getElementById('evImageBase64');
+      
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          hiddenBase64.value = event.target.result;
+          preview.src = event.target.result;
+          preview.classList.remove('hidden');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        hiddenBase64.value = '';
+        preview.src = '';
+        preview.classList.add('hidden');
+      }
+    });
+
+    // ── Events: Form submit ───────────────────────────────────────────
+    document.getElementById('eventForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id      = document.getElementById('eventId').value;
+      const errDiv  = document.getElementById('eventFormError');
+      const submitBtn = document.getElementById('eventSubmitBtn');
+      errDiv.classList.add('hidden');
+      submitBtn.disabled = true;
+
+      const payload = {
+        title:       document.getElementById('evTitle').value.trim(),
+        description: document.getElementById('evDesc').value.trim(),
+        type:        document.getElementById('evType').value,
+        status:      document.getElementById('evStatus').value,
+        startDate:   document.getElementById('evStartDate').value,
+        endDate:     document.getElementById('evEndDate').value,
+        isVirtual:   document.getElementById('evVirtual').checked,
+        virtualLink: document.getElementById('evVirtualLink').value.trim(),
+        maxAttendees: document.getElementById('evMaxAttendees').value ? parseInt(document.getElementById('evMaxAttendees').value) : null,
+        price:        document.getElementById('evPrice').value !== '' ? parseFloat(document.getElementById('evPrice').value) : 0,
+        location: {
+          venue: document.getElementById('evVenue').value.trim(),
+          city:  document.getElementById('evCity').value.trim()
+        }
+      };
+
+      const base64Img = document.getElementById('evImageBase64').value;
+      if (base64Img) payload.images = [base64Img];
+      else payload.images = [];
+
+      try {
+        const url    = id ? `/api/admin/events/${id}` : '/api/admin/events';
+        const method = id ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+          method,
+          headers: { Authorization: `Bearer ${TOKEN()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to save event');
+        closeEventModal();
+        showToast(id ? 'Event updated!' : 'Event created!', 'success');
+        loadEvents(eventCurrentPage);
+        loadStats();
+      } catch (err) {
+        errDiv.textContent = err.message;
+        errDiv.classList.remove('hidden');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+    // ── Events: Delete ────────────────────────────────────────────────
+    function deleteEvent(id, title) {
+      showConfirm(
+        `Delete "${title}"?`,
+        'This event and all registrations will be permanently deleted.',
+        async () => {
+          try {
+            const res = await fetch(`/api/admin/events/${id}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${TOKEN()}` }
+            });
+            const data = await res.json();
+            if (!res.ok) { showToast(data.error || 'Failed', 'error'); return; }
+            showToast('Event deleted', 'success');
+            loadEvents(eventCurrentPage);
+            loadStats();
+          } catch { showToast('Network error', 'error'); }
+        }
+      );
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────
+    loadStats();
+
+    // Wire up search inputs
+    document.getElementById('userSearch').addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => loadUsers(1), 400);
+    });
+    document.getElementById('eventSearch').addEventListener('input', function() {
+      clearTimeout(eventDebounceTimer);
+      eventDebounceTimer = setTimeout(() => loadEvents(1), 400);
+    });
+
+    // ── Jobs: State ───────────────────────────────────────────────────
+    let jobCurrentPage = 1;
+    let jobDebounceTimer;
+
+    // ── Jobs: Load ────────────────────────────────────────────────────
+    async function loadJobs(page = 1) {
+      jobCurrentPage = page;
+      const search = document.getElementById('jobSearch')?.value || '';
+      const status = document.getElementById('jobStatusFilter')?.value || '';
+      const type   = document.getElementById('jobTypeFilter')?.value   || '';
+      const tbody  = document.getElementById('jobsTableBody');
+      tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400"><i class="fas fa-spinner fa-spin text-2xl"></i></td></tr>`;
+
+      try {
+        const qs = new URLSearchParams({ page, limit: 10, search, status, type }).toString();
+        const res = await fetch(`/api/admin/jobs?${qs}`, {
+          headers: { Authorization: `Bearer ${TOKEN()}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+
+        renderJobStats(data.jobs);
+        renderJobsTable(data.jobs);
+        renderJobsPagination(data.pagination);
+
+        // Update sidebar badge
+        const badge = document.getElementById('jobCountBadge');
+        if (badge) badge.textContent = data.pagination.total;
+      } catch (err) {
+        showToast(err.message, 'error');
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-400">${err.message}</td></tr>`;
+      }
+    }
+
+    // ── Jobs: Stats bar ───────────────────────────────────────────────
+    function renderJobStats(jobs) {
+      const total     = jobs.length;
+      const published = jobs.filter(j => j.status === 'published').length;
+      const featured  = jobs.filter(j => j.isFeatured).length;
+      const totalApps = jobs.reduce((s, j) => s + (j.applications?.length || 0), 0);
+      const container = document.getElementById('jobStatsRow');
+      const stat = (icon, label, val, color) =>
+        `<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl ${color} flex-shrink-0 flex items-center justify-center">
+            <i class="fas ${icon} text-white text-sm"></i>
+          </div>
+          <div><p class="text-xs text-gray-500">${label}</p><p class="text-xl font-bold text-gray-900">${val}</p></div>
+        </div>`;
+      container.innerHTML =
+        stat('fa-briefcase',   'Shown (this page)', total,     'bg-yellow-500') +
+        stat('fa-check-circle','Published',          published, 'bg-green-500')  +
+        stat('fa-star',        'Featured',           featured,  'bg-purple-500') +
+        stat('fa-users',       'Total Applicants',  totalApps, 'bg-blue-500');
+    }
+
+    // ── Jobs: Table rows ──────────────────────────────────────────────
+    function renderJobsTable(jobs) {
+      const tbody = document.getElementById('jobsTableBody');
+      if (!jobs.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No jobs found</td></tr>`;
+        return;
+      }
+
+      const statusBadge = {
+        published: 'bg-green-100 text-green-700',
+        draft:     'bg-gray-100  text-gray-600',
+        closed:    'bg-red-100   text-red-600',
+        filled:    'bg-blue-100  text-blue-700'
+      };
+      const typeBadge = {
+        'full-time':  'bg-indigo-100 text-indigo-700',
+        'part-time':  'bg-teal-100   text-teal-700',
+        'contract':   'bg-orange-100 text-orange-700',
+        'internship': 'bg-pink-100   text-pink-700',
+        'freelance':  'bg-lime-100   text-lime-700',
+        'remote':     'bg-sky-100    text-sky-700'
+      };
+
+      tbody.innerHTML = jobs.map(j => {
+        const poster  = j.postedBy ? `${j.postedBy.name || '—'}<br><span class="text-xs text-gray-400">${j.postedBy.email||''}</span>` : '—';
+        const apps    = j.applications?.length || 0;
+        const loc     = [j.company?.location?.city, j.company?.location?.country].filter(Boolean).join(', ') || '—';
+        const sbClass = statusBadge[j.status] || 'bg-gray-100 text-gray-600';
+        const tbClass = typeBadge[j.type]     || 'bg-gray-100 text-gray-600';
+        const isFeat  = j.isFeatured;
+        const posted  = new Date(j.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+
+        return `<tr class="hover:bg-gray-50 transition" id="job-row-${j._id}">
+          <td class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-briefcase text-white text-sm"></i>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-900 flex items-center gap-2">
+                  ${j.title}
+                  ${isFeat ? '<span class="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-medium">⭐ Featured</span>' : ''}
+                </p>
+                <p class="text-xs text-gray-500">${j.company?.name || '—'} · ${loc}</p>
+                <p class="text-xs text-gray-400">${posted}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4">
+            <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${tbClass} capitalize">${j.type||'—'}</span>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-700">${poster}</td>
+          <td class="px-6 py-4">
+            <select onchange="setJobStatus('${j._id}', this.value, this)"
+              class="text-xs font-semibold px-3 py-1.5 rounded-lg ${sbClass} border-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-yellow-400">
+              <option value="published" ${j.status==='published'?'selected':''}>Published</option>
+              <option value="draft"     ${j.status==='draft'    ?'selected':''}>Draft</option>
+              <option value="closed"    ${j.status==='closed'   ?'selected':''}>Closed</option>
+              <option value="filled"    ${j.status==='filled'   ?'selected':''}>Filled</option>
+            </select>
+          </td>
+          <td class="px-6 py-4 text-center">
+            <span class="inline-flex items-center gap-1 text-sm font-semibold text-gray-700">
+              <i class="fas fa-user-check text-blue-400"></i> ${apps}
+            </span>
+          </td>
+          <td class="px-6 py-4">
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="toggleJobFeature('${j._id}', ${isFeat})"
+                title="${isFeat ? 'Un-feature' : 'Feature this job'}"
+                class="p-2 rounded-lg ${isFeat ? 'text-purple-500 hover:bg-purple-50' : 'text-gray-400 hover:bg-gray-100'} transition">
+                <i class="fas fa-star"></i>
+              </button>
+              <button onclick="deleteJob('${j._id}', '${j.title.replace(/'/g,"\\'")}')"
+                title="Delete job"
+                class="p-2 rounded-lg text-red-400 hover:bg-red-50 transition">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ── Jobs: Pagination ──────────────────────────────────────────────
+    function renderJobsPagination({ page, pages, total, limit }) {
+      const start = (page - 1) * limit + 1;
+      const end   = Math.min(page * limit, total);
+      const info  = total ? `Showing ${start}–${end} of ${total} jobs` : '0 jobs';
+      document.getElementById('jobPaginationInfo').textContent  = info;
+      document.getElementById('jobPaginationInfo2').textContent = info;
+      const c = document.getElementById('jobPaginationBtns');
+      c.innerHTML = '';
+      for (let i = 1; i <= pages; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.className = `w-9 h-9 rounded-lg text-sm font-semibold transition ${i===page?'bg-yellow-500 text-white':'bg-gray-100 text-gray-600 hover:bg-gray-200'}`;
+        btn.onclick = () => loadJobs(i);
+        c.appendChild(btn);
+      }
+    }
+
+    // ── Jobs: Status change ───────────────────────────────────────────
+    async function setJobStatus(id, status, selectEl) {
+      const prev = [...selectEl.options].find(o => o.selected)?.value;
+      try {
+        const res  = await fetch(`/api/admin/jobs/${id}/status`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${TOKEN()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        showToast(`Job marked as ${status}`, 'success');
+        loadJobs(jobCurrentPage);
+        loadStats();
+      } catch (err) {
+        showToast(err.message, 'error');
+        if (selectEl && prev) selectEl.value = prev;
+      }
+    }
+
+    // ── Jobs: Feature toggle ──────────────────────────────────────────
+    async function toggleJobFeature(id, currentlyFeatured) {
+      try {
+        const res  = await fetch(`/api/admin/jobs/${id}/feature`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${TOKEN()}` }
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        showToast(data.message, 'success');
+        loadJobs(jobCurrentPage);
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    // ── Jobs: Delete ──────────────────────────────────────────────────
+    function deleteJob(id, title) {
+      showConfirm(
+        `Delete "${title}"?`,
+        'This job and all applications will be permanently deleted.',
+        async () => {
+          try {
+            const res  = await fetch(`/api/admin/jobs/${id}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${TOKEN()}` }
+            });
+            const data = await res.json();
+            if (!res.ok) { showToast(data.error || 'Failed', 'error'); return; }
+            showToast('Job deleted', 'success');
+            loadJobs(jobCurrentPage);
+            loadStats();
+          } catch { showToast('Network error', 'error'); }
+        }
+      );
+    }
+
+    // ── Job Modal: Open ───────────────────────────────────────────────
+    function openJobModal() {
+      document.getElementById('jobForm').reset();
+      document.getElementById('jobFormError').classList.add('hidden');
+      document.getElementById('jobSubmitBtn').disabled = false;
+      document.getElementById('jobSubmitBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Post Job';
+      const m = document.getElementById('jobModal');
+      m.style.display = 'flex';
+    }
+
+    // ── Job Modal: Close ──────────────────────────────────────────────
+    function closeJobModal() {
+      document.getElementById('jobModal').style.display = 'none';
+    }
+
+    // ── Job Modal: Submit ─────────────────────────────────────────────
+    async function submitJob(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('jobFormError');
+      const btn   = document.getElementById('jobSubmitBtn');
+      errEl.classList.add('hidden');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…';
+
+      const payload = {
+        title:          document.getElementById('jbTitle').value.trim(),
+        companyName:    document.getElementById('jbCompany').value.trim(),
+        companyWebsite: document.getElementById('jbWebsite').value.trim(),
+        type:           document.getElementById('jbType').value,
+        location:       document.getElementById('jbLocation').value.trim(),
+        experience:     document.getElementById('jbExperience').value,
+        salaryMin:      document.getElementById('jbSalaryMin').value,
+        salaryMax:      document.getElementById('jbSalaryMax').value,
+        status:         document.getElementById('jbStatus').value,
+        description:    document.getElementById('jbDescription').value.trim(),
+        requirements:   document.getElementById('jbRequirements').value.trim()
+      };
+
+      try {
+        const res  = await fetch('/api/admin/jobs', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${TOKEN()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to post job');
+        showToast('Job posted successfully!', 'success');
+        closeJobModal();
+        loadJobs(1);
+        loadStats();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Post Job';
+      }
+    }
+    // ═══════════════════════════════════════════════════════════════════
+    // CAMPAIGNS SECTION LOGIC
+    // ═══════════════════════════════════════════════════════════════════
+    async function loadCampaigns() {
+      const tbody = document.getElementById('campaignsTableBody');
+      tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i> Loading...</td></tr>`;
+      
+      try {
+        const res = await fetch('/api/admin/campaigns', { headers: { Authorization: `Bearer ${TOKEN()}` } });
+        const data = await res.json();
+        const campaigns = data.campaigns || [];
+        
+        const badge = document.getElementById('campaignCountBadge');
+        if (badge) badge.textContent = campaigns.length;
+
+        if (!campaigns.length) {
+          tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">No campaigns found.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = campaigns.map(c => `
+          <tr class="hover:bg-gray-50/50 transition">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-bold text-gray-900">${c.title}</div>
+              <div class="text-xs text-gray-500">Ends: ${new Date(c.endDate).toLocaleDateString()}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">${c.category}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹${c.goalAmount.toLocaleString()}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <div class="w-full bg-gray-200 rounded-full h-2 max-w-[80px]">
+                  <div class="bg-purple-600 h-2 rounded-full" style="width: ${Math.min((c.currentAmount/c.goalAmount)*100, 100)}%"></div>
+                </div>
+                <span class="text-xs font-semibold text-purple-600">₹${c.currentAmount.toLocaleString()}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <select onchange="updateCampaignStatus('${c._id}', this.value)" class="text-xs font-bold px-2 py-1 rounded-full border-0 ${
+                c.status === 'active' ? 'bg-green-100 text-green-700' :
+                c.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                c.status === 'draft' ? 'bg-gray-100 text-gray-700' : 'bg-red-100 text-red-700'
+              } outline-none cursor-pointer">
+                <option value="active" ${c.status === 'active' ? 'selected' : ''}>Active</option>
+                <option value="draft" ${c.status === 'draft' ? 'selected' : ''}>Draft</option>
+                <option value="completed" ${c.status === 'completed' ? 'selected' : ''}>Completed</option>
+                <option value="cancelled" ${c.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+              </select>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+              <button onclick="confirmAction('Delete Campaign', 'Are you sure you want to delete this campaign?', () => deleteCampaign('${c._id}'))" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition inline-flex items-center justify-center">
+                <i class="fas fa-trash-alt text-xs"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Error: ${err.message}</td></tr>`;
+      }
+    }
+
+    async function updateCampaignStatus(id, status) {
+      try {
+        const res = await fetch(`/api/admin/campaigns/${id}/status`, {
+          method: 'PATCH',
+          headers: { Authorization: `Bearer ${TOKEN()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        if (!res.ok) throw new Error('Failed to update status');
+        showToast('Campaign status updated!', 'success');
+        loadCampaigns();
+      } catch (err) {
+        showToast(err.message, 'error');
+        loadCampaigns();
+      }
+    }
+
+    async function deleteCampaign(id) {
+      try {
+        const res = await fetch(`/api/admin/campaigns/${id}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${TOKEN()}` }
+        });
+        if (!res.ok) throw new Error('Failed to delete campaign');
+        showToast('Campaign deleted successfully', 'success');
+        loadCampaigns();
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+
+    function openCampaignModal() {
+      document.getElementById('campaignForm').reset();
+      document.getElementById('campaignFormError').classList.add('hidden');
+      document.getElementById('campaignSubmitBtn').disabled = false;
+      document.getElementById('campaignSubmitBtn').innerHTML = '<i class="fas fa-paper-plane"></i> Create Campaign';
+      document.getElementById('campaignModal').style.display = 'flex';
+    }
+
+    function closeCampaignModal() {
+      document.getElementById('campaignModal').style.display = 'none';
+    }
+
+    async function submitCampaign(e) {
+      e.preventDefault();
+      const errEl = document.getElementById('campaignFormError');
+      const btn = document.getElementById('campaignSubmitBtn');
+      errEl.classList.add('hidden');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+      const payload = {
+        title: document.getElementById('cmpTitle').value.trim(),
+        category: document.getElementById('cmpCategory').value,
+        goalAmount: Number(document.getElementById('cmpGoal').value),
+        endDate: document.getElementById('cmpEndDate').value,
+        status: document.getElementById('cmpStatus').value,
+        description: document.getElementById('cmpDesc').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/admin/campaigns', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${TOKEN()}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to create campaign');
+        showToast('Campaign created successfully!', 'success');
+        closeCampaignModal();
+        loadCampaigns();
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.classList.remove('hidden');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Create Campaign';
+      }
+    }
+
+    // Wrap the existing switchSection functionality
+    const originalSwitchSection = window.switchSection;
+    window.switchSection = function(sectionId) {
+      originalSwitchSection(sectionId);
+      if (sectionId === 'campaigns') loadCampaigns();
+    };
+
+    // Load campaigns initially if it's somehow the active section
+    // Actually we just added it so we should hook it into initial loads if we want
+  </script>
+
+</body>
+</html>

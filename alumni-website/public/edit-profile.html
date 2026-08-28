@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - Alumni Network</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-indigo': '#4F46E5',
+                        'accent-teal': '#14B8A6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f9fafb;
+            color: #1f2937;
+        }
+
+        .font-outfit {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Standardize Form Inputs */
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e5e7eb;
+            background-color: #ffffff;
+            color: #1f2937;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .section-card {
+            background-color: #ffffff;
+            border: 1px solid #f3f4f6;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Ensure consistent theme with main profile page */
+        .section-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        /* Button hover states */
+        .btn-primary:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background-color: #f9fafb;
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen py-12 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-outfit font-bold text-gray-900">Edit Your Profile</h1>
+                <p class="text-gray-500 text-sm mt-1">Keep your professional journey up to date</p>
+            </div>
+            <div class="flex gap-3">
+                <a href="profile.html"
+                    class="px-5 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-700 font-medium text-sm btn-secondary hover:bg-gray-50 transition">
+                    Cancel
+                </a>
+                <button id="save-all-btn"
+                    class="px-6 py-2.5 rounded-lg bg-primary-indigo text-white font-medium text-sm btn-primary hover:bg-indigo-700 transition shadow-sm">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+
+        <form id="edit-profile-form">
+            <!-- Basic Information -->
+            <section class="section-card">
+                <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fas fa-user-circle text-primary-indigo"></i> Basic Information
+                </h2>
+
+                <!-- Profile Picture Upload -->
+                <div class="mb-8 flex items-center gap-6">
+                    <div class="relative group w-24 h-24 mt-2">
+                        <img id="edit-profile-img" src="images/singlee person.webp" alt="Profile" class="w-full h-full rounded-full object-cover border-4 border-gray-100 shadow-sm">
+                        <label for="profile-image-upload" class="absolute inset-0 bg-black/50 text-white rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200 cursor-pointer">
+                            <i class="fas fa-camera mb-1"></i>
+                            <span class="text-[10px] font-bold uppercase tracking-wider">Upload</span>
+                        </label>
+                        <input type="file" id="profile-image-upload" accept="image/*" class="hidden">
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-gray-900">Profile Picture</h3>
+                        <p class="text-xs text-gray-500 mt-1">Recommended size: 256x256px.<br>Max file size: 5MB.</p>
+                        <p id="upload-status" class="text-xs font-bold text-primary-indigo mt-2 hidden">Uploading...</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Display
+                            Name</label>
+                        <input type="text" name="name" class="form-input" placeholder="e.g., Jane Doe">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Professional
+                            Title</label>
+                        <input type="text" name="title" class="form-input" placeholder="e.g., Senior Product Designer">
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Location</label>
+                        <input type="text" name="location" class="form-input" placeholder="e.g., San Francisco, CA">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Graduation
+                            Year</label>
+                        <input type="number" name="graduationYear" class="form-input" placeholder="2024">
+                    </div>
+                </div>
+                    <div class="mt-6">
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Bio</label>
+                        <textarea name="bio" id="bio-textarea" rows="4" class="form-input"
+                            placeholder="Tell your story... (Maximum 200 words)" maxlength="1000"></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xs text-gray-400">Maximum 200 words recommended</span>
+                            <span id="word-count" class="text-xs text-gray-500 font-medium">0 / 200 words</span>
+                        </div>
+                    </div>
+            </section>
+
+            <!-- Social Links -->
+            <section class="section-card">
+                <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fas fa-link text-primary-indigo"></i> Social Links
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">LinkedIn</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fab fa-linkedin text-gray-400"></i>
+                            </div>
+                            <input type="url" name="linkedin" class="form-input pl-10" placeholder="https://linkedin.com/in/username">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Twitter</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fab fa-twitter text-gray-400"></i>
+                            </div>
+                            <input type="url" name="twitter" class="form-input pl-10" placeholder="https://twitter.com/username">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">GitHub</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fab fa-github text-gray-400"></i>
+                            </div>
+                            <input type="url" name="github" class="form-input pl-10" placeholder="https://github.com/username">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Work Experience -->
+            <section class="section-card">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-briefcase text-blue-500"></i> Work Experience
+                    </h2>
+                    <button type="button" id="add-experience-btn"
+                        class="text-sm font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-md transition">
+                        + Add Role
+                    </button>
+                </div>
+                <div id="experience-list" class="space-y-4">
+                    <!-- Dynamic Items Here -->
+                </div>
+            </section>
+
+            <!-- Education -->
+            <section class="section-card">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-graduation-cap text-teal-500"></i> Education
+                    </h2>
+                    <button type="button" id="add-education-btn"
+                        class="text-sm font-bold text-teal-600 hover:text-teal-700 bg-teal-50 px-3 py-1.5 rounded-md transition">
+                        + Add Degree
+                    </button>
+                </div>
+                <div id="education-list" class="space-y-4">
+                    <!-- Dynamic Items Here -->
+                </div>
+            </section>
+
+            <!-- Skills -->
+            <section class="section-card">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                        <i class="fas fa-code text-indigo-500"></i> Skills & Expertise
+                    </h2>
+                    <button type="button" id="add-skill-btn"
+                        class="text-sm font-bold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-md transition">
+                        + Add Skill
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 mb-4">Add your technical and professional skills with proficiency level.</p>
+                <div id="skills-list" class="space-y-3">
+                    <!-- Dynamic Skills Here -->
+                </div>
+            </section>
+
+            <!-- Privacy Settings -->
+            <section class="section-card">
+                <h2 class="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-gray-400"></i> Privacy Settings
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Profile Photo
+                        </label>
+                        <div class="relative">
+                            <select name="privacy_profilePhoto" class="form-input appearance-none">
+                                <option value="Public">Public (Visible to everyone)</option>
+                                <option value="Alumni Only">Alumni Network Only</option>
+                                <option value="Connections Only">My Connections Only</option>
+                                <option value="Private">Private (Only Me)</option>
+                            </select>
+                            <div
+                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </form>
+    </div>
+
+    <script src="js/edit-profile_v2.js?v=6"></script>
+</body>
+
+</html>

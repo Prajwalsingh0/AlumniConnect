@@ -1,0 +1,161 @@
+{
+  "alumni": [
+    {
+      "id": 1,
+      "name": "Sarah Martinez",
+      "graduationYear": 2012,
+      "degree": "Bachelor of Science in Computer Science",
+      "position": "Chief Technology Officer",
+      "company": "TechVision Inc.",
+      "location": "San Francisco, CA",
+      "featured": true,
+      "story": "After graduating with a Computer Science degree, Sarah joined a small startup as a junior developer. Through dedication and continuous learning, she climbed the ranks to become CTO at TechVision Inc., a leading AI technology company. Sarah has led the development of groundbreaking machine learning platforms that have revolutionized healthcare diagnostics. She regularly returns to campus as a guest lecturer and mentors current students pursuing careers in technology.",
+      "achievements": [
+        "Forbes 30 Under 30 (2018)",
+        "Tech Innovation Award (2021)",
+        "Women in Tech Leadership Award (2022)"
+      ],
+      "linkedin": "https://linkedin.com/in/sarahmartinez",
+      "image": "https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 2,
+      "name": "Dr. Michael Chen",
+      "graduationYear": 2008,
+      "degree": "Bachelor of Science in Biology",
+      "position": "Lead Research Scientist",
+      "company": "National Institute of Health",
+      "location": "Bethesda, MD",
+      "featured": true,
+      "story": "Michael's journey from undergraduate biology student to leading researcher at the National Institute of Health exemplifies the power of scientific curiosity and persistence. His groundbreaking research on neurodegenerative diseases has led to several breakthrough treatments currently in clinical trials. Michael credits his undergraduate research experience and supportive professors for inspiring his career in medical research and his commitment to improving human health through science.",
+      "achievements": [
+        "NIH Excellence in Research Award (2020)",
+        "Published 45+ peer-reviewed articles",
+        "Breakthrough in Alzheimer's Research (2023)"
+      ],
+      "linkedin": "https://linkedin.com/in/michaelchen-phd",
+      "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 3,
+      "name": "Jennifer Washington",
+      "graduationYear": 2015,
+      "degree": "Master of Business Administration",
+      "position": "Global Marketing Director",
+      "company": "Sustainable Solutions Corp",
+      "location": "New York, NY",
+      "featured": true,
+      "story": "Jennifer transformed her passion for environmental sustainability into a successful career in green marketing. As Global Marketing Director at Sustainable Solutions Corp, she has spearheaded campaigns that have increased awareness about climate change and promoted sustainable business practices across multiple industries. Her innovative marketing strategies have helped the company grow by 300% while maintaining their commitment to environmental responsibility.",
+      "achievements": [
+        "Green Marketing Excellence Award (2022)",
+        "Sustainable Business Leader Recognition (2023)",
+        "Speaker at 15+ international conferences"
+      ],
+      "linkedin": "https://linkedin.com/in/jenniferwashington",
+      "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 4,
+      "name": "David Rodriguez",
+      "graduationYear": 2010,
+      "degree": "Bachelor of Arts in Education",
+      "position": "Principal",
+      "company": "Lincoln Elementary School",
+      "location": "Chicago, IL",
+      "featured": false,
+      "story": "David has dedicated his career to improving educational opportunities for underserved communities. As principal of Lincoln Elementary, he has implemented innovative teaching programs that have significantly improved student achievement scores.",
+      "achievements": [
+        "Principal of the Year (2021)",
+        "Educational Innovation Award (2022)"
+      ],
+      "linkedin": "https://linkedin.com/in/davidrodriguez-edu",
+      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 5,
+      "name": "Lisa Park",
+      "graduationYear": 2014,
+      "degree": "Bachelor of Fine Arts",
+      "position": "Creative Director",
+      "company": "Artistic Visions Studio",
+      "location": "Los Angeles, CA",
+      "featured": false,
+      "story": "Lisa has built a successful creative career, working with major brands and celebrities on visual campaigns. Her work has been featured in numerous publications and exhibitions worldwide.",
+      "achievements": [
+        "Cannes Lions Creative Award (2020)",
+        "Art Director of the Year (2022)"
+      ],
+      "linkedin": "https://linkedin.com/in/lisapark-creative",
+      "image": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 6,
+      "name": "Robert Johnson",
+      "graduationYear": 2011,
+      "degree": "Bachelor of Science in Finance",
+      "position": "Investment Advisor",
+      "company": "Johnson Wealth Management",
+      "location": "Dallas, TX",
+      "featured": false,
+      "story": "Robert founded his own wealth management firm, helping individuals and families achieve their financial goals. He specializes in retirement planning and has been recognized for his ethical approach to financial advising.",
+      "achievements": [
+        "CFP Board Center for Financial Planning Award",
+        "Financial Advisor of the Year (2023)"
+      ],
+      "linkedin": "https://linkedin.com/in/robertjohnson-finance",
+      "image": "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 7,
+      "name": "Dr. Amanda Taylor",
+      "graduationYear": 2009,
+      "degree": "Bachelor of Science in Pre-Med",
+      "position": "Emergency Medicine Physician",
+      "company": "Metropolitan General Hospital",
+      "location": "Boston, MA",
+      "featured": false,
+      "story": "Amanda has served on the front lines of emergency medicine for over a decade. Her dedication during the COVID-19 pandemic and her work in medical education have made her a respected leader in her field.",
+      "achievements": [
+        "Physician of the Year (2021)",
+        "COVID-19 Frontline Hero Award",
+        "Medical Education Excellence Award"
+      ],
+      "linkedin": "https://linkedin.com/in/amandataylor-md",
+      "image": "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 8,
+      "name": "Carlos Mendoza",
+      "graduationYear": 2016,
+      "degree": "Bachelor of Science in Engineering",
+      "position": "Senior Software Engineer",
+      "company": "InnovateTech Solutions",
+      "location": "Austin, TX",
+      "featured": false,
+      "story": "Carlos has been instrumental in developing cutting-edge software solutions for renewable energy systems. His work contributes to making clean energy more accessible and efficient.",
+      "achievements": [
+        "Innovation in Clean Tech Award (2022)",
+        "Patent holder for solar energy optimization"
+      ],
+      "linkedin": "https://linkedin.com/in/carlosmendoza-eng",
+      "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    },
+    {
+      "id": 9,
+      "name": "Rachel Kim",
+      "graduationYear": 2013,
+      "degree": "Bachelor of Arts in Journalism",
+      "position": "Senior Correspondent",
+      "company": "Global News Network",
+      "location": "Washington, DC",
+      "featured": false,
+      "story": "Rachel has covered major international stories and has been recognized for her investigative journalism. Her reporting has brought attention to important social issues and policy changes.",
+      "achievements": [
+        "Pulitzer Prize Nominee (2021)",
+        "Investigative Journalism Award (2020)"
+      ],
+      "linkedin": "https://linkedin.com/in/rachelkim-journalist",
+      "image": "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80"
+    }
+  ]
+}

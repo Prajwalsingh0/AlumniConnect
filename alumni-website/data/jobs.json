@@ -1,0 +1,292 @@
+{
+  "jobs": [
+    {
+      "id": 1,
+      "title": "Senior Software Engineer",
+      "company": "TechVision Inc.",
+      "location": "San Francisco, CA",
+      "type": "Full Time",
+      "category": "Technology",
+      "salary": "$120,000 - $160,000",
+      "description": "We're seeking an experienced software engineer to join our AI platform team. You'll work on cutting-edge machine learning applications and collaborate with cross-functional teams to deliver innovative solutions.",
+      "requirements": [
+        "5+ years of software development experience",
+        "Proficiency in Python, Java, or C++",
+        "Experience with machine learning frameworks",
+        "Strong problem-solving skills"
+      ],
+      "benefits": [
+        "Comprehensive health insurance",
+        "401(k) matching",
+        "Flexible work arrangements",
+        "Professional development budget"
+      ],
+      "postedDate": "2024-09-20",
+      "applicationDeadline": "2024-11-01"
+    },
+    {
+      "id": 2,
+      "title": "Marketing Manager",
+      "company": "Green Solutions Corp",
+      "location": "Remote",
+      "type": "Full Time",
+      "category": "Marketing",
+      "salary": "$70,000 - $90,000",
+      "description": "Join our mission to promote sustainable business practices through innovative marketing campaigns. Lead digital marketing initiatives and brand strategy for our environmental consulting services.",
+      "requirements": [
+        "Bachelor's degree in Marketing or related field",
+        "3+ years of digital marketing experience",
+        "Experience with content marketing and social media",
+        "Passion for sustainability"
+      ],
+      "benefits": [
+        "Remote work flexibility",
+        "Health and dental insurance",
+        "Professional development opportunities",
+        "Sabbatical program"
+      ],
+      "postedDate": "2024-09-18",
+      "applicationDeadline": "2024-10-25"
+    },
+    {
+      "id": 3,
+      "title": "Data Analyst",
+      "company": "Metropolitan Health Systems",
+      "location": "Boston, MA",
+      "type": "Full Time",
+      "category": "Healthcare",
+      "salary": "$65,000 - $85,000",
+      "description": "Analyze healthcare data to improve patient outcomes and operational efficiency. Work with clinical teams to identify trends and develop data-driven solutions for better healthcare delivery.",
+      "requirements": [
+        "Bachelor's degree in Statistics, Mathematics, or related field",
+        "Proficiency in SQL, Python, or R",
+        "Experience with data visualization tools",
+        "Knowledge of healthcare systems preferred"
+      ],
+      "benefits": [
+        "Excellent health benefits",
+        "Retirement plan with matching",
+        "Continuing education support",
+        "Work-life balance initiatives"
+      ],
+      "postedDate": "2024-09-15",
+      "applicationDeadline": "2024-10-30"
+    },
+    {
+      "id": 4,
+      "title": "Financial Advisor",
+      "company": "Wealth Management Partners",
+      "location": "New York, NY",
+      "type": "Full Time",
+      "category": "Finance",
+      "salary": "$80,000 - $120,000 + Commission",
+      "description": "Provide comprehensive financial planning services to high-net-worth clients. Build long-term relationships and help clients achieve their financial goals through strategic investment planning.",
+      "requirements": [
+        "Bachelor's degree in Finance, Economics, or related field",
+        "Series 7 and 66 licenses (or willingness to obtain)",
+        "2+ years of financial services experience",
+        "Strong communication and relationship-building skills"
+      ],
+      "benefits": [
+        "Competitive base salary plus commission",
+        "Comprehensive benefits package",
+        "Professional development and licensing support",
+        "Client referral bonuses"
+      ],
+      "postedDate": "2024-09-12",
+      "applicationDeadline": "2024-10-28"
+    },
+    {
+      "id": 5,
+      "title": "UX/UI Designer",
+      "company": "Creative Digital Agency",
+      "location": "Los Angeles, CA",
+      "type": "Full Time",
+      "category": "Technology",
+      "salary": "$75,000 - $100,000",
+      "description": "Design engaging user experiences for web and mobile applications. Collaborate with development teams to create intuitive, user-centered designs that drive business results.",
+      "requirements": [
+        "Bachelor's degree in Design or related field",
+        "3+ years of UX/UI design experience",
+        "Proficiency in Figma, Sketch, or similar tools",
+        "Portfolio demonstrating strong design skills"
+      ],
+      "benefits": [
+        "Creative work environment",
+        "Health and wellness benefits",
+        "Flexible schedule",
+        "Design conference attendance"
+      ],
+      "postedDate": "2024-09-10",
+      "applicationDeadline": "2024-10-20"
+    },
+    {
+      "id": 6,
+      "title": "Elementary School Teacher",
+      "company": "Lincoln Elementary School",
+      "location": "Chicago, IL",
+      "type": "Full Time",
+      "category": "Education",
+      "salary": "$50,000 - $65,000",
+      "description": "Inspire young minds as a dedicated elementary school teacher. Create engaging lesson plans and foster a positive learning environment for students in grades 3-5.",
+      "requirements": [
+        "Bachelor's degree in Education or subject area",
+        "Valid teaching license",
+        "Experience with diverse student populations",
+        "Commitment to student success"
+      ],
+      "benefits": [
+        "Comprehensive health insurance",
+        "Teacher retirement system",
+        "Summer break",
+        "Professional development opportunities"
+      ],
+      "postedDate": "2024-09-08",
+      "applicationDeadline": "2024-10-15"
+    },
+    {
+      "id": 7,
+      "title": "Research Intern",
+      "company": "National Institute of Health",
+      "location": "Bethesda, MD",
+      "type": "Internship",
+      "category": "Healthcare",
+      "salary": "$20 - $25 per hour",
+      "description": "Gain hands-on research experience in cutting-edge biomedical studies. Work alongside leading scientists on projects related to neurodegenerative diseases and develop research skills.",
+      "requirements": [
+        "Currently enrolled in Bachelor's or Master's program",
+        "Major in Biology, Neuroscience, or related field",
+        "Strong academic performance (GPA 3.5+)",
+        "Previous research experience preferred"
+      ],
+      "benefits": [
+        "Mentorship from leading researchers",
+        "Networking opportunities",
+        "Potential for publication",
+        "Career development workshops"
+      ],
+      "postedDate": "2024-09-05",
+      "applicationDeadline": "2024-11-15"
+    },
+    {
+      "id": 8,
+      "title": "Software Development Intern",
+      "company": "InnovateTech Solutions",
+      "location": "Austin, TX",
+      "type": "Internship",
+      "category": "Technology",
+      "salary": "$18 - $22 per hour",
+      "description": "Join our development team to work on renewable energy software solutions. Gain experience in full-stack development and contribute to meaningful environmental technology projects.",
+      "requirements": [
+        "Currently pursuing Computer Science degree",
+        "Knowledge of programming languages (Python, JavaScript)",
+        "Interest in clean energy technology",
+        "Strong problem-solving abilities"
+      ],
+      "benefits": [
+        "Real project experience",
+        "Mentorship program",
+        "Flexible summer schedule",
+        "Potential for full-time offer"
+      ],
+      "postedDate": "2024-09-03",
+      "applicationDeadline": "2024-11-30"
+    },
+    {
+      "id": 9,
+      "title": "Business Operations Manager",
+      "company": "Sustainable Solutions Corp",
+      "location": "Denver, CO",
+      "type": "Full Time",
+      "category": "Marketing",
+      "salary": "$90,000 - $110,000",
+      "description": "Oversee day-to-day operations and drive efficiency improvements across our sustainability consulting practice. Lead process optimization initiatives and manage cross-functional teams.",
+      "requirements": [
+        "Bachelor's degree in Business Administration or related field",
+        "5+ years of operations management experience",
+        "Project management certification preferred",
+        "Experience in consulting or professional services"
+      ],
+      "benefits": [
+        "Competitive salary and bonus structure",
+        "Comprehensive benefits package",
+        "Leadership development program",
+        "Flexible work arrangements"
+      ],
+      "postedDate": "2024-09-01",
+      "applicationDeadline": "2024-10-18"
+    },
+    {
+      "id": 10,
+      "title": "Journalism Intern",
+      "company": "Global News Network",
+      "location": "Washington, DC",
+      "type": "Internship",
+      "category": "Education",
+      "salary": "$15 - $18 per hour",
+      "description": "Develop journalism skills while working with our award-winning news team. Research stories, conduct interviews, and contribute to digital content creation for our global audience.",
+      "requirements": [
+        "Journalism or Communications major",
+        "Strong writing and communication skills",
+        "Curiosity about current events and global issues",
+        "Previous journalism experience preferred"
+      ],
+      "benefits": [
+        "Byline opportunities",
+        "Professional mentorship",
+        "Press event access",
+        "Portfolio development"
+      ],
+      "postedDate": "2024-08-28",
+      "applicationDeadline": "2024-11-10"
+    },
+    {
+      "id": 11,
+      "title": "Project Manager",
+      "company": "BuildTech Construction",
+      "location": "Seattle, WA",
+      "type": "Full Time",
+      "category": "Finance",
+      "salary": "$85,000 - $105,000",
+      "description": "Lead construction projects from conception to completion. Coordinate with architects, engineers, and contractors to deliver high-quality commercial and residential buildings on time and within budget.",
+      "requirements": [
+        "Bachelor's degree in Construction Management or Engineering",
+        "PMP certification preferred",
+        "3+ years of project management experience",
+        "Knowledge of construction processes and regulations"
+      ],
+      "benefits": [
+        "Project completion bonuses",
+        "Health and retirement benefits",
+        "Professional development support",
+        "Company vehicle"
+      ],
+      "postedDate": "2024-08-25",
+      "applicationDeadline": "2024-10-12"
+    },
+    {
+      "id": 12,
+      "title": "Marketing Intern",
+      "company": "Creative Digital Agency",
+      "location": "Los Angeles, CA",
+      "type": "Internship",
+      "category": "Marketing",
+      "salary": "$16 - $20 per hour",
+      "description": "Support our creative team with marketing campaigns for entertainment and lifestyle brands. Gain experience in social media management, content creation, and digital marketing strategies.",
+      "requirements": [
+        "Marketing, Communications, or related major",
+        "Familiarity with social media platforms",
+        "Creative thinking and attention to detail",
+        "Adobe Creative Suite knowledge preferred"
+      ],
+      "benefits": [
+        "Portfolio building opportunities",
+        "Creative industry exposure",
+        "Networking events",
+        "Flexible schedule for students"
+      ],
+      "postedDate": "2024-08-20",
+      "applicationDeadline": "2024-11-05"
+    }
+  ]
+}

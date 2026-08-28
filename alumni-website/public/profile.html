@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Alumni Network</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --indigo: #4F46E5;
+            --indigo-light: #eef2ff;
+            --indigo-mid: #c7d2fe;
+            --purple: #7C3AED;
+            --teal: #14B8A6;
+            --teal-light: #f0fdfa;
+            --pink: #EC4899;
+            --bg: #f8f9fc;
+            --surface: #ffffff;
+            --surface2: #f3f4f6;
+            --border: #e5e7eb;
+            --text: #111827;
+            --text-muted: #6b7280;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05);
+            --shadow-hover: 0 8px 24px rgba(79,70,229,0.12);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 1rem; }
+
+        .nav-back {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .nav-back:hover { background: var(--indigo-light); color: var(--indigo); border-color: var(--indigo-mid); }
+
+        .nav-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text);
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+        .btn-edit {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, var(--indigo), var(--purple));
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.25);
+        }
+        .btn-edit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.35); }
+
+        .btn-logout {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .btn-logout:hover { background: #fef2f2; border-color: #fecaca; color: #ef4444; }
+
+        /* Main Layout */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+        /* ===== LEFT COLUMN ===== */
+        .left-col { display: flex; flex-direction: column; gap: 1.25rem; }
+
+        /* Profile Card */
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-banner {
+            height: 90px;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #14B8A6 100%);
+            position: relative;
+        }
+        .profile-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='40' cy='40' r='38' fill='none' stroke='%23ffffff18' stroke-width='2'/%3E%3Ccircle cx='10' cy='15' r='12' fill='none' stroke='%23ffffff10' stroke-width='2'/%3E%3C/svg%3E") repeat;
+        }
+
+        .profile-card-body { padding: 0 1.5rem 1.5rem; text-align: center; }
+
+        .avatar-wrapper {
+            display: inline-block;
+            position: relative;
+            margin-top: -44px;
+            margin-bottom: 0.85rem;
+        }
+
+        .profile-avatar {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 2px var(--indigo-mid), var(--shadow);
+            display: block;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .avatar-wrapper:hover .profile-avatar {
+            transform: scale(1.06);
+            box-shadow: 0 0 0 3px var(--indigo), 0 8px 24px rgba(79,70,229,0.2);
+        }
+
+        .verification-badge {
+            display: none;
+            position: absolute;
+            bottom: 4px; right: 4px;
+            width: 22px; height: 22px;
+            background: #3b82f6;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            align-items: center; justify-content: center;
+            font-size: 9px;
+            color: #fff;
+        }
+
+        .user-name {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.45rem;
+            color: var(--text);
+            margin-bottom: 0.25rem;
+            letter-spacing: -0.3px;
+        }
+
+        .user-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--indigo);
+            margin-bottom: 0.65rem;
+        }
+
+        .grad-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.85rem;
+            background: var(--indigo-light);
+            border: 1px solid var(--indigo-mid);
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--indigo);
+            margin-bottom: 1.1rem;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 0.25rem;
+        }
+
+        .social-link {
+            width: 38px; height: 38px;
+            border-radius: 11px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.25s;
+        }
+        .social-link:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .social-link.linkedin:hover { background: #e8f0fe; border-color: #93c5fd; color: #0a66c2; }
+        .social-link.twitter:hover  { background: #e0f2fe; border-color: #7dd3fc; color: #0ea5e9; }
+        .social-link.github:hover   { background: #f3f4f6; border-color: #9ca3af; color: #111827; }
+
+        /* Stats */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.1rem;
+            text-align: center;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--indigo), var(--purple));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--indigo-mid); }
+        .stat-card:hover::before { transform: scaleX(1); }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--indigo);
+            line-height: 1;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Info Card */
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: var(--shadow);
+        }
+
+        .info-card-title {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .info-row:last-child { border-bottom: none; }
+
+        .info-icon {
+            width: 32px; height: 32px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        .info-ico-indigo  { background: var(--indigo-light); color: var(--indigo); }
+        .info-ico-teal    { background: #f0fdfa; color: #0d9488; }
+        .info-ico-purple  { background: #f5f3ff; color: #7c3aed; }
+        .info-ico-pink    { background: #fdf2f8; color: #db2777; }
+
+        .info-text { display: flex; flex-direction: column; }
+        .info-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); font-weight: 700; }
+        .info-value { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+
+        /* ===== RIGHT COLUMN ===== */
+        .right-col { display: flex; flex-direction: column; gap: 1.25rem; }
+
+        /* Tab Container */
+        .tab-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+            overflow-x: auto;
+            scrollbar-width: none;
+            background: #fafafa;
+        }
+        .tab-header::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            position: relative;
+            padding: 0.9rem 1.1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 0.2s;
+            letter-spacing: 0.02em;
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--indigo), var(--purple));
+            transform: scaleX(0);
+            transition: transform 0.3s;
+            border-radius: 2px 2px 0 0;
+        }
+        .tab-btn.active { color: var(--indigo); }
+        .tab-btn.active::after { transform: scaleX(1); }
+        .tab-btn:hover:not(.active) { color: var(--text); }
+
+        .tab-body { padding: 1.75rem; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Section Title */
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            letter-spacing: -0.2px;
+        }
+        .section-icon {
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        /* Bio */
+        .bio-text {
+            font-size: 0.925rem;
+            line-height: 1.8;
+            color: #374151;
+            background: var(--indigo-light);
+            border: 1px solid var(--indigo-mid);
+            border-radius: 14px;
+            padding: 1.1rem 1.4rem;
+            border-left: 3px solid var(--indigo);
+        }
+
+        /* Skill Bars */
+        .skill-item { margin-bottom: 1rem; }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.4rem;
+        }
+
+        .skill-name { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+
+        .skill-level-badge {
+            font-size: 0.62rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .level-beginner     { background: #fef3c7; color: #d97706; }
+        .level-intermediate { background: var(--indigo-light); color: var(--indigo); }
+        .level-expert       { background: #f0fdfa; color: #0d9488; }
+        .level-master       { background: #f5f3ff; color: var(--purple); }
+
+        .skill-bar-track {
+            height: 6px;
+            background: #f3f4f6;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .skill-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            width: 0;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fill-beginner     { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .fill-intermediate { background: linear-gradient(90deg, var(--indigo), #818cf8); }
+        .fill-expert       { background: linear-gradient(90deg, var(--teal), #34d399); }
+        .fill-master       { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+
+        /* Seeking Tags */
+        .seeking-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 0.9rem;
+            background: var(--indigo-light);
+            border: 1px solid var(--indigo-mid);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--indigo);
+            margin: 0 0.4rem 0.4rem 0;
+            transition: all 0.2s;
+        }
+        .seeking-tag:hover { transform: translateY(-2px); background: #e0e7ff; box-shadow: 0 4px 10px rgba(79,70,229,0.15); }
+
+        /* Experience Items */
+        .exp-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.1rem 1.25rem;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 0.75rem;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .exp-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--indigo), var(--purple));
+        }
+        .exp-item:hover { transform: translateX(3px); border-color: var(--indigo-mid); background: var(--indigo-light); box-shadow: var(--shadow-hover); }
+
+        .exp-icon {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: var(--indigo-light);
+            border: 1px solid var(--indigo-mid);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            color: var(--indigo);
+            flex-shrink: 0;
+        }
+
+        .exp-position { font-family: 'Space Grotesk', sans-serif; font-size: 0.975rem; font-weight: 600; color: var(--text); margin-bottom: 0.15rem; letter-spacing: -0.2px; }
+        .exp-company  { font-size: 0.825rem; font-weight: 600; color: var(--indigo); margin-bottom: 0.35rem; }
+        .exp-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #fff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+        }
+
+        /* Education Items */
+        .edu-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.1rem 1.25rem;
+            background: #fafafa;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 0.75rem;
+            transition: all 0.25s;
+            position: relative;
+            overflow: hidden;
+        }
+        .edu-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--teal), #06b6d4);
+        }
+        .edu-item:hover { transform: translateX(3px); border-color: #99f6e4; background: #f0fdfa; box-shadow: 0 8px 24px rgba(20,184,166,0.1); }
+
+        .edu-icon {
+            width: 40px; height: 40px;
+            border-radius: 11px;
+            background: #f0fdfa;
+            border: 1px solid #99f6e4;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            color: #0d9488;
+            flex-shrink: 0;
+        }
+
+        .edu-degree      { font-family: 'Space Grotesk', sans-serif; font-size: 0.975rem; font-weight: 600; color: var(--text); margin-bottom: 0.15rem; letter-spacing: -0.2px; }
+        .edu-institution { font-size: 0.825rem; font-weight: 600; color: #0d9488; margin-bottom: 0.25rem; }
+        .edu-field       { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+
+        /* Activity Items */
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.9rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .activity-item:last-child { border-bottom: none; }
+
+        .activity-dot {
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .activity-title { font-size: 0.875rem; font-weight: 600; color: var(--text); margin-bottom: 0.15rem; }
+        .activity-time  { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* Resume Button */
+        .resume-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text-muted);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            box-shadow: var(--shadow);
+        }
+        .resume-btn:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220,38,38,0.1);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-muted);
+        }
+        .empty-state i { font-size: 2rem; margin-bottom: 0.75rem; opacity: 0.35; display: block; }
+        .empty-state p { font-size: 0.875rem; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="index.html" class="nav-back">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <span class="nav-title">My Profile</span>
+        </div>
+        <div class="nav-right">
+            <button id="edit-profile-btn" class="btn-edit">
+                <i class="fas fa-pen"></i> Edit Profile
+            </button>
+            <button id="logout-btn" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main>
+        <!-- ===== LEFT COLUMN ===== -->
+        <div class="left-col">
+
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="profile-banner"></div>
+                <div class="profile-card-body">
+                    <div class="avatar-wrapper">
+                        <img id="profile-img" src="images/singlee person.webp" alt="Profile" class="profile-avatar">
+                        <div id="verification-badge" class="verification-badge">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <h2 id="user-name" class="user-name">Loading...</h2>
+                    <p id="user-title" class="user-title">Professional Alumnus</p>
+                    <div id="grad-year-badge" class="grad-badge">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Class of —</span>
+                    </div>
+                    <div class="social-links">
+                        <a id="link-linkedin" href="#" class="social-link linkedin" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a id="link-twitter" href="#" class="social-link twitter" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a id="link-github" href="#" class="social-link github" title="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" id="connection-count">—</div>
+                    <div class="stat-label">Connections</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="events-count">—</div>
+                    <div class="stat-label">Events</div>
+                </div>
+            </div>
+
+            <!-- Quick Info Card -->
+            <div class="info-card">
+                <div class="info-card-title">Quick Info</div>
+                <div class="info-row" id="info-location-row" style="display:none">
+                    <div class="info-icon info-ico-indigo"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Location</span>
+                        <span class="info-value" id="info-location">—</span>
+                    </div>
+                </div>
+                <div class="info-row" id="info-company-row" style="display:none">
+                    <div class="info-icon info-ico-teal"><i class="fas fa-briefcase"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Company</span>
+                        <span class="info-value" id="info-company">—</span>
+                    </div>
+                </div>
+                <div class="info-row" id="info-dept-row" style="display:none">
+                    <div class="info-icon info-ico-purple"><i class="fas fa-building"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Department</span>
+                        <span class="info-value" id="info-dept">—</span>
+                    </div>
+                </div>
+                <div class="info-row" id="info-degree-row" style="display:none">
+                    <div class="info-icon info-ico-pink"><i class="fas fa-award"></i></div>
+                    <div class="info-text">
+                        <span class="info-label">Degree</span>
+                        <span class="info-value" id="info-degree">—</span>
+                    </div>
+                </div>
+                <div id="info-empty" class="empty-state" style="padding:1.25rem">
+                    <p>No info added yet</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== RIGHT COLUMN ===== -->
+        <div class="right-col">
+
+            <!-- Tab Container -->
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button class="tab-btn active" data-tab="overview">
+                        <i class="fas fa-user-circle" style="margin-right:5px;font-size:0.75rem"></i>Overview
+                    </button>
+                    <button class="tab-btn" data-tab="experience">
+                        <i class="fas fa-briefcase" style="margin-right:5px;font-size:0.75rem"></i>Experience
+                    </button>
+                    <button class="tab-btn" data-tab="education">
+                        <i class="fas fa-graduation-cap" style="margin-right:5px;font-size:0.75rem"></i>Education
+                    </button>
+                    <button class="tab-btn" data-tab="activity">
+                        <i class="fas fa-bolt" style="margin-right:5px;font-size:0.75rem"></i>Activity
+                    </button>
+                </div>
+
+                <div class="tab-body">
+                    <!-- Overview Tab -->
+                    <div id="overview-tab" class="tab-content active">
+                        <div style="margin-bottom:1.75rem">
+                            <div class="section-title">
+                                <div class="section-icon" style="background:var(--indigo-light);color:var(--indigo)">
+                                    <i class="fas fa-quote-left"></i>
+                                </div>
+                                About Me
+                            </div>
+                            <p id="user-bio" class="bio-text">Loading...</p>
+                        </div>
+
+                        <div style="margin-bottom:1.75rem">
+                            <div class="section-title">
+                                <div class="section-icon" style="background:#f0fdfa;color:#0d9488">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                Skills & Expertise
+                            </div>
+                            <div id="skills-container"></div>
+                        </div>
+
+                        <div>
+                            <div class="section-title">
+                                <div class="section-icon" style="background:#f5f3ff;color:var(--purple)">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                Looking For
+                            </div>
+                            <div id="seeking-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Experience Tab -->
+                    <div id="experience-tab" class="tab-content">
+                        <div class="section-title">
+                            <div class="section-icon" style="background:var(--indigo-light);color:var(--indigo)">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            Work Experience
+                        </div>
+                        <div id="work-history-container"></div>
+                    </div>
+
+                    <!-- Education Tab -->
+                    <div id="education-tab" class="tab-content">
+                        <div class="section-title">
+                            <div class="section-icon" style="background:#f0fdfa;color:#0d9488">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            Education History
+                        </div>
+                        <div id="education-container"></div>
+                    </div>
+
+                    <!-- Activity Tab -->
+                    <div id="activity-tab" class="tab-content">
+                        <div class="section-title">
+                            <div class="section-icon" style="background:#fdf2f8;color:var(--pink)">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            Recent Activity
+                        </div>
+                        <div id="activity-feed"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View Resume Button -->
+            <button id="view-resume-btn" class="resume-btn">
+                <i class="far fa-file-pdf" style="color:#ef4444"></i>
+                View Professional Resume
+            </button>
+
+        </div>
+    </main>
+
+    <script src="js/profile_v2.js?v=3"></script>
+</body>
+
+</html>

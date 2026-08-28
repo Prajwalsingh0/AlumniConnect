@@ -1,0 +1,84 @@
+{
+  "news": [
+    {
+      "id": 1,
+      "title": "University Launches New Innovation Center",
+      "summary": "The state-of-the-art Innovation Center opens its doors, providing cutting-edge facilities for research and entrepreneurship programs.",
+      "content": "The University is proud to announce the grand opening of the new Innovation Center, a 50,000 square foot facility designed to foster creativity, collaboration, and breakthrough research. The center features modern laboratories, collaborative workspaces, and startup incubation facilities.",
+      "date": "2024-09-20",
+      "author": "University Communications",
+      "category": "Campus News",
+      "image": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "id": 2,
+      "title": "Alumni Scholarship Fund Reaches $2 Million Milestone",
+      "summary": "Thanks to generous alumni donations, our scholarship fund has reached a historic milestone, supporting over 200 students annually.",
+      "content": "The Alumni Scholarship Fund has achieved a remarkable milestone, surpassing $2 million in total contributions. This achievement represents the collective generosity of over 1,500 alumni donors who believe in supporting the next generation of students.",
+      "date": "2024-09-15",
+      "author": "Alumni Relations",
+      "category": "Fundraising",
+      "image": "https://images.unsplash.com/photo-1523050854058-8df90110c9d1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "id": 3,
+      "title": "Class of 1999 Establishes Endowment for STEM Programs",
+      "summary": "The Class of 1999 celebrates their 25th reunion by creating a $500,000 endowment to support science, technology, engineering, and mathematics programs.",
+      "content": "In honor of their 25th reunion, the Class of 1999 has established a permanent endowment fund dedicated to enhancing STEM education at the university. The fund will provide equipment, research opportunities, and scholarships for students pursuing careers in science and technology.",
+      "date": "2024-09-10",
+      "author": "Development Office",
+      "category": "Alumni Achievement",
+      "image": "https://images.unsplash.com/photo-1532094349884-543bc11b234d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "id": 4,
+      "title": "Alumni Mentorship Program Expands Globally",
+      "summary": "Our mentorship program now connects students and recent graduates with alumni mentors across 30 countries worldwide.",
+      "content": "The Alumni Mentorship Program has experienced tremendous growth, now facilitating meaningful connections between current students and accomplished alumni across six continents. The program matches participants based on career interests, industry experience, and professional goals.",
+      "date": "2024-09-05",
+      "author": "Career Services",
+      "category": "Programs",
+      "image": "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "id": 5,
+      "title": "Sustainable Campus Initiative Wins National Award",
+      "summary": "The university's comprehensive sustainability program, supported by alumni funding, receives recognition as the top green campus initiative in the nation.",
+      "content": "Our commitment to environmental sustainability has earned national recognition, with the campus sustainability initiative winning the prestigious Green University Award. The program includes renewable energy systems, waste reduction programs, and environmental research projects.",
+      "date": "2024-08-28",
+      "author": "Sustainability Office",
+      "category": "Awards",
+      "image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "id": 6,
+      "title": "New Alumni Mobile App Launches",
+      "summary": "Stay connected with your alma mater through our new mobile app, featuring networking tools, event registration, and exclusive alumni content.",
+      "content": "The University Alumni Association is excited to launch its new mobile application, designed to keep alumni connected and engaged with their alma mater. The app features a comprehensive alumni directory, event registration, news updates, and exclusive content for verified alumni.",
+      "date": "2024-08-15",
+      "author": "Alumni Relations",
+      "category": "Technology",
+      "image": "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "id": 7,
+      "title": "Distinguished Alumni Awards Ceremony Announced",
+      "summary": "Join us in celebrating outstanding alumni achievements at the annual Distinguished Alumni Awards ceremony on November 18th.",
+      "content": "The 2024 Distinguished Alumni Awards will honor exceptional graduates who have made significant contributions to their professions, communities, and society. This year's recipients include leaders from technology, healthcare, education, and public service sectors.",
+      "date": "2024-08-10",
+      "author": "Alumni Relations",
+      "category": "Events",
+      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    },
+    {
+      "id": 8,
+      "title": "Alumni Business Network Surpasses 1,000 Members",
+      "summary": "The Alumni Business Network reaches a significant milestone with over 1,000 entrepreneur and business leader members worldwide.",
+      "content": "The Alumni Business Network has grown to include more than 1,000 successful entrepreneurs, executives, and business owners from various industries. The network facilitates business partnerships, investment opportunities, and knowledge sharing among alumni-owned companies.",
+      "date": "2024-07-25",
+      "author": "Business Network",
+      "category": "Networking",
+      "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+    }
+  ]
+}

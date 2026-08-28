@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - University Alumni Network</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary-indigo": "#4F46E5",
+            "accent-teal": "#14B8A6",
+          },
+          keyframes: {
+            fadeIn: {
+              "0%": { opacity: "0", transform: "translateY(10px)" },
+              "100%": { opacity: "1", transform: "translateY(0)" },
+            },
+          },
+          animation: {
+            fadeIn: "fadeIn 1s ease-out forwards",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-gray-50">
+  <nav class="bg-white shadow-xl sticky top-0 z-50">
+    <div class="w-full">
+      <div class="flex justify-between items-center h-16 px-4">
+        <div class="flex-shrink-0">
+          <h1 class="text-2xl font-extrabold text-primary-indigo tracking-wider">
+            MPU Alumni Network
+          </h1>
+        </div>
+        <div class="hidden md:flex flex-1 justify-center">
+          <div class="flex space-x-6 items-center">
+            <a href="index.html"
+              class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
+
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                About Us<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="about.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Mission
+                  & Vision</a>
+                <a href="about.html#team"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Team</a>
+                <a href="about.html#gallery"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Gallery</a>
+                <a href="about.html#news"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">News</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                Programs & Events<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="events.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Event
+                  Calendar</a>
+                <a href="events.html#registration"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Registration</a>
+                <a href="events.html#sponsorship"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Sponsorship</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                Alumni Stories<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="stories.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Featured
+                  Alumni</a>
+                <a href="stories.html#submit"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Submit
+                  Story</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">Resources<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="jobs.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Job
+                  Board</a>
+                <a href="donations.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Give
+                  Back</a>
+                <a href="admin.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Admin
+                  Panel</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div id="login-button-container" class="hidden md:flex">
+            <a id="portal-login-link" href="portal.html#login"
+              class="px-5 py-2 rounded-md text-medium font-medium text-gray-700 bg-blue-100 hover:bg-blue-600 hover:text-white transition duration-300 shadow">Login</a>
+          </div>
+          <div id="user-dropdown" class="hidden relative group">
+            <button id="user-menu-button" type="button"
+              class="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition duration-300 focus:outline-none">
+              <img id="user-avatar" src="images/singlee person.webp" alt="User Avatar"
+                class="w-8 h-8 rounded-full object-cover" />
+              <span id="navbar-username" class="hidden md:inline text-gray-700 font-medium"></span>
+              <i id="user-menu-chevron"
+                class="fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+            </button>
+            <div id="user-menu"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+              <div class="px-4 py-2 border-b">
+                <p id="dropdown-name" class="text-sm font-semibold"></p>
+                <p id="dropdown-email" class="text-xs text-gray-500"></p>
+              </div>
+              <a href="profile.html"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><i
+                  class="fas fa-user mr-2"></i>My Profile</a>
+              <button id="dropdown-logout" type="button"
+                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200"
+                link="portal.html#logout">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden">
+      <button id="mobile-menu-button"
+        class="text-gray-700 hover:text-primary-indigo focus:outline-none focus:text-primary-indigo transition duration-300">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden mobile-sidebar hidden">
+      <button id="close-mobile-menu" class="sidebar-close-btn" aria-label="Close Menu">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+        <a href="index.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Home</a>
+        <a href="about.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">About
+          Us</a>
+        <a href="events.html"
+          class="hover:text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Events</a>
+        <a href="stories.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Alumni
+          Stories</a>
+        <a href="portal.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero-section text-blue-600 py-20 relative" style="
+        background: url('images/image 11.jpg') center center/cover no-repeat;
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+      ">
+    <!-- Opacity overlay -->
+    <div class="absolute inset-0 bg-black opacity-50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <div class="inline-block bg-white/30 backdrop-blur-md p-8 rounded-lg animate-fadeIn">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          About Our Alumni Network
+        </h1>
+        <p class="text-xl md:text-2xl max-w-3xl mx-auto">
+          Connecting graduates, fostering lifelong relationships, and building
+          a stronger community together.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission & Vision Section -->
+  <section id="mission" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Our Mission & Vision
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div
+          class="bg-blue-100 p-8 rounded-xl transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300">
+          <div class="text-center mb-6">
+            <i class="fas fa-bullseye text-4xl text-blue-600 mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-900">Our Mission</h3>
+          </div>
+          <p class="text-gray-700 text-lg leading-relaxed">
+            The mission of the Madhyanchal Professional University is to make
+            distinction in today’s education, revolutionize the imagination of
+            students and to be counted as the best university for human
+            development, creation of knowledge thereby contributing to society
+            through the pursuit of education, learning and research at the
+            highest international levels of excellence
+          </p>
+        </div>
+
+        <div
+          class="bg-purple-100 p-8 rounded-xl transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300">
+          <div class="text-center mb-6">
+            <i class="fas fa-eye text-4xl text-purple-600 mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-900">Our Vision</h3>
+          </div>
+          <p class="text-gray-700 text-lg leading-relaxed">
+            To emerge as an outstanding university in creating and
+            disseminating knowledge by, and providing students a
+            extraordinary, outstanding unparallel learning experience in
+            Science, Technology, Medicine, Pharmacy, Nursing, Agriculture,
+            Humanities, Management & commerce that will bring wisdom,
+            innovation and positive transformation to the vibrant society to
+            uplift the life style of rural citizens
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team Section -->
+  <section id="team" class="py-16 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12 js-fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Meet Our Team
+        </h2>
+        <p class="text-xl text-gray-600">
+          The dedicated professionals behind our alumni network
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div
+          class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift js-fade-in transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2070&auto=format&fit=crop"
+            alt="Director"
+            class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-500" />
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">
+              ManVijay Singh
+            </h3>
+            <p class="text-blue-600 font-medium mb-3">Dean Of Engineer</p>
+            <p class="text-gray-600">
+              Leading alumni relations with 15+ years of experience in higher
+              education and community building.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift js-fade-in transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300">
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=2070&auto=format&fit=crop"
+            alt="Programs Manager"
+            class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-500" />
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">
+              Animesh Dubey
+            </h3>
+            <p class="text-blue-600 font-medium mb-3">HOD-CSE Department</p>
+            <p class="text-gray-600">
+              Coordinating events and programs that bring our alumni community
+              together for meaningful experiences.
+            </p>
+          </div>
+        </div>
+
+        <div
+          class="bg-white rounded-xl shadow-lg overflow-hidden hover-lift js-fade-in transition-transform transform hover:-translate-y-2 hover:shadow-2xl duration-300">
+          <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=2070&auto=format&fit=crop"
+            alt="Communications Coordinator"
+            class="w-full h-64 object-cover transform hover:scale-105 transition-transform duration-500" />
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Afreen Khan</h3>
+            <p class="text-blue-600 font-medium mb-3">Our Mentor</p>
+            <p class="text-gray-600">
+              Managing communications and digital engagement to keep our
+              alumni network connected and informed.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12 js-fade-in">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Photo Gallery
+        </h2>
+        <p class="text-xl text-gray-600">
+          Memories from our alumni events and gatherings
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=2070&auto=format&fit=crop"
+            alt="Alumni Event"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2070&auto=format&fit=crop"
+            alt="Networking Event"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop"
+            alt="Conference"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=2070&auto=format&fit=crop"
+            alt="Graduation"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=2070&auto=format&fit=crop"
+            alt="Workshop"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1591115765373-5207764f72e7?q=80&w=2070&auto=format&fit=crop"
+            alt="Reunion"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=2070&auto=format&fit=crop"
+            alt="Awards Ceremony"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover-lift js-fade-in">
+          <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2070&auto=format&fit=crop"
+            alt="Campus Visit"
+            class="w-full h-48 object-cover transform hover:scale-110 transition-transform duration-500" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- News Section -->
+  <section id="news" class="py-16 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Latest News
+        </h2>
+        <p class="text-xl text-gray-600">
+          Stay updated with our alumni network
+        </p>
+      </div>
+
+      <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Static news cards (fallback) -->
+        <article class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition duration-300">
+          <img src="https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?q=80&w=1400&auto=format&fit=crop"
+            alt="News 1" class="w-full h-44 object-cover" />
+          <div class="p-6">
+            <time class="text-sm text-gray-500">Dec 1, 2025</time>
+            <h3 class="mt-2 text-lg font-semibold text-gray-900">
+              Alumni Reunion Successfully Hosted
+            </h3>
+            <p class="mt-3 text-gray-600">
+              Our annual alumni reunion brought together graduates from across
+              cohorts for networking and celebrations.
+            </p>
+            <div class="mt-4">
+              <a href="#" class="text-primary-indigo font-semibold hover:text-accent-teal">Read more →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition duration-300">
+          <img src="https://images.unsplash.com/photo-1496317899792-9d7dbcd928a1?q=80&w=1400&auto=format&fit=crop"
+            alt="News 2" class="w-full h-44 object-cover" />
+          <div class="p-6">
+            <time class="text-sm text-gray-500">Nov 18, 2025</time>
+            <h3 class="mt-2 text-lg font-semibold text-gray-900">
+              Mentorship Program Launch
+            </h3>
+            <p class="mt-3 text-gray-600">
+              We launched a new mentorship initiative connecting current
+              students with experienced alumni mentors.
+            </p>
+            <div class="mt-4">
+              <a href="#" class="text-primary-indigo font-semibold hover:text-accent-teal">Read more →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition duration-300">
+          <img src="https://images.unsplash.com/photo-1526318472351-c75fcf070f6b?q=80&w=1400&auto=format&fit=crop"
+            alt="News 3" class="w-full h-44 object-cover" />
+          <div class="p-6">
+            <time class="text-sm text-gray-500">Oct 5, 2025</time>
+            <h3 class="mt-2 text-lg font-semibold text-gray-900">
+              New Career Services Partnership
+            </h3>
+            <p class="mt-3 text-gray-600">
+              A partnership with local industry leaders offers more internship
+              and placement opportunities for alumni and students.
+            </p>
+            <div class="mt-4">
+              <a href="#" class="text-primary-indigo font-semibold hover:text-accent-teal">Read more →</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer (Same as index.html) -->
+  <footer class="bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Contact Us
+          </h3>
+          <div class="space-y-2 text-gray-300 text-sm">
+            <p class="hover:text-white transition duration-200">
+              <i class="fas fa-map-marker-alt mr-2 text-primary-indigo"></i>Patel Group of Institute, Ratibad, Madhya
+              Pradesh 462044
+            </p>
+            <p class="hover:text-white transition duration-200">
+              <i class="fas fa-phone mr-2 text-primary-indigo"></i>0755 289
+              6281
+            </p>
+            <p class="hover:text-white transition duration-200">
+              <i class="fas fa-envelope mr-2 text-primary-indigo"></i>alumni@pgoi.edu
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Quick Links
+          </h3>
+          <div class="space-y-2 text-sm">
+            <a href="index.html"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">Home</a>
+            <a href="about.html"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">About
+              Us</a>
+            <a href="events.html"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">Events</a>
+            <a href="stories.html"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">Alumni
+              Stories</a>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Programs
+          </h3>
+          <div class="space-y-2 text-sm">
+            <a href="#"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">Mentorship</a>
+            <a href="#"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">Professional
+              Development</a>
+            <a href="#"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">Networking</a>
+            <a href="#"
+              class="block text-gray-300 hover:text-accent-teal active:text-accent-teal transition duration-200">Volunteer
+              Opportunities</a>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Follow Us
+          </h3>
+          <div class="flex space-x-4">
+            <a href="#"
+              class="text-gray-300 hover:text-accent-teal active:text-accent-teal text-2xl transition duration-300 transform hover:scale-110 active:scale-110"><i
+                class="fab fa-facebook-square"></i></a>
+            <a href="#"
+              class="text-gray-300 hover:text-accent-teal active:text-accent-teal text-2xl transition duration-300 transform hover:scale-110 active:scale-110"><i
+                class="fab fa-twitter-square"></i></a>
+            <a href="#"
+              class="text-gray-300 hover:text-accent-teal active:text-accent-teal text-2xl transition duration-300 transform hover:scale-110 active:scale-110"><i
+                class="fab fa-linkedin"></i></a>
+            <a href="#"
+              class="text-gray-300 hover:text-accent-teal active:text-accent-teal text-2xl transition duration-300 transform hover:scale-110 active:scale-110"><i
+                class="fab fa-instagram-square"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
+        <p>
+          &copy; 2025 PGOI Alumni Network. All rights reserved. | Built with
+          ❤️ and Tailwind CSS.
+        </p>
+      </div>
+    </div>
+  </footer>
+  <script src="js/script.js"></script>
+</body>
+
+</html>

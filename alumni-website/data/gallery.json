@@ -1,0 +1,40 @@
+{
+  "images": [
+    {
+      "url": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=crop",
+      "alt": "Alumni Reunion 2023",
+      "title": "Annual Alumni Reunion",
+      "description": "Bringing together graduates from all generations"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=800&auto=format&fit=crop",
+      "alt": "Networking Event",
+      "title": "Professional Networking",
+      "description": "Connecting alumni across industries"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=800&auto=format&fit=crop",
+      "alt": "Conference",
+      "title": "Alumni Conference",
+      "description": "Annual conference featuring distinguished speakers"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?q=80&w=800&auto=format&fit=crop",
+      "alt": "Graduation",
+      "title": "Graduation Ceremony",
+      "description": "Celebrating our newest alumni"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1556761175-b413da4baf72?q=80&w=800&auto=format&fit=crop",
+      "alt": "Workshop",
+      "title": "Alumni Workshop",
+      "description": "Professional development and skill building"
+    },
+    {
+      "url": "https://images.unsplash.com/photo-1591115765373-5207764f72e7?q=80&w=800&auto=format&fit=crop",
+      "alt": "Reunion",
+      "title": "Class Reunion",
+      "description": "Reconnecting with classmates"
+    }
+  ]
+}

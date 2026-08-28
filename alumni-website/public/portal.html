@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Alumni Portal - University Alumni Network</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+
+  <style>
+    .fade {
+      transition: opacity 220ms ease, transform 220ms ease;
+    }
+  </style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary-indigo": "#4F46E5",
+            "primary-dark-blue": "#312E81",
+            "accent-teal": "#14B8A6",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <nav class="bg-white shadow-xl sticky top-0 z-50">
+    <div class="w-full">
+      <div class="flex justify-between items-center h-16 px-4">
+        <div class="flex-shrink-0">
+          <h1 class="text-2xl font-extrabold text-primary-indigo tracking-wider">
+            Alumni Network
+          </h1>
+        </div>
+        <div class="hidden md:flex flex-1 justify-center">
+          <div class="flex space-x-6 items-center">
+            <a href="index.html"
+              class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
+            <a href="profile.html" id="navbar-dashboard-link"
+              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 hidden">My
+              Profile</a>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                About Us<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="about.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Mission
+                  & Vision</a>
+                <a href="about.html#team"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Team</a>
+                <a href="about.html#gallery"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Gallery</a>
+                <a href="about.html#news"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">News</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                Programs & Events<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="events.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Event
+                  Calendar</a>
+                <a href="events.html#registration"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Registration</a>
+                <a href="events.html#sponsorship"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Sponsorship</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                Alumni Stories<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="stories.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Featured
+                  Alumni</a>
+                <a href="stories.html#submit"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Submit
+                  Story</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">Resources<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="jobs.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Job
+                  Board</a>
+                <a href="donations.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Give
+                  Back</a>
+                <a href="admin.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Admin
+                  Panel</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div id="login-button-container" class="hidden md:flex">
+            <a id="portal-login-link" href="portal.html#login"
+              class="px-5 py-2 rounded-md text-medium font-medium text-gray-700 bg-blue-100 hover:bg-blue-600 hover:text-white transition duration-300 shadow">Login</a>
+          </div>
+          <div id="user-dropdown" class="hidden relative group">
+            <button id="user-menu-button" type="button"
+              class="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition duration-300 focus:outline-none">
+              <img id="user-avatar" src="images/singlee person.webp" alt="User Avatar"
+                class="w-8 h-8 rounded-full object-cover" />
+              <span id="navbar-username" class="hidden md:inline text-gray-700 font-medium"></span>
+              <i id="user-menu-chevron"
+                class="fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+            </button>
+            <div id="user-menu"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+              <div class="px-4 py-2 border-b">
+                <p id="dropdown-name" class="text-sm font-semibold"></p>
+                <p id="dropdown-email" class="text-xs text-gray-500"></p>
+              </div>
+              <a href="profile.html"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><i
+                  class="fas fa-user mr-2"></i>My Profile</a>
+              <button id="dropdown-logout" type="button"
+                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200"
+                link="portal.html#logout">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden">
+      <button id="mobile-menu-button"
+        class="text-gray-700 hover:text-primary-indigo focus:outline-none focus:text-primary-indigo transition duration-300">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden mobile-sidebar hidden">
+      <button id="close-mobile-menu" class="sidebar-close-btn" aria-label="Close Menu">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+        <a href="index.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Home</a>
+        <a href="about.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">About
+          Us</a>
+        <a href="events.html"
+          class="hover:text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Events</a>
+        <a href="stories.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Alumni
+          Stories</a>
+        <a href="portal.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- (Login/Register/Dashboard sections tumhare code me same rahenge, sirf JS update kiya hai niche 👇) -->
+
+  <!-- TABS -->
+  <section class="py-8 bg-white">
+    <div class="w-[500px] mx-auto">
+      <div class="flex bg-gray-100 rounded-lg p-1">
+        <button id="login-tab"
+          class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition bg-blue-600 text-white">
+          Login
+        </button>
+        <button id="register-tab" class="flex-1 py-2 px-4 rounded-md text-sm font-medium transition text-gray-600">
+          Register
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGIN -->
+  <section id="login" class="py-6 bg-white">
+    <div class="max-w-md mx-auto px-4">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+        <p class="text-gray-600">Sign in to access your alumni portal</p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <form id="login-form" class="space-y-4">
+          <div>
+            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+            <input id="login-email" type="email" required
+              class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
+
+          <div>
+            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <div class="relative">
+              <input id="login-password" type="password" required
+                class="w-full px-3 py-2 border rounded-lg pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <button type="button" id="toggle-login-password"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                <i class="fas fa-eye text-gray-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <label class="flex items-center text-sm">
+              <input id="remember-me" type="checkbox" class="rounded border-gray-300 text-blue-600" />
+              <span class="ml-2 text-gray-600">Remember me</span>
+            </label>
+            <a href="#" class="text-sm text-blue-600">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg">
+            Sign In
+          </button>
+        </form>
+
+        <div class="mt-4 text-center text-sm text-gray-600">
+          Don't have an account?
+          <button id="switch-to-register" class="text-blue-600">
+            Sign up
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REGISTER (you asked to use your registration code - kept same structure) -->
+  <section id="register" class="py-6 bg-white hidden">
+    <div class="max-w-2xl mx-auto px-4">
+      <div class="text-center mb-6">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">
+          Join Our Network
+        </h2>
+        <p class="text-gray-600">
+          Create your alumni profile and connect with your community
+        </p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-6">
+        <form id="registration-form" class="space-y-6">
+          <!-- Personal Information -->
+          <div class="border-b border-gray-200 pb-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+              Personal Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="reg-first-name" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                <input id="reg-first-name" type="text" required class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+              <div>
+                <label for="reg-last-name" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                <input id="reg-last-name" type="text" required class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div>
+                <label for="reg-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                <input id="reg-email" type="email" required class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+              <div>
+                <label for="reg-phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                <input id="reg-phone" type="tel" class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Academic Information -->
+          <div class="border-b border-gray-200 pb-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+              Academic Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="reg-graduation-year" class="block text-sm font-medium text-gray-700 mb-2">Graduation Year
+                  *</label>
+                <select id="reg-graduation-year" required class="w-full px-3 py-2 border rounded-lg">
+                  <option value="">Select Year</option>
+                  <option>2024</option>
+                  <option>2023</option>
+                  <option>2022</option>
+                  <option>2021</option>
+                  <option>2020</option>
+                  <option>2019</option>
+                  <option>2018</option>
+                  <option>2017</option>
+                  <option>2016</option>
+                  <option>2015</option>
+                  <option value="older">Before 2015</option>
+                </select>
+              </div>
+              <div>
+                <label for="reg-degree" class="block text-sm font-medium text-gray-700 mb-2">Degree/Program *</label>
+                <input id="reg-degree" type="text" required placeholder="e.g., Bachelor of Science in CS"
+                  class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label for="reg-major" class="block text-sm font-medium text-gray-700 mb-2">Major/Field of Study</label>
+              <input id="reg-major" type="text" placeholder="e.g., Computer Science"
+                class="w-full px-3 py-2 border rounded-lg" />
+            </div>
+          </div>
+
+          <!-- Professional Information -->
+          <div class="border-b border-gray-200 pb-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+              Professional Information
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="reg-current-position" class="block text-sm font-medium text-gray-700 mb-2">Current
+                  Position</label>
+                <input id="reg-current-position" type="text" placeholder="e.g., Software Engineer"
+                  class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+              <div>
+                <label for="reg-company"
+                  class="block text-sm font-medium text-gray-700 mb-2">Company/Organization</label>
+                <input id="reg-company" type="text" placeholder="e.g., Tech Company Inc."
+                  class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div>
+                <label for="reg-industry" class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                <select id="reg-industry" class="w-full px-3 py-2 border rounded-lg">
+                  <option value="">Select Industry</option>
+                  <option>Technology</option>
+                  <option>Healthcare</option>
+                  <option>Finance</option>
+                  <option>Education</option>
+                  <option>Marketing</option>
+                  <option>Consulting</option>
+                  <option>Non-Profit</option>
+                  <option>Government</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label for="reg-location" class="block text-sm font-medium text-gray-700 mb-2">Current Location</label>
+                <input id="reg-location" type="text" placeholder="e.g., New York, NY"
+                  class="w-full px-3 py-2 border rounded-lg" />
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <label for="reg-linkedin" class="block text-sm font-medium text-gray-700 mb-2">LinkedIn Profile
+                (Optional)</label>
+              <input id="reg-linkedin" type="url" placeholder="https://linkedin.com/in/yourprofile"
+                class="w-full px-3 py-2 border rounded-lg" />
+            </div>
+          </div>
+
+          <!-- Account Setup -->
+          <div class="pb-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">
+              Account Setup
+            </h3>
+
+            <div>
+              <label for="reg-password" class="block text-sm font-medium text-gray-700 mb-2">Password *</label>
+              <div class="relative">
+                <input id="reg-password" type="password" required class="w-full px-3 py-2 border rounded-lg pr-10" />
+                <button type="button" id="toggle-reg-password"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <i class="fas fa-eye text-gray-400"></i>
+                </button>
+              </div>
+              <p class="text-sm text-gray-500 mt-1">
+                Must be at least 8 characters with uppercase, lowercase, and
+                number
+              </p>
+            </div>
+
+            <div class="mt-4">
+              <label for="reg-confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password
+                *</label>
+              <div class="relative">
+                <input id="reg-confirm-password" type="password" required
+                  class="w-full px-3 py-2 border rounded-lg pr-10" />
+                <button type="button" id="toggle-confirm-password"
+                  class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <i class="fas fa-eye text-gray-400"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Privacy -->
+          <div class="space-y-2">
+            <h3 class="text-lg font-medium text-gray-900">
+              Privacy & Preferences
+            </h3>
+            <label class="flex items-center"><input id="reg-directory" type="checkbox"
+                class="rounded border-gray-300" /><span class="ml-2 text-sm text-gray-700">Include my profile in the
+                alumni directory</span></label>
+            <label class="flex items-center"><input id="reg-newsletter" type="checkbox"
+                class="rounded border-gray-300" /><span class="ml-2 text-sm text-gray-700">Subscribe to alumni
+                newsletter and event updates</span></label>
+            <label class="flex items-center"><input id="reg-mentorship" type="checkbox"
+                class="rounded border-gray-300" /><span class="ml-2 text-sm text-gray-700">I'm interested in
+                participating in mentorship programs</span></label>
+            <label class="flex items-center"><input id="reg-terms" type="checkbox" required
+                class="rounded border-gray-300" /><span class="ml-2 text-sm text-gray-700">I agree to the
+                <a href="#" class="text-blue-600">Terms</a> and
+                <a href="#" class="text-blue-600">Privacy Policy</a></span></label>
+          </div>
+
+          <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg">
+            Create Account
+          </button>
+        </form>
+
+        <div class="mt-4 text-center text-sm text-gray-600">
+          Already have an account?
+          <button id="switch-to-login" class="text-blue-600">Sign in</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <!-- Small footer copied from earlier -->
+  <footer class="bg-gray-900 text-white mt-10">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Contact Us
+          </h3>
+          <div class="space-y-2 text-gray-300 text-sm">
+            <p>
+              <i class="fas fa-map-marker-alt mr-2 text-primary-indigo"></i>Patel Group of Institute, Ratibad, Madhya
+              Pradesh 462044
+            </p>
+            <p>
+              <i class="fas fa-phone mr-2 text-primary-indigo"></i>0755 289
+              6281
+            </p>
+            <p>
+              <i class="fas fa-envelope mr-2 text-primary-indigo"></i>alumni@pgoi.edu
+            </p>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Quick Links
+          </h3>
+          <div class="space-y-2 text-sm">
+            <a class="block text-gray-300 hover:text-accent-teal" href="#">Home</a>
+            <a class="block text-gray-300 hover:text-accent-teal" href="#">About Us</a>
+            <a class="block text-gray-300 hover:text-accent-teal" href="#">Events</a>
+            <a class="block text-gray-300 hover:text-accent-teal" href="#">Alumni Stories</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Programs
+          </h3>
+          <div class="space-y-2 text-sm">
+            <a class="block text-gray-300 hover:text-accent-teal" href="#">Mentorship</a>
+            <a class="block text-gray-300 hover:text-accent-teal" href="#">Professional Development</a>
+            <a class="block text-gray-300 hover:text-accent-teal" href="#">Networking</a>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold mb-4 border-b border-primary-indigo/50 pb-1">
+            Follow Us
+          </h3>
+          <div class="flex space-x-4">
+            <a class="text-gray-300 hover:text-accent-teal text-2xl" href="#"><i class="fab fa-facebook-square"></i></a>
+            <a class="text-gray-300 hover:text-accent-teal text-2xl" href="#"><i class="fab fa-twitter-square"></i></a>
+            <a class="text-gray-300 hover:text-accent-teal text-2xl" href="#"><i class="fab fa-linkedin"></i></a>
+            <a class="text-gray-300 hover:text-accent-teal text-2xl" href="#"><i
+                class="fab fa-instagram-square"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-700 mt-8 pt-4 text-center text-gray-400 text-sm">
+        &copy; <span id="year"></span> PGOI Alumni Network. All rights
+        reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- FOOTER same rahega -->
+
+  <script src="js/script.js?v=3"></script>
+  <script src="js/portal.js?v=3"></script>
+</body>
+
+</html>

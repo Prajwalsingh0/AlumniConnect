@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Board - Alumni Network</title>
+    <meta name="description" content="Exclusive job openings for alumni. Browse, search and apply to top opportunities.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-indigo': '#4F46E5',
+                        'accent-teal': '#14B8A6',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .job-card { transition: all 0.2s ease; }
+        .job-card:hover { transform: translateY(-2px); }
+        .skeleton { background: linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.2s infinite; }
+        @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+        .type-badge { display:inline-flex; align-items:center; padding:3px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+        .line-clamp-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-xl sticky top-0 z-50">
+        <div class="w-full">
+            <div class="flex justify-between items-center h-16 px-4">
+                <div class="flex-shrink-0">
+                    <a href="index.html">
+                        <h1 class="text-2xl font-extrabold text-primary-indigo tracking-wider">Alumni Network</h1>
+                    </a>
+                </div>
+                <div class="hidden md:flex flex-1 justify-center">
+                    <div class="flex space-x-6 items-center">
+                        <a href="index.html" class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
+                        <div class="relative group">
+                            <button class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">About Us<i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                                <a href="about.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Mission & Vision</a>
+                                <a href="about.html#team" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Team</a>
+                                <a href="about.html#gallery" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Gallery</a>
+                                <a href="about.html#news" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">News</a>
+                            </div>
+                        </div>
+                        <div class="relative group">
+                            <button class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">Programs & Events<i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                                <a href="events.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Event Calendar</a>
+                                <a href="events.html#registration" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Registration</a>
+                                <a href="events.html#sponsorship" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Sponsorship</a>
+                            </div>
+                        </div>
+                        <div class="relative group">
+                            <button class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">Alumni Stories<i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                                <a href="stories.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Featured Alumni</a>
+                                <a href="stories.html#submit" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Submit Story</a>
+                            </div>
+                        </div>
+                        <div class="relative group">
+                            <button class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">Resources<i class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+                            <div class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                                <a href="jobs.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Job Board</a>
+                                <a href="donations.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Give Back</a>
+                                <a href="admin.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Admin Panel</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div id="login-button-container" class="hidden md:flex">
+                        <a href="portal.html#login" class="px-5 py-2 rounded-md text-sm font-medium text-gray-700 bg-blue-100 hover:bg-blue-600 hover:text-white transition shadow">Login</a>
+                    </div>
+                    <div id="user-dropdown" class="hidden relative group">
+                        <button id="user-menu-button" type="button"
+                          class="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition duration-300 focus:outline-none">
+                          <img id="user-avatar" src="images/singlee person.webp" alt="User Avatar"
+                            class="w-8 h-8 rounded-full object-cover" />
+                          <span id="navbar-username" class="hidden md:inline text-gray-700 font-medium"></span>
+                          <i id="user-menu-chevron"
+                            class="fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+                        </button>
+                        <div id="user-menu"
+                          class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+                          <div class="px-4 py-2 border-b">
+                            <p id="dropdown-name" class="text-sm font-semibold"></p>
+                            <p id="dropdown-email" class="text-xs text-gray-500"></p>
+                          </div>
+                          <a href="profile.html"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><i
+                              class="fas fa-user mr-2"></i>My Profile</a>
+                          <button id="dropdown-logout" type="button"
+                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200"
+                            link="portal.html#logout">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                          </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="relative bg-gray-900 text-white py-24 px-6 overflow-hidden">
+        <img src="images/jobs-hero.png" alt="Jobs Hero" class="absolute inset-0 w-full h-full object-cover opacity-40">
+        <div class="relative max-w-7xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">Career Opportunities</h1>
+            <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
+                Exclusive job openings for our alumni network. Connect with companies looking for your expertise.
+            </p>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <section class="max-w-7xl mx-auto px-6 py-12 -mt-10 relative z-10">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Search Jobs</label>
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input id="jobSearchInput" type="text" placeholder="Job title, keywords, or company"
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary-indigo outline-none transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                    <div class="relative">
+                        <i class="fas fa-map-marker-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input id="jobLocationInput" type="text" placeholder="City or Remote"
+                            class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary-indigo outline-none transition">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">&nbsp;</label>
+                    <button onclick="fetchJobs()"
+                        class="w-full bg-accent-teal hover:bg-teal-600 text-white font-bold py-3 rounded-lg transition">
+                        <i class="fas fa-search mr-1"></i> Search
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 pb-20">
+        <div class="flex flex-col md:flex-row gap-8">
+
+            <!-- Sidebar Filters -->
+            <aside class="w-full md:w-64 space-y-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Job Type</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" class="job-type-cb" value="full-time"> Full-time</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" class="job-type-cb" value="part-time"> Part-time</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" class="job-type-cb" value="contract"> Contract</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" class="job-type-cb" value="internship"> Internship</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" class="job-type-cb" value="remote"> Remote</label>
+                        <label class="flex items-center gap-2 cursor-pointer text-sm"><input type="checkbox" class="job-type-cb" value="freelance"> Freelance</label>
+                    </div>
+                    <button onclick="fetchJobs()" class="mt-4 w-full text-sm bg-indigo-50 hover:bg-indigo-100 text-primary-indigo font-semibold py-2 rounded-lg transition">Apply Filter</button>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-3">Live Stats</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Total Jobs</span><span class="font-bold text-gray-800" id="statTotal">—</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Full-time</span><span class="font-bold text-gray-800" id="statFull">—</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Internships</span><span class="font-bold text-gray-800" id="statIntern">—</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-gray-500">Remote</span><span class="font-bold text-gray-800" id="statRemote">—</span></div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Jobs List -->
+            <div class="flex-1">
+                <p id="jobsCount" class="text-sm text-gray-500 mb-4"></p>
+                <div id="jobsGrid" class="space-y-6">
+                    <div class="skeleton rounded-xl h-40"></div>
+                    <div class="skeleton rounded-xl h-40"></div>
+                    <div class="skeleton rounded-xl h-40"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p>&copy; 2024 University Alumni Network. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Apply Modal -->
+    <div id="applyModal" class="fixed inset-0 bg-black bg-opacity-50 z-[100] hidden flex items-center justify-center backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all scale-95 opacity-0" id="applyModalContent">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-xl font-bold text-gray-900" id="applyModalTitle">Apply for Job</h3>
+                <button onclick="closeApplyModal()" class="text-gray-400 hover:text-red-500 transition-colors focus:outline-none">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <form id="applyForm" onsubmit="submitApplication(event)" class="p-6">
+                <input type="hidden" id="applyJobId">
+                
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Resume Link (URL)</label>
+                    <input type="url" id="applyResume" required placeholder="https://drive.google.com/..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary-indigo focus:ring-2 focus:ring-indigo-100 outline-none transition">
+                    <p class="text-xs text-gray-500 mt-1">Please provide a link to your resume (Drive, LinkedIn, Portfolio).</p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Cover Letter</label>
+                    <textarea id="applyCoverLetter" required rows="4" placeholder="Briefly explain why you are a good fit for this role..." class="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary-indigo focus:ring-2 focus:ring-indigo-100 outline-none transition resize-none"></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeApplyModal()" class="px-5 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition">Cancel</button>
+                    <button type="submit" id="applySubmitBtn" class="px-5 py-2 text-sm font-semibold text-white bg-primary-indigo hover:bg-indigo-700 rounded-lg shadow-md hover:shadow-lg transition flex items-center">
+                        <span id="applySubmitText">Submit Application</span>
+                        <i id="applySubmitIcon" class="fas fa-paper-plane ml-2 hidden"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const TYPE_COLORS = {
+            'full-time':  'bg-indigo-100 text-indigo-700',
+            'part-time':  'bg-teal-100 text-teal-700',
+            'contract':   'bg-orange-100 text-orange-700',
+            'internship': 'bg-pink-100 text-pink-700',
+            'freelance':  'bg-lime-100 text-lime-700',
+            'remote':     'bg-sky-100 text-sky-700'
+        };
+
+        function formatSalary(salary) {
+            if (!salary || (!salary.min && !salary.max)) return null;
+            const fmt = v => v >= 100000 ? `₹${(v/100000).toFixed(1)}L` : `₹${v.toLocaleString('en-IN')}`;
+            if (salary.min && salary.max) return `${fmt(salary.min)} – ${fmt(salary.max)}/yr`;
+            if (salary.min) return `${fmt(salary.min)}+/yr`;
+            return null;
+        }
+
+        function relTime(date) {
+            const diff = (Date.now() - new Date(date)) / 1000;
+            if (diff < 3600)   return `${Math.floor(diff/60)} min ago`;
+            if (diff < 86400)  return `${Math.floor(diff/3600)} hr ago`;
+            if (diff < 604800) return `${Math.floor(diff/86400)} days ago`;
+            return new Date(date).toLocaleDateString('en-IN', {day:'numeric', month:'short'});
+        }
+
+        function renderCard(j) {
+            const initial  = (j.company?.name || 'J')[0].toUpperCase();
+            const tc       = TYPE_COLORS[j.type] || 'bg-gray-100 text-gray-600';
+            const salary   = formatSalary(j.salary);
+            const location = j.company?.location?.city || '';
+            const featured = j.isFeatured
+                ? `<span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">⭐ Featured</span>` : '';
+            const salBadge = salary
+                ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">💰 ${salary}</span>` : '';
+            const expBadge = j.experience?.minimum > 0
+                ? `<span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-medium">${j.experience.minimum}+ yrs exp</span>` : '';
+
+            const token = localStorage.getItem('token');
+            let actionButton = '';
+            
+            if (token) {
+                // If logged in, show apply button that opens modal
+                actionButton = `<button onclick="openApplyModal('${j._id}', '${j.title.replace(/'/g, "\\'")}')"
+                    class="bg-primary-indigo text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">
+                    Apply Now
+                </button>`;
+            } else {
+                // If not logged in, show link to login
+                actionButton = `<a href="portal.html#login"
+                    class="bg-white border-2 border-primary-indigo text-primary-indigo px-5 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary-indigo hover:text-white transition">
+                    Log in to Apply
+                </a>`;
+            }
+
+            return `
+            <div class="job-card bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-xl group">
+                <div class="flex items-start justify-between flex-wrap gap-3">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-50 flex items-center justify-center text-primary-indigo text-2xl font-bold flex-shrink-0">
+                            ${initial}
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 group-hover:text-primary-indigo transition flex flex-wrap items-center gap-2">
+                                ${j.title} ${featured}
+                            </h3>
+                            <p class="text-gray-500 text-sm mt-0.5">
+                                ${j.company?.name || '—'}${location ? ` &bull; <i class="fas fa-map-marker-alt text-xs"></i> ${location}` : ''}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="type-badge ${tc} capitalize">${j.type || '—'}</span>
+                </div>
+                <p class="mt-4 text-gray-600 text-sm line-clamp-2">${j.description || ''}</p>
+                <div class="mt-4 flex flex-wrap gap-2">${salBadge}${expBadge}</div>
+                <div class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
+                    <span class="text-xs text-gray-400"><i class="far fa-clock mr-1"></i>${relTime(j.createdAt)}</span>
+                    ${actionButton}
+                </div>
+            </div>`;
+        }
+
+        let allJobs = [];
+
+        // Apply Modal Logic
+        function openApplyModal(id, title) {
+            document.getElementById('applyJobId').value = id;
+            document.getElementById('applyModalTitle').textContent = `Apply for: ${title}`;
+            document.getElementById('applyForm').reset();
+            
+            const modal = document.getElementById('applyModal');
+            const content = document.getElementById('applyModalContent');
+            
+            modal.classList.remove('hidden');
+            // Small delay to allow display:block to apply before animating opacity/scale
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeApplyModal() {
+            const modal = document.getElementById('applyModal');
+            const content = document.getElementById('applyModalContent');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        async function submitApplication(e) {
+            e.preventDefault();
+            const btn = document.getElementById('applySubmitBtn');
+            const btnText = document.getElementById('applySubmitText');
+            const btnIcon = document.getElementById('applySubmitIcon');
+            
+            const jobId = document.getElementById('applyJobId').value;
+            const resume = document.getElementById('applyResume').value.trim();
+            const coverLetter = document.getElementById('applyCoverLetter').value.trim();
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                alert("You are not logged in!");
+                return;
+            }
+
+            try {
+                // Show loading state
+                btn.disabled = true;
+                btnText.textContent = "Submitting...";
+                btn.classList.add('opacity-75');
+
+                const res = await fetch(`/api/jobs/${jobId}/apply`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ resume, coverLetter })
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || 'Failed to apply');
+                }
+
+                // Success
+                btnText.textContent = "Applied Successfully!";
+                btn.classList.replace('bg-primary-indigo', 'bg-green-500');
+                btn.classList.replace('hover:bg-indigo-700', 'hover:bg-green-600');
+                
+                setTimeout(() => {
+                    closeApplyModal();
+                    // Reset button state
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btnText.textContent = "Submit Application";
+                        btn.classList.remove('opacity-75');
+                        btn.classList.replace('bg-green-500', 'bg-primary-indigo');
+                        btn.classList.replace('hover:bg-green-600', 'hover:bg-indigo-700');
+                        // Refresh jobs to potentially show 'Applied' state if implemented
+                        fetchJobs();
+                    }, 300);
+                }, 1500);
+
+            } catch (err) {
+                alert(err.message);
+                btn.disabled = false;
+                btnText.textContent = "Submit Application";
+                btn.classList.remove('opacity-75');
+            }
+        }
+
+        async function fetchJobs() {
+            const search   = document.getElementById('jobSearchInput').value.trim();
+            const location = document.getElementById('jobLocationInput').value.trim();
+            const checked  = [...document.querySelectorAll('.job-type-cb:checked')].map(cb => cb.value);
+
+            const params = new URLSearchParams();
+            if (search)   params.set('search', search);
+            if (location) params.set('location', location);
+            if (checked.length === 1) params.set('type', checked[0]);
+
+            document.getElementById('jobsGrid').innerHTML =
+                '<div class="skeleton rounded-xl h-40"></div>'.repeat(3);
+            document.getElementById('jobsCount').textContent = '';
+
+            try {
+                const res  = await fetch(`/api/jobs?${params}`);
+                const jobs = await res.json();
+
+                allJobs = Array.isArray(jobs) ? jobs : [];
+
+                // Multi-type client filter
+                const filtered = checked.length > 1
+                    ? allJobs.filter(j => checked.includes(j.type))
+                    : allJobs;
+
+                updateStats(allJobs);
+                renderJobs(filtered);
+            } catch {
+                document.getElementById('jobsGrid').innerHTML =
+                    `<div class="bg-red-50 text-red-500 rounded-xl p-10 text-center">
+                        <i class="fas fa-exclamation-circle text-3xl mb-3 block"></i>
+                        Could not load jobs. Please try again later.
+                    </div>`;
+            }
+        }
+
+        function renderJobs(jobs) {
+            const grid  = document.getElementById('jobsGrid');
+            const count = document.getElementById('jobsCount');
+            if (!jobs.length) {
+                grid.innerHTML = `<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-16 text-center text-gray-400">
+                    <i class="fas fa-briefcase text-4xl mb-4 block text-gray-200"></i>
+                    <p class="font-medium">No jobs found matching your criteria.</p>
+                    <p class="text-sm mt-1">Try clearing your filters or check back later.</p>
+                </div>`;
+                count.textContent = '';
+                return;
+            }
+            count.textContent = `Showing ${jobs.length} job${jobs.length !== 1 ? 's' : ''}`;
+            grid.innerHTML = jobs.map(renderCard).join('');
+        }
+
+        function updateStats(jobs) {
+            document.getElementById('statTotal').textContent  = jobs.length;
+            document.getElementById('statFull').textContent   = jobs.filter(j => j.type === 'full-time').length;
+            document.getElementById('statIntern').textContent = jobs.filter(j => j.type === 'internship').length;
+            document.getElementById('statRemote').textContent = jobs.filter(j => j.type === 'remote').length;
+        }
+
+        // Live search debounce
+        let searchTimer;
+        document.getElementById('jobSearchInput').addEventListener('input', () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(fetchJobs, 400);
+        });
+
+        // Initial load
+        fetchJobs();
+    </script>
+    <script src="js/script.js"></script>
+</body>
+</html>
