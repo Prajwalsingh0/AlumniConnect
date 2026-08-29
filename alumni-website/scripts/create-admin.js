@@ -1,29 +1,35 @@
 /**
  * create-admin.js
- * Run this ONCE to create an admin user in the database.
+ * Run this ONCE to create (or promote) an admin user in the database.
  *
  * Usage:
  *   node scripts/create-admin.js
  *
- * You can change the email/password below before running.
+ * Credentials are read from environment variables so no password is
+ * hardcoded in the repository. If ADMIN_PASSWORD is not provided, a
+ * strong random password is generated and printed once.
+ *
+ * Optional .env entries:
+ *   ADMIN_EMAIL=admin@alumni.com
+ *   ADMIN_PASSWORD=YourStrongPasswordHere
  */
 
 require('dotenv').config();
+const crypto = require('crypto');
 const mongoose = require('mongoose');
-const User     = require('../models/User');
+const User = require('../models/User');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/alumni-website';
 
-// ── Admin credentials — change these if you want ──────────────────────────
-const ADMIN_NAME     = 'Super Admin';
-const ADMIN_EMAIL    = 'admin@alumni.com';
-const ADMIN_PASSWORD = 'Admin@1234';
-// ──────────────────────────────────────────────────────────────────────────
+const ADMIN_NAME = 'Super Admin';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@alumni.com';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || crypto.randomBytes(12).toString('base64url');
+const generatedPassword = !process.env.ADMIN_PASSWORD;
 
 async function createAdmin() {
-  console.log('\n🔗 Connecting to MongoDB...');
+  console.log('\nConnecting to MongoDB...');
   await mongoose.connect(MONGODB_URI);
-  console.log('✅ Connected!\n');
+  console.log('Connected!\n');
 
   try {
     // Check if admin already exists
@@ -35,37 +41,41 @@ async function createAdmin() {
         existing.role = 'admin';
         existing.isActive = true;
         await existing.save();
-        console.log(`✅ Existing user "${existing.name}" promoted to admin!`);
+        console.log(`Existing user "${existing.name}" promoted to admin!`);
       } else {
-        console.log(`ℹ️  Admin user already exists: ${existing.email}`);
+        console.log(`Admin user already exists: ${existing.email}`);
       }
     } else {
       // Create fresh admin user
       const admin = new User({
-        name:          ADMIN_NAME,
-        email:         ADMIN_EMAIL,
-        password:      ADMIN_PASSWORD,   // will be hashed by pre-save hook
-        role:          'admin',
-        isActive:      true,
-        emailVerified: true,
+        name: ADMIN_NAME,
+        email: ADMIN_EMAIL,
+        password: ADMIN_PASSWORD, // will be hashed by pre-save hook
+        role: 'admin',
+        isActive: true,
+        emailVerified: true
       });
       await admin.save();
-      console.log('🎉 Admin user created successfully!\n');
+      console.log('Admin user created successfully!');
     }
 
-    console.log('┌─────────────────────────────────────┐');
-    console.log('│         Admin Login Details          │');
-    console.log('├─────────────────────────────────────┤');
-    console.log(`│  URL:      http://localhost:3000/admin-login.html`);
-    console.log(`│  Email:    ${ADMIN_EMAIL.padEnd(27)}│`);
-    console.log(`│  Password: ${ADMIN_PASSWORD.padEnd(27)}│`);
-    console.log('└─────────────────────────────────────┘\n');
+    console.log('\n========================================');
+    console.log('         Admin Login Details');
+    console.log('========================================');
+    console.log(`  URL:      http://localhost:3000/admin-login.html`);
+    console.log(`  Email:    ${ADMIN_EMAIL}`);
+    console.log(`  Password: ${ADMIN_PASSWORD}`);
+    if (generatedPassword) {
+      console.log('  (password was generated for this run - store it now,');
+      console.log('   or set ADMIN_PASSWORD in .env before running again)');
+    }
+    console.log('========================================\n');
 
   } catch (err) {
-    console.error('❌ Error:', err.message);
+    console.error('Error:', err.message);
   } finally {
     await mongoose.disconnect();
-    console.log('🔌 Disconnected from MongoDB.');
+    console.log('Disconnected from MongoDB.');
   }
 }
 

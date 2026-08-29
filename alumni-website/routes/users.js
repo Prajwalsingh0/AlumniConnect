@@ -1,6 +1,5 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
-const bcrypt = require('bcryptjs');
 const { authenticateToken } = require('../middleware/auth');
 const User = require('../models/User');
 const upload = require('../middleware/upload');
@@ -94,8 +93,6 @@ router.put('/profile', authenticateToken, validateProfileUpdate, async (req, res
       });
     }
 
-    console.log('Profile update payload:', JSON.stringify(updates));
-
     const updatedUser = await User.findByIdAndUpdate(
       req.user.userId,
       { $set: updates },
@@ -160,9 +157,10 @@ router.get('/public/:userId', authenticateToken, async (req, res) => {
     const targetUser = await User.findById(req.params.userId);
     if (!targetUser) return res.status(404).json({ error: 'User not found' });
 
-    // Determine connection status (simplified check for now)
-    // In a real app, you'd check if req.user.userId is in targetUser.connections
-    const isConnection = false; // Placeholder
+    // Determine whether the requester may see restricted sections.
+    // The project has no connections feature yet, so only the alumni/admin check applies;
+    // sections marked "Connections Only" stay hidden.
+    const isConnection = false;
     const isAlumni = req.user.role === 'alumni' || req.user.role === 'admin';
 
     const profile = targetUser.toObject();
@@ -306,12 +304,8 @@ router.post('/profile/image', authenticateToken, upload.single('profileImage'), 
 // Get all users (for alumni directory)
 router.get('/directory', authenticateToken, async (req, res) => {
   try {
-    // Filter active users who want to be in directory
-    const directoryUsers = await User.find({
-      isActive: true,
-      'preferences.directory': { $ne: false }
-    })
-      .select('-password -preferences')
+    const directoryUsers = await User.find({ isActive: true })
+      .select('-password')
       .lean();
 
     res.json({ users: directoryUsers });
@@ -333,21 +327,20 @@ router.get('/search', authenticateToken, async (req, res) => {
 
     const searchTerm = query.toLowerCase();
 
-    // Create a MongoDB query for searching users
+    // Search across name and profile fields (they live in the profile subdocument)
     const searchQuery = {
       isActive: true,
-      'preferences.directory': { $ne: false },
       $or: [
         { name: { $regex: searchTerm, $options: 'i' } },
-        { degree: { $regex: searchTerm, $options: 'i' } },
-        { company: { $regex: searchTerm, $options: 'i' } },
-        { industry: { $regex: searchTerm, $options: 'i' } },
-        { location: { $regex: searchTerm, $options: 'i' } }
+        { 'profile.degree': { $regex: searchTerm, $options: 'i' } },
+        { 'profile.company': { $regex: searchTerm, $options: 'i' } },
+        { 'profile.department': { $regex: searchTerm, $options: 'i' } },
+        { 'profile.location': { $regex: searchTerm, $options: 'i' } }
       ]
     };
 
     const filteredUsers = await User.find(searchQuery)
-      .select('-password -preferences')
+      .select('-password')
       .lean();
 
     res.json({ users: filteredUsers });

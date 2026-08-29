@@ -1,8 +1,8 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
+const mongoose = require('mongoose');
 const Event = require('../models/Event');
-const User = require('../models/User');
 const router = express.Router();
 
 // Get all published or completed events
@@ -43,6 +43,10 @@ router.get('/', async (req, res) => {
 // Get single event by ID
 router.get('/:id', async (req, res) => {
   try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Event not found or not public' });
+    }
+
     const event = await Event.findById(req.params.id)
       .populate('organizer', 'name email')
       .lean();

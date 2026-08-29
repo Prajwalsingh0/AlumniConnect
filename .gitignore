@@ -8,6 +8,9 @@ alumni-website/node_modules/
 alumni-website/.env
 alumni-website/.env.local
 
+# Runtime uploads (profile images)
+alumni-website/uploads/
+
 # VS Code config
 .vscode/
 alumni-website/.vscode/

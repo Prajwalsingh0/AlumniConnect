@@ -35,9 +35,8 @@ function handleLogout() {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             }
-        }).catch(err => {
+        }).catch(() => {
             // Ignore errors - token is already cleared
-            console.log('Logout API call completed');
         });
     }
 

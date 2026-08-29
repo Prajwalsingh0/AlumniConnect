@@ -1,14 +1,12 @@
 /**
- * Edit Profile Logic (V2 - Debug Fix)
+ * Edit Profile Logic (V2)
  */
-console.log('DEBUG: edit-profile_v2.js LOADED');
 
 // 1. Define addItem function FIRST to ensure availability
 function addItem(type, data = {}) {
-    console.log('DEBUG: addItem called for', type);
     const list = type === 'experience' ? document.getElementById('experience-list') : document.getElementById('education-list');
     if (!list) {
-        console.error('DEBUG: List container not found for', type);
+        console.error('List container not found for', type);
         return;
     }
 
@@ -301,18 +299,14 @@ async function saveProfile(e) {
     // Attach Listeners Immediately
     const addExpBtn = document.getElementById('add-experience-btn');
     if (addExpBtn) {
-        console.log('DEBUG: Attaching listener to add-experience-btn');
         addExpBtn.addEventListener('click', (e) => {
             e.preventDefault();
             addItem('experience');
         });
-    } else {
-        console.error('DEBUG: add-experience-btn NOT FOUND');
     }
 
     const addEduBtn = document.getElementById('add-education-btn');
     if (addEduBtn) {
-        console.log('DEBUG: Attaching listener to add-education-btn');
         addEduBtn.addEventListener('click', (e) => {
             e.preventDefault();
             addItem('education');

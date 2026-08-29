@@ -1,8 +1,8 @@
-const CACHE_NAME = 'alumni-cache-v4';
+const CACHE_NAME = 'alumni-cache-v5';
 const urlsToCache = [
     '/',
     '/css/style.css',
-    '/js/main.js',
+    '/js/script.js',
     '/manifest.json',
     '/portal.html'
 ];

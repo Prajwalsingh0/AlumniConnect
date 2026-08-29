@@ -1,7 +1,6 @@
 /**
  * Alumni Profile Logic (V2 - Redesigned)
  */
-console.log("PROFILE V2 LOADED");
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -353,14 +352,9 @@ function setupNavigationListeners() {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('token');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user');
             window.location.href = 'portal.html#login';
-        });
-    }
-
-    const viewResumeBtn = document.getElementById('view-resume-btn');
-    if (viewResumeBtn) {
-        viewResumeBtn.addEventListener('click', () => {
-            alert('Resume feature coming soon!');
         });
     }
 }

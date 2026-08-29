@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Campaign = require('../models/Campaign');
 const Donation = require('../models/Donation');
 const { authenticateToken } = require('../middleware/auth');
@@ -32,6 +33,13 @@ router.post('/campaigns', authenticateToken, async (req, res) => {
 router.post('/donate', authenticateToken, async (req, res) => {
     try {
         const { campaignId, amount, isAnonymous, message } = req.body;
+
+        if (!campaignId || !mongoose.Types.ObjectId.isValid(campaignId)) {
+            return res.status(404).json({ error: 'Campaign not found' });
+        }
+        if (typeof amount !== 'number' || amount <= 0) {
+            return res.status(400).json({ error: 'Donation amount must be a positive number' });
+        }
 
         const campaign = await Campaign.findById(campaignId);
         if (!campaign) return res.status(404).json({ error: 'Campaign not found' });

@@ -1,14 +1,31 @@
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
-// Email configuration
-const transporter = nodemailer.createTransport({
-  service: 'gmail', // or use SendGrid, AWS SES
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+let transporter = null;
+
+/**
+ * Create the SMTP transporter on first use so the app can start
+ * (and register users) even when email is not configured.
+ */
+const getTransporter = () => {
+  if (transporter) return transporter;
+
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    throw new Error('Email service is not configured (set EMAIL_USER and EMAIL_PASSWORD)');
   }
-});
+
+  transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT, 10) || 587,
+    secure: parseInt(process.env.EMAIL_PORT, 10) === 465,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD
+    }
+  });
+
+  return transporter;
+};
 
 /**
  * Generate a random long-lived verification token
@@ -24,8 +41,8 @@ const generateVerificationToken = () => {
  * @param {string} token - Verification token
  */
 const sendVerificationEmail = async (email, token) => {
-  const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-  
+  const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
+
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: email,
@@ -37,8 +54,8 @@ const sendVerificationEmail = async (email, token) => {
       <p>This link will expire in 24 hours.</p>
     `
   };
-  
-  await transporter.sendMail(mailOptions);
+
+  await getTransporter().sendMail(mailOptions);
 };
 
 /**
@@ -47,23 +64,23 @@ const sendVerificationEmail = async (email, token) => {
  * @param {string} token - Reset token
  */
 const sendPasswordResetEmail = async (email, token) => {
-    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-    
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: email,
-      subject: 'Password Reset Request',
-      html: `
-        <h1>Password Reset</h1>
-        <p>You requested a password reset. Click the link below to set a new password:</p>
-        <a href="${resetLink}">Reset Password</a>
-        <p>This link will expire in 15 minutes.</p>
-        <p>If you did not request this, please ignore this email.</p>
-      `
-    };
-    
-    await transporter.sendMail(mailOptions);
+  const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Password Reset Request',
+    html: `
+      <h1>Password Reset</h1>
+      <p>You requested a password reset. Click the link below to set a new password:</p>
+      <a href="${resetLink}">Reset Password</a>
+      <p>This link will expire in 15 minutes.</p>
+      <p>If you did not request this, please ignore this email.</p>
+    `
   };
+
+  await getTransporter().sendMail(mailOptions);
+};
 
 module.exports = {
   generateVerificationToken,

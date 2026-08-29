@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
@@ -10,11 +9,11 @@ const connectDB = require('./config/database');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const eventRoutes = require('./routes/events');
-const alumniRoutes = require('./routes/alumni');
 const jobRoutes = require('./routes/jobs');
 const messageRoutes = require('./routes/messages');
 const donationRoutes = require('./routes/donations');
 const groupRoutes = require('./routes/groups');
+const storyRoutes = require('./routes/stories');
 const adminRoutes = require('./routes/admin');
 
 const http = require('http');
@@ -59,13 +58,6 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false,
 }));
 
-// Rate limiting removed globally for development
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000, // 15 minutes
-//   max: 5000 // limit each IP to 5000 requests per windowMs
-// });
-// app.use(limiter);
-
 // CORS configuration - allow requests from frontend
 app.use(cors({
   origin: ['http://localhost:3000', 'http://localhost:8000', 'http://127.0.0.1:3000', 'http://127.0.0.1:8000'],
@@ -80,11 +72,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
-app.use('/api/alumni', alumniRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/stories', storyRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Serve uploads directory
@@ -114,6 +106,17 @@ app.use(express.static(publicPath, {
 // Error handling middleware - must come before catch-all route
 app.use((err, req, res, next) => {
   console.error(err.stack);
+
+  // Malformed JSON / oversized bodies are client errors
+  if (err.type === 'entity.parse.failed' || err.type === 'entity.too.large') {
+    return res.status(400).json({ error: 'Invalid request body' });
+  }
+
+  // Upload rejections (wrong file type, oversized files) are client errors
+  if (err.name === 'MulterError' || err.message === 'Only image files are allowed') {
+    return res.status(400).json({ error: err.message || 'Invalid file upload' });
+  }
+
   res.status(500).json({
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
@@ -179,6 +182,16 @@ io.on('connection', (socket) => {
   socket.on('send_message', async (data) => {
     try {
       const { conversationId, recipientId, content } = data;
+
+      // Only participants of the conversation may send messages in it
+      const conversation = await Conversation.findById(conversationId);
+      if (!conversation) {
+        return socket.emit('error', { message: 'Conversation not found' });
+      }
+      const participantIds = conversation.participants.map(id => id.toString());
+      if (!participantIds.includes(socket.userId) || !participantIds.includes(recipientId)) {
+        return socket.emit('error', { message: 'Not a participant of this conversation' });
+      }
 
       const message = new Message({
         conversationId,

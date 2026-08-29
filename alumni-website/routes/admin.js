@@ -76,7 +76,7 @@ router.get('/users', authenticateToken, isAdmin, async (req, res) => {
 
         const [users, total] = await Promise.all([
             User.find(filter)
-                .select('-password -emailVerificationToken -passwordResetToken -twoFactorSecret')
+                .select('-password -emailVerificationToken -passwordResetToken')
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit)

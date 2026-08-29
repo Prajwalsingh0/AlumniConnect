@@ -111,11 +111,6 @@ const userSchema = new mongoose.Schema({
   emailVerificationExpires: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
-  twoFactorEnabled: {
-    type: Boolean,
-    default: false
-  },
-  twoFactorSecret: String,
   lastLogin: Date,
   createdAt: {
     type: Date,
@@ -155,6 +150,10 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
 userSchema.methods.getPublicProfile = function () {
   const userObject = this.toObject();
   delete userObject.password;
+  delete userObject.emailVerificationToken;
+  delete userObject.emailVerificationExpires;
+  delete userObject.passwordResetToken;
+  delete userObject.passwordResetExpires;
   return userObject;
 };
 

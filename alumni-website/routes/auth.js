@@ -9,15 +9,11 @@ const {
   sendVerificationEmail,
   sendPasswordResetEmail
 } = require('../services/emailService');
-const {
-  generate2FASecret,
-  generateQRCode,
-  verify2FAToken
-} = require('../services/twoFactorService');
 const router = express.Router();
 
 // JWT secret key
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
+const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
 
 // Validation middleware
 const validateRegistration = [
@@ -92,17 +88,24 @@ router.post('/register', validateRegistration, async (req, res) => {
 
     await newUser.save();
 
-    // Send verification email
+    // Send verification email (best effort - registration still succeeds if SMTP is not configured)
     try {
       await sendVerificationEmail(newUser.email, verificationToken);
     } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // We still registered the user, but they'll need to resend verification later
+      console.error('Failed to send verification email:', emailError.message);
     }
+
+    // Log the user in immediately (both frontend flows expect token + user after registration)
+    const token = jwt.sign(
+      { userId: newUser._id, email: newUser.email, role: newUser.role },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRE }
+    );
 
     res.status(201).json({
       message: 'Registration successful. Please check your email to verify your account.',
-      userId: newUser._id
+      token,
+      user: newUser.getPublicProfile()
     });
 
   } catch (error) {
@@ -141,8 +144,11 @@ router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email });
 
+    // Always respond the same way so attackers cannot discover which emails are registered
+    const genericResponse = { message: 'If that email is registered, a password reset link has been sent.' };
+
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.json(genericResponse);
     }
 
     // Generate reset token
@@ -154,9 +160,10 @@ router.post('/forgot-password', async (req, res) => {
     // Send reset email
     await sendPasswordResetEmail(user.email, resetToken);
 
-    res.json({ message: 'Password reset email sent' });
+    res.json(genericResponse);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Forgot password error:', error.message);
+    res.json({ message: 'If that email is registered, a password reset link has been sent.' });
   }
 });
 
@@ -180,81 +187,6 @@ router.post('/reset-password/:token', async (req, res) => {
     await user.save();
 
     res.json({ message: 'Password reset successful' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Enable 2FA
-router.post('/2fa/enable', authenticateToken, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId);
-
-    // Generate secret
-    const { secret, otpauthUrl } = generate2FASecret(user.email);
-
-    // Generate QR code
-    const qrCode = await generateQRCode(otpauthUrl);
-
-    // Save secret temporarily (not enabled yet)
-    user.twoFactorSecret = secret;
-    user.twoFactorEnabled = false;
-    await user.save();
-
-    res.json({
-      secret: secret,
-      qrCode: qrCode
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Verify and complete 2FA setup
-router.post('/2fa/verify', authenticateToken, async (req, res) => {
-  try {
-    const { token } = req.body;
-    const user = await User.findById(req.user.userId);
-
-    if (!user.twoFactorSecret) {
-      return res.status(400).json({ error: '2FA not initialized' });
-    }
-
-    // Verify token
-    const isValid = verify2FAToken(user.twoFactorSecret, token);
-
-    if (!isValid) {
-      return res.status(400).json({ error: 'Invalid 2FA token' });
-    }
-
-    // Enable 2FA
-    user.twoFactorEnabled = true;
-    await user.save();
-
-    res.json({ message: '2FA enabled successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Disable 2FA
-router.post('/2fa/disable', authenticateToken, async (req, res) => {
-  try {
-    const { password } = req.body;
-    const user = await User.findById(req.user.userId);
-
-    // Verify password
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Invalid password' });
-    }
-
-    // Disable 2FA
-    user.twoFactorEnabled = false;
-    user.twoFactorSecret = undefined;
-    await user.save();
-
-    res.json({ message: '2FA disabled successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -289,9 +221,9 @@ router.post('/login', validateLogin, async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: user.email, role: user.role },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: JWT_EXPIRE }
     );
 
     // Get user data without password

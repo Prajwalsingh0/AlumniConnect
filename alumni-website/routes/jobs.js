@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Job = require('../models/Job');
 const { authenticateToken } = require('../middleware/auth');
 const { body, validationResult } = require('express-validator');
@@ -50,6 +51,10 @@ router.post('/', authenticateToken, async (req, res) => {
 // Apply for a job
 router.post('/:id/apply', authenticateToken, async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ error: 'Job not found' });
+        }
+
         const job = await Job.findById(req.params.id);
         if (!job) return res.status(404).json({ error: 'Job not found' });
 
@@ -73,6 +78,10 @@ router.post('/:id/apply', authenticateToken, async (req, res) => {
 // Get job by ID
 router.get('/:id', async (req, res) => {
     try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ error: 'Job not found' });
+        }
+
         const job = await Job.findById(req.params.id).populate('postedBy', 'name profile');
         if (!job) return res.status(404).json({ error: 'Job not found' });
 

@@ -1,21 +1,17 @@
 // Alumni Website - Main JavaScript File
-// Handles navigation, dynamic content loading, and form interactions
+// Shared logic used on every page: mobile navigation, user dropdown,
+// login state in the navbar, logout, notifications, smooth scrolling.
+//
+// Page-specific forms are handled by their own scripts:
+//   portal.html  -> js/portal.js   (login / registration)
+//   events.html  -> js/events.js   (event registration)
+//   stories.html -> js/stories.js  (story submission)
+//   profile.html -> js/profile_v2.js, edit-profile.html -> js/edit-profile_v2.js
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Initialize all functionality
   initMobileNavigation();
   initUserDropdownToggle();
-  initPasswordToggle();
-  initFileUpload();
-  initFormHandlers();
-  loadDynamicContent();
-
-  // Only initialize portal functionality if we're on the portal page
-  if (window.location.pathname.includes("portal.html")) {
-    if (typeof initPortalFormToggle === "function") {
-      initPortalFormToggle();
-    }
-  }
+  loadUserStatus();
 });
 
 // ==============================================
@@ -28,9 +24,6 @@ function initMobileNavigation() {
 
   // Only proceed if both elements exist
   if (!mobileMenuButton || !mobileMenu) {
-    console.log(
-      "Mobile navigation elements not found - skipping mobile menu initialization"
-    );
     return;
   }
 
@@ -117,281 +110,6 @@ function initUserDropdownToggle() {
 }
 
 // ==============================================
-// PASSWORD VISIBILITY TOGGLE
-// ==============================================
-
-function initPasswordToggle() {
-  const passwordToggles = [
-    "toggle-login-password",
-    "toggle-reg-password",
-    "toggle-confirm-password",
-  ];
-
-  passwordToggles.forEach((toggleId) => {
-    const toggle = document.getElementById(toggleId);
-    if (toggle) {
-      toggle.addEventListener("click", function () {
-        const input = toggle.parentElement.querySelector("input");
-        const icon = toggle.querySelector("i");
-
-        if (input.type === "password") {
-          input.type = "text";
-          icon.classList.remove("fa-eye");
-          icon.classList.add("fa-eye-slash");
-        } else {
-          input.type = "password";
-          icon.classList.remove("fa-eye-slash");
-          icon.classList.add("fa-eye");
-        }
-      });
-    }
-  });
-}
-
-// ==============================================
-// FILE UPLOAD FUNCTIONALITY
-// ==============================================
-
-function initFileUpload() {
-  const fileInput = document.getElementById("resume-file");
-  const dropArea = document.getElementById("file-drop-area");
-  const fileName = document.getElementById("file-name");
-
-  if (fileInput && dropArea) {
-    // Click to upload
-    dropArea.addEventListener("click", () => fileInput.click());
-
-    // File input change
-    fileInput.addEventListener("change", function (e) {
-      handleFileSelect(e.target.files[0]);
-    });
-
-    // Drag and drop functionality
-    dropArea.addEventListener("dragover", function (e) {
-      e.preventDefault();
-      dropArea.classList.add("border-blue-500", "bg-blue-50");
-    });
-
-    dropArea.addEventListener("dragleave", function (e) {
-      e.preventDefault();
-      dropArea.classList.remove("border-blue-500", "bg-blue-50");
-    });
-
-    dropArea.addEventListener("drop", function (e) {
-      e.preventDefault();
-      dropArea.classList.remove("border-blue-500", "bg-blue-50");
-      handleFileSelect(e.dataTransfer.files[0]);
-    });
-  }
-
-  function handleFileSelect(file) {
-    if (file && fileName) {
-      fileName.textContent = `Selected: ${file.name}`;
-      fileName.classList.remove("hidden");
-    }
-  }
-}
-
-// ==============================================
-// FORM HANDLERS
-// ==============================================
-
-function initFormHandlers() {
-  // Login form
-  const loginForm = document.getElementById("login-form");
-  if (loginForm) {
-    loginForm.addEventListener("submit", handleLogin);
-  }
-
-  // Registration form
-  const registrationForm = document.getElementById("registration-form");
-  if (registrationForm) {
-    registrationForm.addEventListener("submit", handleRegistration);
-  }
-
-  // Event registration form
-  const eventForm = document.getElementById("event-registration-form");
-  if (eventForm) {
-    eventForm.addEventListener("submit", handleEventRegistration);
-  }
-
-  // Story submission form
-  const storyForm = document.getElementById("story-submission-form");
-  if (storyForm) {
-    storyForm.addEventListener("submit", handleStorySubmission);
-  }
-
-  // Resume upload form
-  const resumeForm = document.getElementById("resume-upload-form");
-  if (resumeForm) {
-    resumeForm.addEventListener("submit", handleResumeUpload);
-  }
-
-  // Job-related functionality removed as per request
-}
-
-async function handleLogin(e) {
-  e.preventDefault();
-  const email = document.getElementById("login-email")?.value;
-  const password = document.getElementById("login-password")?.value;
-
-  if (!email || !password) {
-    showNotification("Please fill in all fields", "error");
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Login failed");
-    }
-
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("userData", JSON.stringify(data.user));
-
-    showNotification("Login successful! Welcome back.", "success");
-
-    setTimeout(() => {
-      if (typeof showDashboard === "function") {
-        showDashboard();
-      } else {
-        window.location.href = "dashboard.html";
-      }
-    }, 1000);
-  } catch (error) {
-    showNotification(error.message, "error");
-  }
-}
-
-async function handleRegistration(e) {
-  e.preventDefault();
-
-  const password = document.getElementById("reg-password")?.value;
-  const confirmPassword = document.getElementById(
-    "reg-confirm-password"
-  )?.value;
-
-  if (password !== confirmPassword) {
-    showNotification("Passwords do not match!", "error");
-    return;
-  }
-
-  const userData = {
-    firstName: document.getElementById("reg-first-name")?.value,
-    lastName: document.getElementById("reg-last-name")?.value,
-    email: document.getElementById("reg-email")?.value,
-    phone: document.getElementById("reg-phone")?.value,
-    graduationYear: document.getElementById("reg-graduation-year")?.value,
-    degree: document.getElementById("reg-degree")?.value,
-    major: document.getElementById("reg-major")?.value,
-    currentPosition: document.getElementById("reg-current-position")?.value,
-    company: document.getElementById("reg-company")?.value,
-    industry: document.getElementById("reg-industry")?.value,
-    location: document.getElementById("reg-location")?.value,
-    linkedin: document.getElementById("reg-linkedin")?.value,
-    password: password,
-    directory: document.getElementById("reg-directory")?.checked || false,
-    newsletter: document.getElementById("reg-newsletter")?.checked || false,
-    mentorship: document.getElementById("reg-mentorship")?.checked || false,
-  };
-
-  // Validate required fields
-  const requiredFields = [
-    "firstName",
-    "lastName",
-    "email",
-    "graduationYear",
-    "degree",
-    "password",
-  ];
-  for (const field of requiredFields) {
-    if (!userData[field]) {
-      showNotification(
-        `Please fill in ${field.replace(/([A-Z])/g, " $1").toLowerCase()}`,
-        "error"
-      );
-      return;
-    }
-  }
-
-  try {
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "Registration failed");
-    }
-
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("userData", JSON.stringify(data.user));
-
-    showNotification(
-      "Registration successful! Welcome to the alumni network.",
-      "success"
-    );
-
-    setTimeout(() => {
-      if (typeof showDashboard === "function") {
-        showDashboard();
-      } else {
-        window.location.href = "dashboard.html";
-      }
-    }, 1000);
-  } catch (error) {
-    showNotification(error.message, "error");
-  }
-}
-
-function handleEventRegistration(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-
-  showNotification("Event registration submitted successfully!", "success");
-  e.target.reset();
-}
-
-function handleStorySubmission(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-
-  showNotification(
-    "Your story has been submitted for review. Thank you for sharing!",
-    "success"
-  );
-  e.target.reset();
-}
-
-function handleResumeUpload(e) {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-
-  showNotification("Resume uploaded successfully to our database!", "success");
-  e.target.reset();
-
-  // Hide file name
-  const fileName = document.getElementById("file-name");
-  if (fileName) fileName.classList.add("hidden");
-}
-
-// Job-related functionality removed as per request
-
-// ==============================================
 // NOTIFICATION SYSTEM
 // ==============================================
 
@@ -454,23 +172,15 @@ function showNotification(message, type = "info") {
 }
 
 // ==============================================
-// DYNAMIC CONTENT LOADING
+// LOGIN STATE IN THE NAVBAR
 // ==============================================
 
-function loadDynamicContent() {
-  // Load any dynamic content that needs to be updated
-  loadUserStatus();
-  loadFeaturedContent();
-}
-
 function loadUserStatus() {
-  // Check if user is logged in and update UI accordingly
   const token = localStorage.getItem("token");
   const userData =
     localStorage.getItem("userData") || localStorage.getItem("user");
 
   if (token && userData) {
-    // User is logged in
     let user;
     try {
       user = typeof userData === "string" ? JSON.parse(userData) : userData;
@@ -481,11 +191,6 @@ function loadUserStatus() {
       localStorage.removeItem("token");
       localStorage.removeItem("userData");
       localStorage.removeItem("user");
-      // Fall through to else block by returning or recursively calling?
-      // Simpler: Just reload to clear state, or let the user click login again.
-      // But better: Let's run the logged-out logic.
-      // Since we can't easily jump to the else block, let's just nullify the token and let it fall through if we restructured.
-      // But since we are inside if(token && userData), we need to manually invoke logged-out UI or reload.
       loadUserStatusForLoggedOut();
       return;
     }
@@ -493,7 +198,6 @@ function loadUserStatus() {
     // Get user name - handle different data structures
     const userName =
       user.name ||
-      user.firstName ||
       `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
       "User";
     const userEmail = user.email || "";
@@ -503,25 +207,21 @@ function loadUserStatus() {
       "login-button-container"
     );
     if (loginButtonContainer) {
-      // Use inline style to force hide, overriding any classes
       loginButtonContainer.style.display = "none";
       loginButtonContainer.classList.add("hidden");
       loginButtonContainer.classList.remove("md:flex");
     }
 
-
-    // Dashboard button removed - user dropdown has 'My Profile' link instead
-
     // Show user dropdown
     const userDropdown = document.getElementById("user-dropdown");
     if (userDropdown) {
       userDropdown.classList.remove("hidden");
-      userDropdown.style.display = "block"; // Ensure it's visible
+      userDropdown.style.display = "block";
 
       // Update username in navbar
       const navbarUsername = document.getElementById("navbar-username");
       if (navbarUsername) {
-        navbarUsername.textContent = userName.split(" ")[0] || "User"; // Show first name only
+        navbarUsername.textContent = userName.split(" ")[0] || "User";
       }
 
       // Update dropdown info
@@ -558,9 +258,7 @@ function loadUserStatus() {
         mobileLoginLink.classList.add("hidden");
       }
 
-      if (typeof renderMobileProfileSection === "function") {
-        renderMobileProfileSection(user);
-      }
+      renderMobileProfileSection(user);
     }
   } else {
     loadUserStatusForLoggedOut();
@@ -568,21 +266,12 @@ function loadUserStatus() {
 }
 
 function loadUserStatusForLoggedOut() {
-  // User is not logged in - show login button, hide user dropdown
   const loginButtonContainer = document.getElementById(
     "login-button-container"
   );
   const portalLoginLink = document.getElementById("portal-login-link");
   if (loginButtonContainer) {
-    // Force show login button
-    loginButtonContainer.style.display = ""; // Reset inline style to allow classes to take over, or force flex if needed. 
-    // Actually, force flex if on desktop is safer if classes are flaky.
-    // But let's try clearing first so media queries work.
-    // If we want to support mobile hidden/desktop flex, we should relying on classes.
-    // But since we had trouble hiding it, we used display:none.
-    // To show it again, we remove display:none.
     loginButtonContainer.style.display = "";
-
     loginButtonContainer.classList.remove("hidden");
     loginButtonContainer.classList.add("md:flex");
   }
@@ -591,24 +280,14 @@ function loadUserStatusForLoggedOut() {
     portalLoginLink.setAttribute("href", "portal.html#login");
   }
 
-  // Hide Dashboard link in desktop navbar when logged out
-  const dashboardButtonContainer = document.getElementById(
-    "dashboard-button-container"
-  );
-  if (dashboardButtonContainer) {
-    dashboardButtonContainer.style.display = "none";
-    dashboardButtonContainer.classList.add("hidden");
-    dashboardButtonContainer.classList.remove("md:flex");
-  }
-
   const userDropdown = document.getElementById("user-dropdown");
   if (userDropdown) {
     userDropdown.classList.add("hidden");
   }
 
-  const mobileMenu2 = document.getElementById("mobile-menu");
-  if (mobileMenu2) {
-    const mobileLoginLink = mobileMenu2.querySelector(
+  const mobileMenu = document.getElementById("mobile-menu");
+  if (mobileMenu) {
+    const mobileLoginLink = mobileMenu.querySelector(
       'a[href="portal.html"], a[href="portal.html#login"]'
     );
     if (mobileLoginLink) {
@@ -638,14 +317,13 @@ function renderMobileProfileSection(user) {
 
   const userName =
     user.name ||
-    user.firstName ||
     `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
     "User";
   const userEmail = user.email || "";
   const rawPath = user.profileImage || (user.profile && user.profile.profileImage);
   let profileImage = "images/singlee person.webp";
   if (rawPath) {
-      profileImage = rawPath.startsWith('http') || rawPath.startsWith('/uploads/') ? rawPath : `/uploads/${rawPath}`;
+    profileImage = rawPath.startsWith('http') || rawPath.startsWith('/uploads/') ? rawPath : `/uploads/${rawPath}`;
   }
 
   if (!section) {
@@ -697,6 +375,15 @@ function renderMobileProfileSection(user) {
 // ==============================================
 
 function handleLogout() {
+  // Notify the server (best effort; stateless JWT logout is client-side)
+  const token = localStorage.getItem("token");
+  if (token) {
+    fetch("/api/auth/logout", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` }
+    }).catch(() => { /* token already cleared locally */ });
+  }
+
   // Clear all user session data from localStorage
   localStorage.removeItem("token");
   localStorage.removeItem("userData");
@@ -706,57 +393,33 @@ function handleLogout() {
   const currentPage = window.location.pathname;
   let redirectUrl = "index.html";
 
-  // If on dashboard, redirect to portal/login
-  if (currentPage.includes("dashboard.html")) {
+  // If on profile pages, redirect to portal/login
+  if (currentPage.includes("profile.html") || currentPage.includes("edit-profile.html")) {
     redirectUrl = "portal.html#login";
   }
   // If on portal page, stay on portal but show login
   else if (currentPage.includes("portal.html")) {
-    // Just reload to show login form
     window.location.hash = "login";
     window.location.reload();
     return;
   }
-  // For all other pages, redirect to home
-  else {
-    redirectUrl = "index.html";
-  }
 
-  // Redirect to appropriate page
   window.location.href = redirectUrl;
 }
 
-function loadFeaturedContent() {
-  // Load featured alumni stories, events, etc.
-  // This would typically make API calls to fetch latest content
-
-  // For now, just ensure all images load properly
-  const images = document.querySelectorAll("img");
-  images.forEach((img) => {
-    img.addEventListener("error", function () {
-      // Use a local SVG placeholder to avoid network errors
-      this.src = "images/placeholder.svg";
-    });
-  });
-}
-
 // ==============================================
-// UTILITY FUNCTIONS
+// SMOOTH SCROLLING FOR ANCHOR LINKS
 // ==============================================
 
-// Helper function to safely get elements
-function $(id) {
-  return document.getElementById(id);
-}
-
-// Smooth scrolling for anchor links
 document.addEventListener("DOMContentLoaded", function () {
   const anchorLinks = document.querySelectorAll('a[href^="#"]');
   anchorLinks.forEach((link) => {
     link.addEventListener("click", function (e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute("href"));
+      const href = this.getAttribute("href");
+      if (href === "#") return; // Ignore placeholder links
+      const target = document.querySelector(href);
       if (target) {
+        e.preventDefault();
         target.scrollIntoView({
           behavior: "smooth",
           block: "start",
@@ -764,14 +427,4 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
-});
-
-// Add loading animation for page transitions
-window.addEventListener("beforeunload", function () {
-  document.body.classList.add("page-loading");
-});
-
-// Handle browser back/forward buttons
-window.addEventListener("popstate", function () {
-  loadDynamicContent();
 });

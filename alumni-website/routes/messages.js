@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
 const Conversation = require('../models/Conversation');
+const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
 
 // Get all conversations for current user
@@ -23,6 +24,15 @@ router.get('/conversations', authenticateToken, async (req, res) => {
 // Get messages in a conversation
 router.get('/conversations/:conversationId', authenticateToken, async (req, res) => {
     try {
+        const conversation = await Conversation.findOne({
+            _id: req.params.conversationId,
+            participants: req.user.userId
+        });
+
+        if (!conversation) {
+            return res.status(404).json({ error: 'Conversation not found' });
+        }
+
         const messages = await Message.find({
             conversationId: req.params.conversationId,
             deletedBy: { $ne: req.user.userId }
@@ -40,6 +50,15 @@ router.get('/conversations/:conversationId', authenticateToken, async (req, res)
 router.post('/conversations', authenticateToken, async (req, res) => {
     try {
         const { recipientId } = req.body;
+
+        if (!recipientId || recipientId === req.user.userId.toString()) {
+            return res.status(400).json({ error: 'A valid recipient is required' });
+        }
+
+        const recipient = await User.findById(recipientId);
+        if (!recipient) {
+            return res.status(404).json({ error: 'Recipient not found' });
+        }
 
         let conversation = await Conversation.findOne({
             participants: { $all: [req.user.userId, recipientId] }
