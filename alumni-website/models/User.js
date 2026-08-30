@@ -88,6 +88,10 @@ const userSchema = new mongoose.Schema({
     verificationBadge: {
       type: Boolean,
       default: false
+    },
+    openToMentorship: {
+      type: Boolean,
+      default: false
     }
   },
   privacySettings: {
