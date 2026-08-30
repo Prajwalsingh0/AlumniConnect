@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentorship - University Alumni Network</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fadeIn { animation: fadeIn 0.6s ease-out; }
+
+    .skeleton {
+      background: linear-gradient(90deg, #eef2f7 25%, #e2e8f0 50%, #eef2f7 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+      border-radius: 0.5rem;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Chat drawer */
+    #chat-drawer {
+      position: fixed; right: 0; top: 0; bottom: 0; z-index: 90;
+      width: 100%; max-width: 420px;
+      background: #ffffff;
+      box-shadow: -12px 0 40px rgba(15, 23, 42, 0.18);
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      display: flex; flex-direction: column;
+    }
+
+    #chat-drawer.open { transform: translateX(0); }
+
+    #chat-messages {
+      flex: 1; overflow-y: auto; padding: 1rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      background: #f8fafc;
+    }
+
+    .chat-bubble {
+      max-width: 78%; padding: 0.55rem 0.85rem; border-radius: 14px;
+      font-size: 0.88rem; line-height: 1.45; word-break: break-word;
+    }
+
+    .chat-bubble.mine { align-self: flex-end; background: #4F46E5; color: #fff; border-bottom-right-radius: 4px; }
+    .chat-bubble.theirs { align-self: flex-start; background: #e2e8f0; color: #1e293b; border-bottom-left-radius: 4px; }
+    .chat-time { display: block; font-size: 0.62rem; opacity: 0.7; margin-top: 2px; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary-indigo": "#4F46E5",
+            "primary-dark-blue": "#312E81",
+            "accent-teal": "#14B8A6",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-gray-50">
+  <nav class="bg-white shadow-xl sticky top-0 z-50">
+    <div class="w-full">
+      <div class="flex justify-between items-center h-16 px-4">
+        <div class="flex-shrink-0">
+          <h1 class="text-2xl font-extrabold text-primary-indigo tracking-wider">
+            MPU Alumni Network
+          </h1>
+        </div>
+        <div class="hidden md:flex flex-1 justify-center">
+          <div class="flex space-x-6 items-center">
+            <a href="index.html"
+              class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
+            <a href="alumni.html"
+              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300">Directory</a>
+            <a href="mentorship.html" aria-current="page"
+              class="text-accent-teal font-semibold px-3 py-2 rounded-md text-sm transition duration-300">Mentorship</a>
+            <a href="profile.html" id="navbar-dashboard-link"
+              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 hidden">My
+              Profile</a>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                Programs & Events<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="events.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Event
+                  Calendar</a>
+                <a href="events.html#registration"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Registration</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">Resources<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="jobs.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Job
+                  Board</a>
+                <a href="donations.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Give
+                  Back</a>
+                <a href="admin.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Admin
+                  Panel</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div id="login-button-container" class="hidden md:flex">
+            <a id="portal-login-link" href="portal.html#login"
+              class="px-5 py-2 rounded-md text-medium font-medium text-gray-700 bg-blue-100 hover:bg-blue-600 hover:text-white transition duration-300 shadow">Login</a>
+          </div>
+          <div id="user-dropdown" class="hidden relative group">
+            <button id="user-menu-button" type="button"
+              class="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition duration-300 focus:outline-none">
+              <img id="user-avatar" src="images/singlee person.webp" alt="User Avatar"
+                class="w-8 h-8 rounded-full object-cover" />
+              <span id="navbar-username" class="hidden md:inline text-gray-700 font-medium"></span>
+              <i id="user-menu-chevron"
+                class="fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+            </button>
+            <div id="user-menu"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+              <div class="px-4 py-2 border-b">
+                <p id="dropdown-name" class="text-sm font-semibold"></p>
+                <p id="dropdown-email" class="text-xs text-gray-500"></p>
+              </div>
+              <a href="profile.html"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><i
+                  class="fas fa-user mr-2"></i>My Profile</a>
+              <button id="dropdown-logout" type="button"
+                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden">
+      <button id="mobile-menu-button" aria-label="Open menu"
+        class="text-gray-700 hover:text-primary-indigo focus:outline-none focus:text-primary-indigo transition duration-300">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden mobile-sidebar hidden">
+      <button id="close-mobile-menu" class="sidebar-close-btn" aria-label="Close Menu">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+        <a href="index.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Home</a>
+        <a href="alumni.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Directory</a>
+        <a href="mentorship.html" aria-current="page"
+          class="text-accent-teal block px-3 py-2 rounded-md text-base font-semibold hover:bg-gray-100 transition duration-200">Mentorship</a>
+        <a href="events.html"
+          class="hover:text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Events</a>
+        <a href="portal.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="relative bg-cover bg-center bg-no-repeat text-white py-16 animate-fadeIn"
+    style="background-image: url('images/mentorship.jpg')">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Mentorship</h1>
+      <p class="text-lg md:text-xl max-w-3xl mx-auto backdrop-blur-sm">
+        Ask for guidance from alumni who have been there — or give back by
+        mentoring current students and fresh graduates.
+      </p>
+    </div>
+  </section>
+
+  <main class="py-10 bg-gray-50 animate-fadeIn">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <div id="mentorship-error" class="hidden text-center py-12 bg-white rounded-2xl shadow mb-8">
+        <i class="fas fa-triangle-exclamation text-4xl text-red-300 mb-4" aria-hidden="true"></i>
+        <p class="text-gray-600 text-lg mb-6">Your mentorships could not be loaded. Please try again.</p>
+        <button type="button" id="retry-load"
+          class="bg-primary-indigo text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary-dark-blue transition">Retry</button>
+      </div>
+
+      <div id="mentorship-loading" class="space-y-6">
+        <div class="bg-white rounded-2xl shadow p-6"><div class="skeleton h-5 w-40 mb-4"></div><div class="skeleton h-16 w-full"></div></div>
+        <div class="bg-white rounded-2xl shadow p-6"><div class="skeleton h-5 w-40 mb-4"></div><div class="skeleton h-16 w-full"></div></div>
+      </div>
+
+      <div id="mentorship-content" class="hidden space-y-10"></div>
+    </div>
+  </main>
+
+  <!-- Chat drawer -->
+  <div id="chat-drawer" aria-hidden="true">
+    <div class="flex items-center justify-between px-4 py-3 bg-primary-indigo text-white">
+      <div class="flex items-center gap-2 min-w-0">
+        <i class="fas fa-comments" aria-hidden="true"></i>
+        <span id="chat-with-name" class="font-semibold truncate">Chat</span>
+      </div>
+      <button type="button" id="chat-close" aria-label="Close chat"
+        class="w-8 h-8 rounded-full hover:bg-white/20 transition"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="chat-messages" aria-live="polite"></div>
+    <form id="chat-form" class="flex gap-2 p-3 border-t border-gray-200">
+      <input type="text" id="chat-input" autocomplete="off" placeholder="Type a message…"
+        class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo" />
+      <button type="submit" id="chat-send"
+        class="bg-primary-indigo text-white px-4 rounded-lg text-sm font-semibold hover:bg-primary-dark-blue disabled:opacity-50 transition">
+        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+      </button>
+    </form>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/script.js?v=4"></script>
+  <script src="js/mentorship.js"></script>
+</body>
+
+</html>

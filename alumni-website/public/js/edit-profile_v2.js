@@ -159,6 +159,8 @@ async function loadCurrentProfile() {
         if (form.linkedin) form.linkedin.value = user.profile.linkedin || '';
         if (form.twitter) form.twitter.value = user.profile.twitter || '';
         if (form.github) form.github.value = user.profile.github || '';
+        const mentorshipToggle = document.getElementById('open-to-mentorship');
+        if (mentorshipToggle) mentorshipToggle.checked = !!user.profile.openToMentorship;
 
         if (user.privacySettings) {
             Object.keys(user.privacySettings).forEach(key => {
@@ -211,6 +213,7 @@ async function saveProfile(e) {
             linkedin: form.linkedin ? form.linkedin.value : '',
             twitter: form.twitter ? form.twitter.value : '',
             github: form.github ? form.github.value : '',
+            openToMentorship: document.getElementById('open-to-mentorship')?.checked || false,
             workHistory: [],
             education: [],
             skills: [],

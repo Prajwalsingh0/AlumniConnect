@@ -13,6 +13,7 @@ const directoryState = {
   degree: '',
   location: '',
   graduationYear: '',
+  mentorship: '',
   sort: 'name_asc',
   page: 1,
   requestId: 0
@@ -52,6 +53,12 @@ function initDirectoryControls() {
       directoryState.page = 1;
       loadDirectory(getToken());
     });
+  });
+
+  document.getElementById('filter-mentorship').addEventListener('change', function () {
+    directoryState.mentorship = this.checked ? 'available' : '';
+    directoryState.page = 1;
+    loadDirectory(getToken());
   });
 
   document.getElementById('directory-sort').addEventListener('change', function () {
@@ -102,6 +109,7 @@ function resetFilters() {
 
   document.getElementById('directory-search').value = '';
   document.getElementById('directory-sort').value = 'name_asc';
+  document.getElementById('filter-mentorship').checked = false;
   ['filter-department', 'filter-degree', 'filter-location', 'filter-year'].forEach(function (id) {
     document.getElementById(id).value = '';
   });
@@ -172,6 +180,7 @@ async function loadDirectory(token) {
   if (directoryState.degree) params.set('degree', directoryState.degree);
   if (directoryState.location) params.set('location', directoryState.location);
   if (directoryState.graduationYear) params.set('graduationYear', directoryState.graduationYear);
+  if (directoryState.mentorship) params.set('mentorship', directoryState.mentorship);
   if (directoryState.sort) params.set('sort', directoryState.sort);
 
   try {
@@ -255,6 +264,10 @@ function createAlumniCardHtml(user) {
 
   const profileUrl = `profile.html?id=${encodeURIComponent(user._id)}`;
 
+  const mentorshipBadge = profile.openToMentorship
+    ? `<div class="w-full mb-3"><span class="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-teal bg-teal-50 px-2 py-0.5 rounded-full"><i class="fas fa-hands-helping" aria-hidden="true"></i>Available for mentorship</span></div>`
+    : '';
+
   return `
     <article class="alumni-card bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 flex flex-col">
       <div class="p-6 flex flex-col items-center text-center flex-1">
@@ -266,6 +279,7 @@ function createAlumniCardHtml(user) {
         ${company ? `<p class="text-sm text-gray-500 mb-3">${escapeHtml(company)}</p>` : '<p class="mb-3"></p>'}
         <p class="text-xs text-gray-500 mb-1">${escapeHtml(degreeDept)}${year ? ` · Class of ${escapeHtml(String(year))}` : ''}</p>
         ${location ? `<p class="text-xs text-gray-400 mb-3"><i class="fas fa-location-dot mr-1" aria-hidden="true"></i>${escapeHtml(location)}</p>` : '<p class="mb-3"></p>'}
+        ${mentorshipBadge}
         ${skills.length ? `
           <div class="flex flex-wrap justify-center gap-1.5 mt-auto pt-3">
             ${skills.map(function (skill) { return `<span class="text-[11px] font-semibold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">${escapeHtml(skill)}</span>`; }).join('')}
