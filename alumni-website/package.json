@@ -9,6 +9,7 @@
     "seed": "node scripts/init-db.js",
     "create-admin": "node scripts/create-admin.js",
     "test:directory": "node scripts/test-directory.js",
+    "test:mentorship": "node scripts/test-mentorship.js",
     "check-mongodb": "node scripts/check-mongodb.js",
     "download-mongodb": "powershell -ExecutionPolicy Bypass -File scripts/download-mongodb.ps1"
   },

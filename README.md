@@ -40,6 +40,7 @@ See `alumni-website/.env.example`. Key variables:
 |---|---|
 | `index.html` | Landing page |
 | `alumni.html` | Alumni directory (search, filters, pagination) |
+| `mentorship.html` | Mentorship dashboard (requests, active mentorships, chat) |
 | `portal.html` | Login / registration |
 | `profile.html` / `edit-profile.html` | Own profile (view / edit, privacy settings, skills) |
 | `events.html` | Event calendar + registration |
@@ -63,6 +64,11 @@ All endpoints are under `/api`:
 - `GET /api/jobs`, `GET /api/jobs/:id`, `POST /api/jobs`, `POST /api/jobs/:id/apply`
 - `GET /api/donations/campaigns`, `POST /api/donations/campaigns`, `POST /api/donations/donate`
 - `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`
+- `POST /api/mentorships` — request mentorship (`mentorId` + `message`)
+- `GET /api/mentorships` — own mentorships (`status`, `role`, `page`, `limit`)
+- `GET /api/mentorships/requests/received` / `requests/sent` — pending inbox
+- `GET /api/mentorships/status/:userId` — relationship state for the profile CTA
+- `GET/PATCH /api/mentorships/:id` — detail (participants only); `accept`/`reject` (mentor), `cancel` (mentee), `complete` (either participant)
 - `GET/POST /api/groups`, `POST /api/groups/:id/join`, `GET/POST /api/groups/:id/posts`
 - `GET/POST /api/messages/conversations`, `GET /api/messages/conversations/:conversationId`
 - Admin (role `admin` required): `/api/admin/stats`, `/api/admin/users`, `/api/admin/events`, `/api/admin/jobs`, `/api/admin/campaigns`
@@ -76,4 +82,5 @@ All endpoints are under `/api`:
 | `npm run seed` | Create collections + seed demo data (only when the database is empty) |
 | `npm run create-admin` | Create or promote the admin user |
 | `npm run test:directory` | Run the directory API test suite (server must be running) |
+| `npm run test:mentorship` | Run the mentorship API test suite (server must be running) |
 | `npm run check-mongodb` | Verify MongoDB connectivity |
