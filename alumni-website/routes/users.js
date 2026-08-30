@@ -301,46 +301,203 @@ router.post('/profile/image', authenticateToken, upload.single('profileImage'), 
   }
 });
 
-// Get all users (for alumni directory)
+// ── Alumni directory helpers ─────────────────────────────────────────────────
+
+// Escape user input so it is treated literally inside $regex queries
+const escapeRegex = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const DIRECTORY_SORTS = {
+  name_asc: { name: 1 },
+  name_desc: { name: -1 },
+  newest: { createdAt: -1 },
+  grad_year: { 'profile.graduationYear': -1 }
+};
+
+// Only public directory information is fetched from MongoDB
+const DIRECTORY_PROJECTION = {
+  name: 1,
+  role: 1,
+  createdAt: 1,
+  'profile.title': 1,
+  'profile.company': 1,
+  'profile.location': 1,
+  'profile.graduationYear': 1,
+  'profile.department': 1,
+  'profile.degree': 1,
+  'profile.profileImage': 1,
+  'profile.profileImageThumbnail': 1,
+  'profile.skills.name': 1,
+  'profile.skills.level': 1
+};
+
+const DIRECTORY_MAX_LIMIT = 48;
+
+// Build the MongoDB filter for the directory from validated query params.
+// Throws { status, message } on invalid input.
+function buildDirectoryFilter(query) {
+  const filter = { isActive: true };
+
+  // Free-text search across real User schema fields
+  const q = typeof query.q === 'string' ? query.q.trim() : '';
+  if (q) {
+    if (q.length > 100) {
+      throw { status: 400, message: 'Search query is too long' };
+    }
+    const pattern = new RegExp(escapeRegex(q), 'i');
+    filter.$or = [
+      { name: pattern },
+      { 'profile.title': pattern },
+      { 'profile.company': pattern },
+      { 'profile.degree': pattern },
+      { 'profile.department': pattern },
+      { 'profile.location': pattern },
+      { 'profile.skills.name': pattern }
+    ];
+  }
+
+  // Structured filters (exact, case-insensitive matches on schema fields)
+  if (query.graduationYear !== undefined && query.graduationYear !== '') {
+    const year = Number(query.graduationYear);
+    const maxYear = new Date().getFullYear() + 10;
+    if (!Number.isInteger(year) || year < 1900 || year > maxYear) {
+      throw { status: 400, message: 'graduationYear must be a valid year' };
+    }
+    filter['profile.graduationYear'] = year;
+  }
+
+  ['department', 'degree', 'location'].forEach((field) => {
+    const value = query[field];
+    if (value !== undefined && value !== '') {
+      if (typeof value !== 'string' || value.trim().length === 0 || value.length > 100) {
+        throw { status: 400, message: `${field} filter is invalid` };
+      }
+      filter[`profile.${field}`] = new RegExp(`^${escapeRegex(value.trim())}$`, 'i');
+    }
+  });
+
+  return filter;
+}
+
+// Alumni directory: paginated, searchable, filterable member listing
 router.get('/directory', authenticateToken, async (req, res) => {
   try {
-    const directoryUsers = await User.find({ isActive: true })
-      .select('-password')
-      .lean();
+    // Validate pagination parameters
+    let page = 1;
+    if (req.query.page !== undefined && req.query.page !== '') {
+      page = Number(req.query.page);
+      if (!Number.isInteger(page) || page < 1) {
+        return res.status(400).json({ error: 'page must be a positive integer' });
+      }
+    }
 
-    res.json({ users: directoryUsers });
+    let limit = 12;
+    if (req.query.limit !== undefined && req.query.limit !== '') {
+      limit = Number(req.query.limit);
+      if (!Number.isInteger(limit) || limit < 1 || limit > DIRECTORY_MAX_LIMIT) {
+        return res.status(400).json({ error: `limit must be an integer between 1 and ${DIRECTORY_MAX_LIMIT}` });
+      }
+    }
 
+    const sortKey = req.query.sort === undefined || req.query.sort === '' ? 'name_asc' : req.query.sort;
+    const sort = DIRECTORY_SORTS[sortKey];
+    if (!sort) {
+      return res.status(400).json({ error: 'sort must be one of: name_asc, name_desc, newest, grad_year' });
+    }
+
+    let filter;
+    try {
+      filter = buildDirectoryFilter(req.query);
+    } catch (err) {
+      return res.status(err.status || 400).json({ error: err.message });
+    }
+
+    const [users, total] = await Promise.all([
+      User.find(filter)
+        .select(DIRECTORY_PROJECTION)
+        .sort(sort)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      User.countDocuments(filter)
+    ]);
+
+    res.json({
+      users,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     console.error('Get directory error:', error);
     res.status(500).json({ error: 'Failed to get user directory' });
   }
 });
 
-// Search users
+// Distinct filter values for the directory, derived from real active user data
+router.get('/directory/facets', authenticateToken, async (req, res) => {
+  try {
+    const [departments, degrees, locations, graduationYears] = await Promise.all([
+      User.distinct('profile.department', { isActive: true }),
+      User.distinct('profile.degree', { isActive: true }),
+      User.distinct('profile.location', { isActive: true }),
+      User.distinct('profile.graduationYear', { isActive: true })
+    ]);
+
+    const cleanStrings = (values) => values
+      .filter((v) => v !== null && v !== undefined && String(v).trim() !== '')
+      .map((v) => String(v).trim())
+      .filter((v, i, arr) => arr.indexOf(v) === i)
+      .sort((a, b) => a.localeCompare(b));
+
+    res.json({
+      departments: cleanStrings(departments),
+      degrees: cleanStrings(degrees),
+      locations: cleanStrings(locations),
+      graduationYears: graduationYears
+        .filter((y) => Number.isInteger(y))
+        .sort((a, b) => b - a)
+    });
+  } catch (error) {
+    console.error('Get directory facets error:', error);
+    res.status(500).json({ error: 'Failed to get directory filters' });
+  }
+});
+
+// Search users (kept for backward compatibility; the directory endpoint
+// supports the same text search combined with filters and pagination)
 router.get('/search', authenticateToken, async (req, res) => {
   try {
-    const { query } = req.query;
+    const raw = req.query.query !== undefined ? req.query.query : req.query.q;
 
-    if (!query) {
+    if (raw === undefined || String(raw).trim() === '') {
       return res.status(400).json({ error: 'Search query is required' });
     }
 
-    const searchTerm = query.toLowerCase();
+    const searchTerm = String(raw).trim();
+    if (searchTerm.length > 100) {
+      return res.status(400).json({ error: 'Search query is too long' });
+    }
 
-    // Search across name and profile fields (they live in the profile subdocument)
+    const pattern = new RegExp(escapeRegex(searchTerm), 'i');
     const searchQuery = {
       isActive: true,
       $or: [
-        { name: { $regex: searchTerm, $options: 'i' } },
-        { 'profile.degree': { $regex: searchTerm, $options: 'i' } },
-        { 'profile.company': { $regex: searchTerm, $options: 'i' } },
-        { 'profile.department': { $regex: searchTerm, $options: 'i' } },
-        { 'profile.location': { $regex: searchTerm, $options: 'i' } }
+        { name: pattern },
+        { 'profile.degree': pattern },
+        { 'profile.company': pattern },
+        { 'profile.department': pattern },
+        { 'profile.location': pattern },
+        { 'profile.skills.name': pattern }
       ]
     };
 
     const filteredUsers = await User.find(searchQuery)
-      .select('-password')
+      .select(DIRECTORY_PROJECTION)
+      .sort({ name: 1 })
+      .limit(100)
       .lean();
 
     res.json({ users: filteredUsers });
