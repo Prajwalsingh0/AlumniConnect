@@ -39,6 +39,7 @@ See `alumni-website/.env.example`. Key variables:
 | Page | Purpose |
 |---|---|
 | `index.html` | Landing page |
+| `alumni.html` | Alumni directory (search, filters, pagination) |
 | `portal.html` | Login / registration |
 | `profile.html` / `edit-profile.html` | Own profile (view / edit, privacy settings, skills) |
 | `events.html` | Event calendar + registration |
@@ -54,6 +55,8 @@ All endpoints are under `/api`:
 
 - `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
 - `GET/PUT /api/users/profile`, `POST /api/users/profile/image`, `PUT /api/users/password`
+- `GET /api/users/directory` — paginated alumni listing (`page`, `limit` ≤ 48, `q`, `graduationYear`, `department`, `degree`, `location`, `sort`: `name_asc`/`name_desc`/`newest`/`grad_year`)
+- `GET /api/users/directory/facets` — distinct filter values from real user data
 - `GET /api/users/public/:userId`, `GET /api/users/directory`, `GET /api/users/search`
 - `POST /api/users/skills/:skillName/endorse`
 - `GET /api/events`, `GET /api/events/:id`, `POST/DELETE /api/events/:id/register`, `GET /api/events/user/registrations`
@@ -72,4 +75,5 @@ All endpoints are under `/api`:
 | `npm run dev` | Start with nodemon (auto-restart) |
 | `npm run seed` | Create collections + seed demo data (only when the database is empty) |
 | `npm run create-admin` | Create or promote the admin user |
+| `npm run test:directory` | Run the directory API test suite (server must be running) |
 | `npm run check-mongodb` | Verify MongoDB connectivity |
