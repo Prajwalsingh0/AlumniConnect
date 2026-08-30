@@ -141,6 +141,11 @@ userSchema.pre('save', function (next) {
   next();
 });
 
+// Indexes supporting the alumni directory queries
+userSchema.index({ isActive: 1, name: 1 });
+userSchema.index({ isActive: 1, 'profile.graduationYear': 1 });
+userSchema.index({ isActive: 1, 'profile.department': 1 });
+
 // Compare password method
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);

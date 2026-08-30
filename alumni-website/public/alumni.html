@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumni Directory - University Alumni Network</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fadeIn { animation: fadeIn 0.8s ease-out; }
+
+    /* Skeleton loading cards */
+    .skeleton {
+      background: linear-gradient(90deg, #eef2f7 25%, #e2e8f0 50%, #eef2f7 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.4s ease-in-out infinite;
+      border-radius: 0.5rem;
+    }
+
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .alumni-card:hover .alumni-card-cta { text-decoration: underline; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary-indigo": "#4F46E5",
+            "primary-dark-blue": "#312E81",
+            "accent-teal": "#14B8A6",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-gray-50">
+  <nav class="bg-white shadow-xl sticky top-0 z-50">
+    <div class="w-full">
+      <div class="flex justify-between items-center h-16 px-4">
+        <div class="flex-shrink-0">
+          <h1 class="text-2xl font-extrabold text-primary-indigo tracking-wider">
+            MPU Alumni Network
+          </h1>
+        </div>
+        <div class="hidden md:flex flex-1 justify-center">
+          <div class="flex space-x-6 items-center">
+            <a href="index.html"
+              class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
+            <a href="alumni.html" aria-current="page"
+              class="text-accent-teal font-semibold px-3 py-2 rounded-md text-sm transition duration-300">Directory</a>
+            <a href="profile.html" id="navbar-dashboard-link"
+              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 hidden">My
+              Profile</a>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                About Us<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="about.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Mission
+                  & Vision</a>
+                <a href="about.html#team"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Team</a>
+                <a href="about.html#gallery"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Gallery</a>
+                <a href="about.html#news"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">News</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                Programs & Events<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="events.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Event
+                  Calendar</a>
+                <a href="events.html#registration"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Registration</a>
+                <a href="events.html#sponsorship"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Sponsorship</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
+                Alumni Stories<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+              </button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="stories.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Featured
+                  Alumni</a>
+                <a href="stories.html#submit"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Submit
+                  Story</a>
+              </div>
+            </div>
+            <div class="relative group">
+              <button
+                class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">Resources<i
+                  class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
+              <div
+                class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="jobs.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Job
+                  Board</a>
+                <a href="donations.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Give
+                  Back</a>
+                <a href="admin.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Admin
+                  Panel</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div id="login-button-container" class="hidden md:flex">
+            <a id="portal-login-link" href="portal.html#login"
+              class="px-5 py-2 rounded-md text-medium font-medium text-gray-700 bg-blue-100 hover:bg-blue-600 hover:text-white transition duration-300 shadow">Login</a>
+          </div>
+          <div id="user-dropdown" class="hidden relative group">
+            <button id="user-menu-button" type="button"
+              class="flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-100 transition duration-300 focus:outline-none">
+              <img id="user-avatar" src="images/singlee person.webp" alt="User Avatar"
+                class="w-8 h-8 rounded-full object-cover" />
+              <span id="navbar-username" class="hidden md:inline text-gray-700 font-medium"></span>
+              <i id="user-menu-chevron"
+                class="fas fa-chevron-down text-xs transition-transform duration-300 group-hover:rotate-180"></i>
+            </button>
+            <div id="user-menu"
+              class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 z-50">
+              <div class="px-4 py-2 border-b">
+                <p id="dropdown-name" class="text-sm font-semibold"></p>
+                <p id="dropdown-email" class="text-xs text-gray-500"></p>
+              </div>
+              <a href="profile.html"
+                class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><i
+                  class="fas fa-user mr-2"></i>My Profile</a>
+              <button id="dropdown-logout" type="button"
+                class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="md:hidden">
+      <button id="mobile-menu-button" aria-label="Open menu"
+        class="text-gray-700 hover:text-primary-indigo focus:outline-none focus:text-primary-indigo transition duration-300">
+        <i class="fas fa-bars text-xl"></i>
+      </button>
+    </div>
+    <div id="mobile-menu" class="md:hidden mobile-sidebar hidden">
+      <button id="close-mobile-menu" class="sidebar-close-btn" aria-label="Close Menu">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+        <a href="index.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Home</a>
+        <a href="alumni.html" aria-current="page"
+          class="text-accent-teal block px-3 py-2 rounded-md text-base font-semibold hover:bg-gray-100 transition duration-200">Directory</a>
+        <a href="about.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">About
+          Us</a>
+        <a href="events.html"
+          class="hover:text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Events</a>
+        <a href="stories.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Alumni
+          Stories</a>
+        <a href="portal.html"
+          class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Login</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="relative bg-cover bg-center bg-no-repeat text-white py-16 animate-fadeIn"
+    style="background-image: url('images/image16.jpg')">
+    <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">Alumni Directory</h1>
+      <p class="text-lg md:text-xl max-w-3xl mx-auto backdrop-blur-sm">
+        Discover fellow graduates, explore their careers, and connect with people
+        from your university community.
+      </p>
+    </div>
+  </section>
+
+  <main class="py-10 bg-gray-50 animate-fadeIn">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <!-- Search & filters -->
+      <section aria-label="Search and filters" class="bg-white rounded-2xl shadow-lg p-5 md:p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+          <div class="lg:col-span-2">
+            <label for="directory-search" class="block text-xs font-bold text-gray-500 uppercase mb-1">Search</label>
+            <div class="relative">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"
+                aria-hidden="true"></i>
+              <input type="search" id="directory-search" autocomplete="off" placeholder="Name, company, title, skill…"
+                class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+            </div>
+          </div>
+          <div>
+            <label for="filter-department" class="block text-xs font-bold text-gray-500 uppercase mb-1">Department</label>
+            <select id="filter-department" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+              <option value="">All departments</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-degree" class="block text-xs font-bold text-gray-500 uppercase mb-1">Degree</label>
+            <select id="filter-degree" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+              <option value="">All degrees</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-location" class="block text-xs font-bold text-gray-500 uppercase mb-1">Location</label>
+            <select id="filter-location" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+              <option value="">All locations</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-year" class="block text-xs font-bold text-gray-500 uppercase mb-1">Graduation year</label>
+            <select id="filter-year" class="w-full py-2 px-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+              <option value="">All years</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
+          <div class="flex items-center gap-3">
+            <label for="directory-sort" class="text-xs font-bold text-gray-500 uppercase">Sort by</label>
+            <select id="directory-sort" class="py-2 px-3 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+              <option value="name_asc">Name A–Z</option>
+              <option value="name_desc">Name Z–A</option>
+              <option value="newest">Newest profiles</option>
+              <option value="grad_year">Graduation year (newest first)</option>
+            </select>
+          </div>
+          <button type="button" id="reset-filters"
+            class="self-start sm:self-auto text-sm font-semibold text-primary-indigo hover:text-primary-dark-blue transition">
+            <i class="fas fa-rotate-left mr-1"></i>Reset filters
+          </button>
+        </div>
+      </section>
+
+      <!-- Result meta -->
+      <p id="directory-meta" class="text-sm text-gray-500 mb-5" role="status" aria-live="polite"></p>
+
+      <!-- Loading skeletons -->
+      <div id="directory-loading" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        aria-hidden="true">
+        <!-- Skeleton cards are injected by js/alumni.js -->
+      </div>
+
+      <!-- Error state -->
+      <div id="directory-error" class="hidden text-center py-16 bg-white rounded-2xl shadow">
+        <i class="fas fa-triangle-exclamation text-4xl text-red-300 mb-4" aria-hidden="true"></i>
+        <p class="text-gray-600 text-lg mb-6">The directory is temporarily unavailable. Please try again.</p>
+        <button type="button" id="retry-load"
+          class="bg-primary-indigo text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary-dark-blue transition">
+          Retry
+        </button>
+      </div>
+
+      <!-- Empty state -->
+      <div id="directory-empty" class="hidden text-center py-16 bg-white rounded-2xl shadow">
+        <i class="fas fa-users-slash text-4xl text-gray-300 mb-4" aria-hidden="true"></i>
+        <p class="text-gray-600 text-lg mb-2">No alumni found matching your search.</p>
+        <p class="text-gray-400 text-sm mb-6">Try a different keyword or clear the filters to see everyone.</p>
+        <button type="button" id="empty-clear-filters"
+          class="bg-primary-indigo text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary-dark-blue transition">
+          Clear search & filters
+        </button>
+      </div>
+
+      <!-- Alumni cards -->
+      <div id="directory-grid"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+
+      <!-- Pagination -->
+      <nav id="directory-pagination" class="hidden mt-10 flex items-center justify-center gap-2"
+        aria-label="Directory pages">
+        <button type="button" id="page-prev"
+          class="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition">
+          <i class="fas fa-chevron-left mr-1"></i>Prev
+        </button>
+        <div id="page-numbers" class="flex items-center gap-1"></div>
+        <button type="button" id="page-next"
+          class="px-4 py-2 rounded-lg bg-white border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition">
+          Next<i class="fas fa-chevron-right ml-1"></i>
+        </button>
+      </nav>
+    </div>
+  </main>
+
+  <footer class="bg-gray-900 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-400 text-sm">
+      <p>&copy; 2026 PGOI Alumni Network. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/script.js?v=4"></script>
+  <script src="js/alumni.js"></script>
+</body>
+
+</html>

@@ -185,6 +185,137 @@ async function seed() {
     }
   });
 
+  // Additional directory alumni (varied companies, locations, years, departments)
+  const moreAlumni = [
+    {
+      name: 'Priya Sharma',
+      email: 'priya.sharma@alumni.dev',
+      role: 'alumni',
+      profile: {
+        title: 'Software Engineer',
+        company: 'Google',
+        location: 'Bengaluru, Karnataka',
+        graduationYear: 2020,
+        department: 'Computer Science & Engineering',
+        degree: 'B.Tech',
+        bio: 'Working on search infrastructure. Happy to refer alumni for engineering roles.',
+        linkedin: 'https://linkedin.com/in/priya-sharma-demo',
+        skills: [
+          { name: 'Java', level: 'Expert', endorsements: [] },
+          { name: 'React', level: 'Intermediate', endorsements: [] },
+          { name: 'AWS', level: 'Intermediate', endorsements: [] }
+        ]
+      }
+    },
+    {
+      name: 'Arjun Mehta',
+      email: 'arjun.mehta@alumni.dev',
+      role: 'alumni',
+      profile: {
+        title: 'Data Scientist',
+        company: 'Flipkart',
+        location: 'Bengaluru, Karnataka',
+        graduationYear: 2017,
+        department: 'Information Technology',
+        degree: 'B.Tech',
+        bio: 'Recommendation systems and demand forecasting at scale.',
+        linkedin: 'https://linkedin.com/in/arjun-mehta-demo',
+        skills: [
+          { name: 'Python', level: 'Expert', endorsements: [] },
+          { name: 'Machine Learning', level: 'Expert', endorsements: [] },
+          { name: 'SQL', level: 'Intermediate', endorsements: [] }
+        ]
+      }
+    },
+    {
+      name: 'Neha Gupta',
+      email: 'neha.gupta@alumni.dev',
+      role: 'alumni',
+      profile: {
+        title: 'Civil Engineer (Assistant Manager)',
+        company: 'L&T Construction',
+        location: 'Mumbai, Maharashtra',
+        graduationYear: 2015,
+        department: 'Civil Engineering',
+        degree: 'B.Tech',
+        bio: 'Site management for metro rail projects across Maharashtra.',
+        linkedin: 'https://linkedin.com/in/neha-gupta-demo',
+        skills: [
+          { name: 'AutoCAD', level: 'Expert', endorsements: [] },
+          { name: 'Project Management', level: 'Intermediate', endorsements: [] }
+        ]
+      }
+    },
+    {
+      name: 'Vikram Singh Rathore',
+      email: 'vikram.rathore@alumni.dev',
+      role: 'alumni',
+      profile: {
+        title: 'Founder & CEO',
+        company: 'Bhopal Bytes',
+        location: 'Bhopal, Madhya Pradesh',
+        graduationYear: 2013,
+        department: 'Mechanical Engineering',
+        degree: 'B.Tech',
+        bio: 'Run a product studio in Bhopal employing 20 people, mostly campus graduates. Always open to collaboration.',
+        linkedin: 'https://linkedin.com/in/vikram-rathore-demo',
+        seeking: ['Collaboration', 'Networking'],
+        skills: [
+          { name: 'Entrepreneurship', level: 'Expert', endorsements: [] },
+          { name: 'Product Strategy', level: 'Intermediate', endorsements: [] }
+        ]
+      }
+    },
+    {
+      name: 'Ananya Iyer',
+      email: 'ananya.iyer@alumni.dev',
+      role: 'alumni',
+      profile: {
+        title: 'HR Business Partner',
+        company: 'Tata Consultancy Services',
+        location: 'Pune, Maharashtra',
+        graduationYear: 2016,
+        department: 'Business Administration',
+        degree: 'MBA',
+        bio: 'Recruiting for TCS digital across India. Reach out for resume reviews and referrals.',
+        linkedin: 'https://linkedin.com/in/ananya-iyer-demo',
+        seeking: ['Networking'],
+        skills: [
+          { name: 'Recruitment', level: 'Expert', endorsements: [] },
+          { name: 'People Operations', level: 'Intermediate', endorsements: [] }
+        ]
+      }
+    },
+    {
+      name: 'Karan Malhotra',
+      email: 'karan.malhotra@alumni.dev',
+      role: 'alumni',
+      profile: {
+        title: 'Embedded Systems Engineer',
+        company: 'Bosch',
+        location: 'Hyderabad, Telangana',
+        graduationYear: 2019,
+        department: 'Electronics & Communication',
+        degree: 'B.Tech',
+        bio: 'Automotive embedded software - ECU firmware and testing.',
+        linkedin: 'https://linkedin.com/in/karan-malhotra-demo',
+        skills: [
+          { name: 'C++', level: 'Expert', endorsements: [] },
+          { name: 'Embedded C', level: 'Expert', endorsements: [] }
+        ]
+      }
+    }
+  ];
+
+  for (const alum of moreAlumni) {
+    await User.create({
+      ...alum,
+      password: DEMO_PASSWORD,
+      isActive: true,
+      emailVerified: true
+    });
+  }
+
   // ---------- Events ----------
   const now = new Date();
   const upcoming = new Date(now.getTime() + 21 * 24 * 60 * 60 * 1000);
