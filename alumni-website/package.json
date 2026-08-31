@@ -11,6 +11,7 @@
     "test:directory": "node scripts/test-directory.js",
     "test:mentorship": "node scripts/test-mentorship.js",
     "test:chat": "node scripts/test-chat.js",
+    "test:chatbot": "node scripts/test-chatbot.js",
     "check-mongodb": "node scripts/check-mongodb.js",
     "download-mongodb": "powershell -ExecutionPolicy Bypass -File scripts/download-mongodb.ps1"
   },
