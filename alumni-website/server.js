@@ -16,6 +16,7 @@ const donationRoutes = require('./routes/donations');
 const groupRoutes = require('./routes/groups');
 const storyRoutes = require('./routes/stories');
 const mentorshipRoutes = require('./routes/mentorships');
+const chatbotRoutes = require('./routes/chatbot');
 const adminRoutes = require('./routes/admin');
 
 const http = require('http');
@@ -80,6 +81,7 @@ app.use('/api/donations', donationRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/mentorships', mentorshipRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Serve uploads directory

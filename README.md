@@ -41,6 +41,7 @@ See `alumni-website/.env.example`. Key variables:
 | `index.html` | Landing page |
 | `alumni.html` | Alumni directory (search, filters, pagination) |
 | `chat.html` | Real-time chat (conversations, typing, unread badges) |
+| `assistant` (floating widget) | AI website assistant on every page (feature guide) |
 | `mentorship.html` | Mentorship dashboard (requests, active mentorships, chat) |
 | `portal.html` | Login / registration |
 | `profile.html` / `edit-profile.html` | Own profile (view / edit, privacy settings, skills) |
@@ -73,6 +74,7 @@ All endpoints are under `/api`:
 - `GET/POST /api/messages/conversations`, `GET /api/messages/conversations/:conversationId` (cursor paginated via `before` + `limit`)
 - `POST /api/messages/conversations/:conversationId/read` — mark conversation read (server-persisted)
 - `GET /api/messages/unread/count` — total unread messages for the navbar badge
+- `POST /api/chatbot` — website assistant (auth; per-user rate limit; provider abstraction with optional OpenAI-compatible API via `CHATBOT_API_URL`/`CHATBOT_API_KEY`/`CHATBOT_MODEL`, local knowledge-base fallback)
 - `GET/POST /api/groups`, `POST /api/groups/:id/join`, `GET/POST /api/groups/:id/posts`
 - Admin (role `admin` required): `/api/admin/stats`, `/api/admin/users`, `/api/admin/events`, `/api/admin/jobs`, `/api/admin/campaigns`
 
@@ -102,4 +104,5 @@ Message content is validated server-side (non-empty, ≤ 5000 chars); sender ide
 | `npm run test:directory` | Run the directory API test suite (server must be running) |
 | `npm run test:mentorship` | Run the mentorship API test suite (server must be running) |
 | `npm run test:chat` | Run the chat/messaging test suite, including Socket.IO (server must be running) |
+| `npm run test:chatbot` | Run the assistant test suite (server must be running) |
 | `npm run check-mongodb` | Verify MongoDB connectivity |
