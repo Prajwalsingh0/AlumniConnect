@@ -54,7 +54,7 @@ router.put('/profile', authenticateToken, validateProfileUpdate, async (req, res
     const allowedProfileUpdates = [
       'title', 'company', 'location', 'phone', 'graduationYear',
       'department', 'degree', 'bio', 'bannerImage', 'linkedin',
-      'twitter', 'github', 'website', 'seeking'
+      'twitter', 'github', 'website', 'seeking', 'openToMentorship'
     ];
 
     const updates = {};
@@ -172,7 +172,8 @@ router.get('/public/:userId', authenticateToken, async (req, res) => {
         title: profile.profile.title,
         company: profile.profile.company,
         graduationYear: profile.profile.graduationYear,
-        verificationBadge: profile.profile.verificationBadge
+        verificationBadge: profile.profile.verificationBadge,
+        openToMentorship: profile.profile.openToMentorship
       }
     };
 
@@ -327,7 +328,8 @@ const DIRECTORY_PROJECTION = {
   'profile.profileImage': 1,
   'profile.profileImageThumbnail': 1,
   'profile.skills.name': 1,
-  'profile.skills.level': 1
+  'profile.skills.level': 1,
+  'profile.openToMentorship': 1
 };
 
 const DIRECTORY_MAX_LIMIT = 48;
@@ -374,6 +376,11 @@ function buildDirectoryFilter(query) {
       filter[`profile.${field}`] = new RegExp(`^${escapeRegex(value.trim())}$`, 'i');
     }
   });
+
+  // Directory-only filter: show only alumni who are open to mentoring
+  if (query.mentorship === 'available') {
+    filter['profile.openToMentorship'] = true;
+  }
 
   return filter;
 }

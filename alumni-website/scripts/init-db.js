@@ -31,6 +31,7 @@ const Donation = require('../models/Donation');
 const Group = require('../models/Group');
 const ForumPost = require('../models/ForumPost');
 const Story = require('../models/Story');
+const Mentorship = require('../models/Mentorship');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/alumni-website';
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'Demo@1234';
@@ -103,6 +104,7 @@ async function seed() {
       linkedin: 'https://linkedin.com/in/aarav-sharma-demo',
       github: 'https://github.com/aarav-sharma-demo',
       seeking: ['Networking', 'Mentorship'],
+      openToMentorship: true,
       skills: [
         { name: 'JavaScript', level: 'Expert', endorsements: [] },
         { name: 'Node.js', level: 'Expert', endorsements: [] },
@@ -145,6 +147,7 @@ async function seed() {
       bio: 'ECE graduate turned product manager. Love building consumer products and giving back to the campus community.',
       linkedin: 'https://linkedin.com/in/sneha-verma-demo',
       seeking: ['Job Opportunities', 'Collaboration'],
+      openToMentorship: true,
       skills: [
         { name: 'Product Strategy', level: 'Expert', endorsements: [] },
         { name: 'Data Analysis', level: 'Intermediate', endorsements: [] }
@@ -200,6 +203,7 @@ async function seed() {
         degree: 'B.Tech',
         bio: 'Working on search infrastructure. Happy to refer alumni for engineering roles.',
         linkedin: 'https://linkedin.com/in/priya-sharma-demo',
+        openToMentorship: true,
         skills: [
           { name: 'Java', level: 'Expert', endorsements: [] },
           { name: 'React', level: 'Intermediate', endorsements: [] },
@@ -220,6 +224,7 @@ async function seed() {
         degree: 'B.Tech',
         bio: 'Recommendation systems and demand forecasting at scale.',
         linkedin: 'https://linkedin.com/in/arjun-mehta-demo',
+        openToMentorship: true,
         skills: [
           { name: 'Python', level: 'Expert', endorsements: [] },
           { name: 'Machine Learning', level: 'Expert', endorsements: [] },
@@ -260,6 +265,7 @@ async function seed() {
         bio: 'Run a product studio in Bhopal employing 20 people, mostly campus graduates. Always open to collaboration.',
         linkedin: 'https://linkedin.com/in/vikram-rathore-demo',
         seeking: ['Collaboration', 'Networking'],
+        openToMentorship: true,
         skills: [
           { name: 'Entrepreneurship', level: 'Expert', endorsements: [] },
           { name: 'Product Strategy', level: 'Intermediate', endorsements: [] }
@@ -307,8 +313,10 @@ async function seed() {
     }
   ];
 
+  const createdAlumni = {};
   for (const alum of moreAlumni) {
-    await User.create({
+    const key = alum.email.split('@')[0];
+    createdAlumni[key] = await User.create({
       ...alum,
       password: DEMO_PASSWORD,
       isActive: true,
@@ -474,6 +482,32 @@ async function seed() {
     isAnonymous: true
   });
 
+  // ---------- Mentorships ----------
+  const now2 = new Date();
+
+  await Mentorship.create({
+    mentee: rahul._id,
+    mentor: aarav._id,
+    status: 'pending',
+    message: 'Hi Aarav! I am in my final year and aiming for backend engineering roles. Could you guide me on what to focus on this semester?'
+  });
+
+  await Mentorship.create({
+    mentee: rahul._id,
+    mentor: sneha._id,
+    status: 'accepted',
+    message: 'Hi Sneha, I would love your advice on moving from campus projects to real product work.',
+    respondedAt: new Date(now2.getTime() - 2 * 24 * 60 * 60 * 1000)
+  });
+
+  await Mentorship.create({
+    mentee: rahul._id,
+    mentor: createdAlumni['arjun.mehta']._id,
+    status: 'rejected',
+    message: 'Hello Arjun, could you mentor me on data science fundamentals this term?',
+    respondedAt: new Date(now2.getTime() - 5 * 24 * 60 * 60 * 1000)
+  });
+
   // ---------- Groups & forum ----------
   const group = await Group.create({
     name: 'CSE Alumni Network',
@@ -555,6 +589,7 @@ async function seed() {
   console.log('  Groups: 1 group with 2 forum posts');
   console.log('  Stories: 2 published');
   console.log('  Messaging: 1 conversation with 2 messages');
+  console.log('  Mentorships: 1 pending, 1 accepted, 1 rejected');
 }
 
 async function init() {

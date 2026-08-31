@@ -60,6 +60,7 @@
               class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
             <a href="alumni.html" aria-current="page"
               class="text-accent-teal font-semibold px-3 py-2 rounded-md text-sm transition duration-300">Directory</a>
+            <a href="mentorship.html" class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300">Mentorship</a>
             <a href="profile.html" id="navbar-dashboard-link"
               class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 hidden">My
               Profile</a>
@@ -181,6 +182,7 @@
           class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">Home</a>
         <a href="alumni.html" aria-current="page"
           class="text-accent-teal block px-3 py-2 rounded-md text-base font-semibold hover:bg-gray-100 transition duration-200">Directory</a>
+        <a href="mentorship.html" class="text-gray-700 block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Mentorship</a>
         <a href="about.html"
           class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 active:bg-gray-100 transition duration-200">About
           Us</a>
@@ -249,14 +251,20 @@
         </div>
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
-          <div class="flex items-center gap-3">
-            <label for="directory-sort" class="text-xs font-bold text-gray-500 uppercase">Sort by</label>
-            <select id="directory-sort" class="py-2 px-3 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
-              <option value="name_asc">Name A–Z</option>
-              <option value="name_desc">Name Z–A</option>
-              <option value="newest">Newest profiles</option>
-              <option value="grad_year">Graduation year (newest first)</option>
-            </select>
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+              <label for="directory-sort" class="text-xs font-bold text-gray-500 uppercase">Sort by</label>
+              <select id="directory-sort" class="py-2 px-3 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+                <option value="name_asc">Name A–Z</option>
+                <option value="name_desc">Name Z–A</option>
+                <option value="newest">Newest profiles</option>
+                <option value="grad_year">Graduation year (newest first)</option>
+              </select>
+            </div>
+            <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
+              <input type="checkbox" id="filter-mentorship" class="rounded border-gray-300 text-primary-indigo focus:ring-primary-indigo" />
+              <i class="fas fa-hands-helping text-accent-teal" aria-hidden="true"></i>Available for mentorship
+            </label>
           </div>
           <button type="button" id="reset-filters"
             class="self-start sm:self-auto text-sm font-semibold text-primary-indigo hover:text-primary-dark-blue transition">
