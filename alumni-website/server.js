@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
@@ -163,6 +164,9 @@ const io = socketIO(server, {
   }
 });
 
+// Expose the Socket.IO instance to Express routes (e.g. read receipts)
+app.set('io', io);
+
 // Socket.io authentication middleware
 io.use(async (socket, next) => {
   try {
@@ -185,6 +189,18 @@ io.on('connection', (socket) => {
     try {
       const { conversationId, recipientId, content } = data;
 
+      // Server-side message validation (never trust the client)
+      if (typeof conversationId !== 'string' || !mongoose.Types.ObjectId.isValid(conversationId)) {
+        return socket.emit('error', { message: 'Invalid conversation' });
+      }
+      if (typeof content !== 'string' || content.trim().length === 0) {
+        return socket.emit('error', { message: 'Message cannot be empty' });
+      }
+      const trimmedContent = content.trim();
+      if (trimmedContent.length > 5000) {
+        return socket.emit('error', { message: 'Message cannot exceed 5000 characters' });
+      }
+
       // Only participants of the conversation may send messages in it
       const conversation = await Conversation.findById(conversationId);
       if (!conversation) {
@@ -199,7 +215,7 @@ io.on('connection', (socket) => {
         conversationId,
         sender: socket.userId,
         recipient: recipientId,
-        content
+        content: trimmedContent
       });
       await message.save();
 
@@ -212,7 +228,35 @@ io.on('connection', (socket) => {
       io.to(recipientId).emit('new_message', message);
       socket.emit('message_sent', message);
     } catch (error) {
-      socket.emit('error', { message: error.message });
+      socket.emit('error', { message: 'Could not send the message' });
+    }
+  });
+
+  // Typing indicator relay: validated, then sent only to the other participant
+  socket.on('typing', async (data) => {
+    try {
+      const { conversationId, isTyping } = data || {};
+      if (typeof conversationId !== 'string' || !mongoose.Types.ObjectId.isValid(conversationId)) {
+        return;
+      }
+      const conversation = await Conversation.findById(conversationId).select('participants');
+      if (!conversation) return;
+
+      const isParticipant = conversation.participants.some(id => id.toString() === socket.userId);
+      if (!isParticipant) return;
+
+      conversation.participants.forEach((participantId) => {
+        const pid = participantId.toString();
+        if (pid !== socket.userId) {
+          io.to(pid).emit('typing', {
+            conversationId,
+            userId: socket.userId,
+            isTyping: !!isTyping
+          });
+        }
+      });
+    } catch (error) {
+      // Typing indicators are best-effort; ignore relay failures
     }
   });
 

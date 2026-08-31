@@ -39,25 +39,30 @@
   function renderAction(container, viewedUserId, state) {
     container.classList.remove('hidden');
 
+    const messageButton = `<a href="chat.html?to=${encodeURIComponent(viewedUserId)}"
+      class="btn-edit mentorship-btn" title="Open chat">
+      <i class="fas fa-comment-dots"></i> Message
+    </a>`;
+
     if (state.status === 'pending') {
       const label = state.direction === 'sent' ? 'Request Pending' : 'Pending Request';
       container.innerHTML = `<button type="button" class="btn-edit mentorship-btn" disabled>
         <i class="fas fa-hourglass-half"></i> ${label}
-      </button>`;
+      </button>${messageButton}`;
       return;
     }
 
     if (state.status === 'accepted') {
       container.innerHTML = `<a href="mentorship.html" class="btn-edit mentorship-btn mentorship-active">
         <i class="fas fa-hands-helping"></i> Active Mentorship
-      </a>`;
+      </a>${messageButton}`;
       return;
     }
 
     // 'none': a request can be sent (including after reject/cancel)
     container.innerHTML = `<button type="button" id="request-mentorship-btn" class="btn-edit mentorship-btn">
       <i class="fas fa-hands-helping"></i> Request Mentorship
-    </button>`;
+    </button>${messageButton}`;
 
     document.getElementById('request-mentorship-btn').addEventListener('click', function () {
       openRequestModal(viewedUserId);

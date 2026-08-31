@@ -581,6 +581,32 @@ async function seed() {
     content: 'Hi Rahul, sure! Ask away - and do share your resume, I will take a look this weekend.'
   });
 
+  // Second conversation with unread messages so the chat list shows badges
+  const conversation2 = await Conversation.create({
+    participants: [rahul._id, sneha._id]
+  });
+
+  await Message.create({
+    conversationId: conversation2._id,
+    sender: sneha._id,
+    recipient: rahul._id,
+    content: 'Hey Rahul! Saw your question in the CSE group - product analytics is a great path.'
+  });
+
+  await Message.create({
+    conversationId: conversation2._id,
+    sender: sneha._id,
+    recipient: rahul._id,
+    content: 'Let us do a quick call this week - I can review your resume too.',
+    read: true,
+    readAt: new Date()
+  });
+
+  await Conversation.findByIdAndUpdate(conversation2._id, {
+    lastMessage: (await Message.findOne({ conversationId: conversation2._id }).sort({ createdAt: -1 }))._id,
+    $inc: { [`unreadCount.${rahul._id}`]: 1 }
+  });
+
   console.log('Seed complete:');
   console.log(`  Users: admin@alumni.com, aarav.sharma@alumni.dev, sneha.verma@alumni.dev, rahul.patel@alumni.dev (password: ${DEMO_PASSWORD})`);
   console.log('  Events: 2 published (1 upcoming, 1 workshop), 1 completed');
@@ -588,7 +614,7 @@ async function seed() {
   console.log('  Donations: 1 active campaign with 2 donations');
   console.log('  Groups: 1 group with 2 forum posts');
   console.log('  Stories: 2 published');
-  console.log('  Messaging: 1 conversation with 2 messages');
+  console.log('  Messaging: 2 conversations (1 with unread badge)');
   console.log('  Mentorships: 1 pending, 1 accepted, 1 rejected');
 }
 
