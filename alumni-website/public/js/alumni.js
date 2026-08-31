@@ -289,6 +289,10 @@ function createAlumniCardHtml(user) {
         class="alumni-card-cta block bg-primary-indigo text-white text-center py-2.5 text-sm font-semibold hover:bg-primary-dark-blue transition">
         View Profile
       </a>
+      <a href="chat.html?to=${encodeURIComponent(user._id)}"
+        class="block text-center py-2 text-xs font-semibold text-gray-500 bg-gray-50 hover:bg-gray-100 hover:text-primary-indigo transition">
+        <i class="fas fa-comment-dots mr-1" aria-hidden="true"></i>Message
+      </a>
     </article>`;
 }
 

@@ -265,8 +265,12 @@ function renderActiveCard(m) {
     ${personLine(other)}
     <p class="text-xs text-gray-400 mt-2"><i class="far fa-calendar mr-1" aria-hidden="true"></i>Mentoring since ${formatDate(m.respondedAt || m.createdAt)}</p>
     <div class="flex items-center justify-between mt-3 flex-wrap gap-2">
-      <button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-accent-teal text-white hover:bg-teal-600 transition" data-act="chat" data-mid="${escapeHtmlAttr(m._id)}">
-        <i class="fas fa-comments mr-1" aria-hidden="true"></i>Open Chat</button>
+      <div class="flex gap-2">
+        <button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-accent-teal text-white hover:bg-teal-600 transition" data-act="chat" data-mid="${escapeHtmlAttr(m._id)}">
+          <i class="fas fa-comments mr-1" aria-hidden="true"></i>Open Chat</button>
+        <a href="chat.html?to=${encodeURIComponent(other ? other._id : '')}" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+          <i class="fas fa-up-right-from-square mr-1" aria-hidden="true"></i>Full Chat</a>
+      </div>
       <button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition" data-act="complete" data-mid="${escapeHtmlAttr(m._id)}">
         <i class="fas fa-circle-check mr-1" aria-hidden="true"></i>Complete Mentorship</button>
     </div>`;
@@ -420,10 +424,10 @@ async function openChat(mentorshipId) {
 
     const history = await api('GET', `/api/messages/conversations/${conv.data._id}`);
     messagesEl.innerHTML = '';
-    (history.data || []).forEach(function (message) {
+    ((history.data && history.data.messages) || []).forEach(function (message) {
       appendChatMessage(message, isMine(message));
     });
-    if (!history.data || history.data.length === 0) {
+    if (!history.data || !history.data.messages || history.data.messages.length === 0) {
       messagesEl.innerHTML = '<p class="text-center text-gray-400 text-sm py-6">No messages yet. Say hello!</p>';
     }
     scrollChat();
