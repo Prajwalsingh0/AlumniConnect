@@ -40,13 +40,26 @@ app.use(helmet({
         "https://cdnjs.cloudflare.com",
         "https://fonts.googleapis.com"
       ],
+      styleSrcElem: [
+        "'self'", "'unsafe-inline'",
+        "https://cdn.tailwindcss.com",
+        "https://cdnjs.cloudflare.com",
+        "https://fonts.googleapis.com"
+      ],
       scriptSrc: [
-        "'self'", "'unsafe-inline'", "'unsafe-eval'",
+        "'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:",
+        "https://cdn.tailwindcss.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net"
+      ],
+      scriptSrcElem: [
+        "'self'", "'unsafe-inline'", "'unsafe-eval'", "blob:",
         "https://cdn.tailwindcss.com",
         "https://cdnjs.cloudflare.com",
         "https://cdn.jsdelivr.net"
       ],
       scriptSrcAttr: ["'unsafe-inline'"],   // allows onclick="..." handlers
+      workerSrc: ["'self'", "blob:"],
       fontSrc: [
         "'self'",
         "https://cdnjs.cloudflare.com",
@@ -54,8 +67,15 @@ app.use(helmet({
         "https://fonts.gstatic.com",
         "data:"
       ],
-      imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:", "http:", "blob:"],
+      connectSrc: [
+        "'self'",
+        "https://cdn.tailwindcss.com",
+        "https://cdnjs.cloudflare.com",
+        "https://cdn.jsdelivr.net",
+        "ws:",
+        "wss:"
+      ],
     },
   },
   crossOriginEmbedderPolicy: false,
