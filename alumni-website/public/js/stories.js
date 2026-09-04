@@ -34,13 +34,110 @@ async function loadStories() {
     }
 
     container.innerHTML = stories.map(story => createStoryCardHtml(story)).join('');
+
+    // Top sections: spotlight (interview-style cards) + featured grid
+    renderSpotlightStories(stories);
+    renderFeaturedStories(stories);
   } catch (error) {
     console.error('Could not load stories:', error.message);
     container.innerHTML = `
       <div class="text-center py-12 bg-gray-50 rounded-2xl">
         <p class="text-gray-500">Stories are temporarily unavailable. Please try again later.</p>
       </div>`;
+    renderSpotlightError();
+    renderFeaturedError();
   }
+}
+
+// ── Spotlight (top of page): interview-style cards for the 2 newest stories ──
+
+function renderSpotlightStories(stories) {
+  const container = document.getElementById('spotlight-stories');
+  if (!container) return;
+
+  const featured = stories.filter(function (story) { return story.isFeatured; });
+  const chosen = (featured.length >= 2 ? featured : stories).slice(0, 2);
+
+  if (chosen.length === 0) {
+    container.innerHTML = emptyStoriesHtml('No spotlight stories published yet.');
+    return;
+  }
+
+  container.innerHTML = chosen.map(function (story, index) {
+    const authorName = (story.author && story.author.name) || 'Alumni Member';
+    const gradYear = (story.author && story.author.profile && story.author.profile.graduationYear) || '';
+    const authorImage = (story.author && story.author.profile && (story.author.profile.profileImageThumbnail || story.author.profile.profileImage))
+      || 'images/singlee person.webp';
+    const imageSide = `
+      <div class="${index % 2 === 1 ? 'md:w-1/2 p-6 md:p-8 flex justify-center items-center' : 'md:w-1/2 p-6 md:p-8 flex justify-center items-center'}">
+        <img src="${escapeHtml(story.image || 'images/image9.jpg')}" alt="${escapeHtml(story.title)}"
+          class="w-full h-auto object-cover rounded-lg shadow-lg" />
+      </div>`;
+    const textSide = `
+      <div class="md:w-1/2 p-6 md:p-8 flex flex-col justify-center">
+        <div class="flex items-center gap-3 mb-3">
+          <img src="${escapeHtml(authorImage)}" alt="" class="w-10 h-10 rounded-full object-cover border-2 border-indigo-100" />
+          <p class="text-sm font-bold text-gray-900">${escapeHtml(authorName)}</p>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2">${escapeHtml(story.title)}</h3>
+        <p class="text-lg text-primary-indigo font-medium mb-4">${gradYear ? `Class of ${escapeHtml(String(gradYear))}` : escapeHtml(story.category || 'Alumni Story')}</p>
+        <p class="text-gray-700 leading-relaxed mb-4">“${escapeHtml(story.excerpt || '')}”</p>
+        <a href="stories.html" class="inline-block mt-2 text-accent-teal font-semibold hover:text-primary-indigo transition">Read on Stories page</a>
+      </div>`;
+    return index % 2 === 1
+      ? `<div class="bg-gray-100 rounded-2xl shadow-xl overflow-hidden md:flex md:items-center transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl mb-8 md:flex-row-reverse">${textSide}${imageSide}</div>`
+      : `<div class="bg-gray-100 rounded-2xl shadow-xl overflow-hidden md:flex md:items-center transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl mb-8">${imageSide}${textSide}</div>`;
+  }).join('');
+}
+
+// ── Featured grid: featured stories first, then the newest ones ─────────────
+
+function renderFeaturedStories(stories) {
+  const grid = document.getElementById('featured-stories-grid');
+  if (!grid) return;
+
+  const featured = stories.filter(function (story) { return story.isFeatured; });
+  const chosen = (featured.length ? featured : stories).slice(0, 6);
+
+  if (chosen.length === 0) {
+    grid.innerHTML = '<p class="text-gray-500 col-span-full text-center">No featured alumni yet.</p>';
+    return;
+  }
+
+  grid.innerHTML = chosen.map(function (story) {
+    const authorName = (story.author && story.author.name) || 'Alumni Member';
+    const title = (story.author && story.author.profile && story.author.profile.title) || story.category || '';
+    const gradYear = (story.author && story.author.profile && story.author.profile.graduationYear) || '';
+    const authorImage = (story.author && story.author.profile && (story.author.profile.profileImageThumbnail || story.author.profile.profileImage))
+      || 'images/singlee person.webp';
+    return `
+      <div class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn p-6">
+        <div class="flex justify-center mb-4">
+          <img src="${escapeHtml(authorImage)}" alt="${escapeHtml(authorName)}"
+            class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-indigo-100" />
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 text-center mb-1">${escapeHtml(authorName)}</h3>
+        <p class="text-indigo-600 text-center font-medium mb-3">${escapeHtml(title)}${gradYear ? ` · Class of ${escapeHtml(String(gradYear))}` : ''}</p>
+        <p class="text-gray-600 text-sm leading-relaxed mb-4">${escapeHtml((story.excerpt || '').substring(0, 160))}…</p>
+        <p class="text-xs text-gray-400 text-center"><i class="fas fa-quote-left mr-1"></i>${escapeHtml(story.title)}</p>
+      </div>`;
+  }).join('');
+}
+
+function emptyStoriesHtml(text) {
+  return `<div class="text-center py-12 bg-gray-50 rounded-2xl col-span-full">
+    <p class="text-gray-400 text-sm">${escapeHtml(text)}</p>
+  </div>`;
+}
+
+function renderSpotlightError() {
+  const container = document.getElementById('spotlight-stories');
+  if (container) container.innerHTML = emptyStoriesHtml('Spotlight stories are temporarily unavailable.');
+}
+
+function renderFeaturedError() {
+  const grid = document.getElementById('featured-stories-grid');
+  if (grid) grid.innerHTML = '<p class="text-gray-500 col-span-full text-center">Featured stories are temporarily unavailable.</p>';
 }
 
 function createStoryCardHtml(story) {

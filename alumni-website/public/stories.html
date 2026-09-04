@@ -52,13 +52,6 @@
           <div class="flex space-x-6 items-center">
             <a href="index.html"
               class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
-              <a href="alumni.html"
-              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300">Directory</a>
-              <a href="mentorship.html" class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300">Mentorship</a>
-              <a href="chat.html" class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 relative">Chat<span id="chat-unread-badge" class="hidden absolute -top-1 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center"></span></a>
-            <a href="profile.html" id="navbar-dashboard-link"
-              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 hidden">My
-              Profile</a>
             <div class="relative group">
               <button
                 class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
@@ -103,8 +96,10 @@
               </button>
               <div
                 class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="alumni.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Directory</a>
                 <a href="stories.html"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Featured
+                  class="block px-4 py-2 text-sm text-primary-indigo font-semibold bg-gray-50 hover:bg-primary-indigo hover:text-white transition duration-200">Featured
                   Alumni</a>
                 <a href="stories.html#submit"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Submit
@@ -117,6 +112,8 @@
                   class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
               <div
                 class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="mentorship.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Mentorship</a>
                 <a href="jobs.html"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Job
                   Board</a>
@@ -153,6 +150,10 @@
               <a href="profile.html"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><i
                   class="fas fa-user mr-2"></i>My Profile</a>
+              <a href="chat.html"
+                class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><span><i
+                  class="fas fa-comments mr-2"></i>Chat</span><span id="chat-unread-badge"
+                  class="hidden min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold items-center justify-center"></span></a>
               <button id="dropdown-logout" type="button"
                 class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200"
                 link="portal.html#logout">
@@ -219,6 +220,7 @@
         </p>
       </div>
 
+      <div id="spotlight-stories" class="space-y-8">
       <div
         class="bg-gray-100 rounded-2xl shadow-xl overflow-hidden md:flex md:items-center transform transition-all duration-300 hover:scale-[1.01] hover:shadow-2xl mb-8">
         <div class="md:w-1/2 p-6 md:p-8 flex justify-center items-center">
@@ -276,6 +278,7 @@
       </div>
     </div>
   </section>
+      </div>
 
   <section id="featured" class="py-16 bg-white animate-fadeIn">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -288,248 +291,7 @@
           graduates
         </p>
       </div>
-      <section class="py-16 bg-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Card 1 -->
-            <div
-              class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn p-6">
-              <div class="flex justify-center mb-4">
-                <img
-                  src="images/image17.jpeg"
-                  alt="Sonu Kushwaha" class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-blue-500" />
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 text-center mb-1">
-                Sonu Kushwaha
-              </h2>
-              <p class="text-indigo-600 text-center font-medium mb-4">
-                Chief Technology Officer
-              </p>
-              <p class="text-gray-700 text-sm mb-2">
-                <strong>Graduation:</strong> 2012
-              </p>
-              <p class="text-gray-700 text-sm mb-4">
-                <strong>Location:</strong> San Francisco, CA
-              </p>
-              <!-- Story -->
-              <div class="text-gray-600 text-sm mb-4">
-                <p>
-                  "After graduating with a Computer Science degree, Sarah
-                  joined a small startup as a junior developer. Through
-                  dedication and continuous learning, she climbed the ranks to
-                  become CTO at TechVision Inc., a leading AI technology
-                  company. Sarah has led the development of groundbreaking
-                  machine learning platforms that have revolutionized
-                  healthcare diagnostics. She regularly returns to campus as a
-                  guest lecturer and mentors current students pursuing careers
-                  in technology."
-                </p>
-              </div>
-              <a href="https://linkedin.com/in/sarahmartinez" target="_blank"
-                class="block bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                View LinkedIn
-              </a>
-            </div>
-
-            <!-- Card 2 -->
-            <div
-              class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn delay-100 p-6">
-              <div class="flex justify-center mb-4">
-                <img
-                  src="https://images.unsplash.com/photo-1502767089025-6572583495b1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                  alt="John Doe" class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-green-500" />
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 text-center mb-1">
-                John Doe
-              </h2>
-              <p class="text-indigo-600 text-center font-medium mb-4">
-                Senior Data Scientist
-              </p>
-              <p class="text-gray-700 text-sm mb-2">
-                <strong>Graduation:</strong> 2015
-              </p>
-              <p class="text-gray-700 text-sm mb-4">
-                <strong>Location:</strong> Austin, TX
-              </p>
-              <!-- Story -->
-              <div class="text-gray-600 text-sm mb-4">
-                <p>
-                  "After graduating with a Computer Science degree, Sarah
-                  joined a small startup as a junior developer. Through
-                  dedication and continuous learning, she climbed the ranks to
-                  become CTO at TechVision Inc., a leading AI technology
-                  company. Sarah has led the development of groundbreaking
-                  machine learning platforms that have revolutionized
-                  healthcare diagnostics. She regularly returns to campus as a
-                  guest lecturer and mentors current students pursuing careers
-                  in technology."
-                </p>
-              </div>
-              <a href="#" target="_blank"
-                class="block bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                View LinkedIn
-              </a>
-            </div>
-
-            <!-- Card 3 -->
-            <div
-              class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn delay-200 p-6">
-              <div class="flex justify-center mb-4">
-                <img
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                  alt="Emily Johnson"
-                  class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-purple-500" />
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 text-center mb-1">
-                Emily Johnson
-              </h2>
-              <p class="text-indigo-600 text-center font-medium mb-4">
-                Product Manager
-              </p>
-              <p class="text-gray-700 text-sm mb-2">
-                <strong>Graduation:</strong> 2014
-              </p>
-              <p class="text-gray-700 text-sm mb-4">
-                <strong>Location:</strong> Seattle, WA
-              </p>
-              <!-- Story -->
-              <div class="text-gray-600 text-sm mb-4">
-                <p>
-                  "After graduating with a Computer Science degree, Sarah
-                  joined a small startup as a junior developer. Through
-                  dedication and continuous learning, she climbed the ranks to
-                  become CTO at TechVision Inc., a leading AI technology
-                  company. Sarah has led the development of groundbreaking
-                  machine learning platforms that have revolutionized
-                  healthcare diagnostics. She regularly returns to campus as a
-                  guest lecturer and mentors current students pursuing careers
-                  in technology."
-                </p>
-              </div>
-              <a href="#" target="_blank"
-                class="block bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                View LinkedIn
-              </a>
-            </div>
-
-            <div
-              class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn delay-200 p-6">
-              <div class="flex justify-center mb-4">
-                <img
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                  alt="Emily Johnson" class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-aqua-500" />
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 text-center mb-1">
-                Adarsh Singh
-              </h2>
-              <p class="text-indigo-600 text-center font-medium mb-4">
-                Full Stack Developer
-              </p>
-              <p class="text-gray-700 text-sm mb-2">
-                <strong>Graduation:</strong> 2019
-              </p>
-              <p class="text-gray-700 text-sm mb-4">
-                <strong>Location:</strong> Gurugram, India
-              </p>
-              <!-- Story -->
-              <div class="text-gray-600 text-sm mb-4">
-                <p>
-                  "After graduating with a Computer Science degree, Sarah
-                  joined a small startup as a junior developer. Through
-                  dedication and continuous learning, she climbed the ranks to
-                  become CTO at TechVision Inc., a leading AI technology
-                  company. Sarah has led the development of groundbreaking
-                  machine learning platforms that have revolutionized
-                  healthcare diagnostics. She regularly returns to campus as a
-                  guest lecturer and mentors current students pursuing careers
-                  in technology."
-                </p>
-              </div>
-              <a href="#" target="_blank"
-                class="block bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                View LinkedIn
-              </a>
-            </div>
-            <div
-              class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn delay-200 p-6">
-              <div class="flex justify-center mb-4">
-                <img
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                  alt="Emily Johnson"
-                  class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-yellow-500" />
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 text-center mb-1">
-                Saloni Kumari
-              </h2>
-              <p class="text-indigo-600 text-center font-medium mb-4">
-                Web Developer
-              </p>
-              <p class="text-gray-700 text-sm mb-2">
-                <strong>Graduation:</strong> 2016
-              </p>
-              <p class="text-gray-700 text-sm mb-4">
-                <strong>Location:</strong> Mumbai, India
-              </p>
-              <!-- Story -->
-              <div class="text-gray-600 text-sm mb-4">
-                <p>
-                  "After graduating with a Computer Science degree, Sarah
-                  joined a small startup as a junior developer. Through
-                  dedication and continuous learning, she climbed the ranks to
-                  become CTO at TechVision Inc., a leading AI technology
-                  company. Sarah has led the development of groundbreaking
-                  machine learning platforms that have revolutionized
-                  healthcare diagnostics. She regularly returns to campus as a
-                  guest lecturer and mentors current students pursuing careers
-                  in technology."
-                </p>
-              </div>
-              <a href="#" target="_blank"
-                class="block bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                View LinkedIn
-              </a>
-            </div>
-            <div
-              class="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl animate-fadeIn delay-200 p-6">
-              <div class="flex justify-center mb-4">
-                <img
-                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80"
-                  alt="Emily Johnson" class="w-32 h-32 object-cover rounded-full shadow-md border-4 border-pink-700" />
-              </div>
-              <h2 class="text-2xl font-bold text-gray-900 text-center mb-1">
-                Preeti Kewat
-              </h2>
-              <p class="text-indigo-600 text-center font-medium mb-4">
-                Senior Manager
-              </p>
-              <p class="text-gray-700 text-sm mb-2">
-                <strong>Graduation:</strong> 2016
-              </p>
-              <p class="text-gray-700 text-sm mb-4">
-                <strong>Location:</strong> Bhopal, India
-              </p>
-              <!-- Story -->
-              <div class="text-gray-600 text-sm mb-4">
-                <p>
-                  "After graduating with a Computer Science degree, Sarah
-                  joined a small startup as a junior developer. Through
-                  dedication and continuous learning, she climbed the ranks to
-                  become CTO at TechVision Inc., a leading AI technology
-                  company. Sarah has led the development of groundbreaking
-                  machine learning platforms that have revolutionized
-                  healthcare diagnostics. She regularly returns to campus as a
-                  guest lecturer and mentors current students pursuing careers
-                  in technology."
-                </p>
-              </div>
-              <a href="#" target="_blank"
-                class="block bg-blue-600 text-white text-center py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
-                View LinkedIn
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div id="featured-stories-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8"></div>
 
       <div id="alumni-stories-container" class="space-y-12"></div>
     </div>

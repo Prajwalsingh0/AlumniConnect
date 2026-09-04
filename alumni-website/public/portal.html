@@ -45,13 +45,6 @@
           <div class="flex space-x-6 items-center">
             <a href="index.html"
               class="text-primary-indigo hover:text-accent-teal px-3 py-2 rounded-md text-sm font-semibold transition duration-300">Home</a>
-              <a href="alumni.html"
-              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300">Directory</a>
-              <a href="mentorship.html" class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300">Mentorship</a>
-              <a href="chat.html" class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 relative">Chat<span id="chat-unread-badge" class="hidden absolute -top-1 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center"></span></a>
-            <a href="profile.html" id="navbar-dashboard-link"
-              class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium transition duration-300 hidden">My
-              Profile</a>
             <div class="relative group">
               <button
                 class="text-gray-700 hover:text-primary-indigo px-3 py-2 rounded-md text-sm font-medium flex items-center transition duration-300">
@@ -96,6 +89,8 @@
               </button>
               <div
                 class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="alumni.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Directory</a>
                 <a href="stories.html"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Featured
                   Alumni</a>
@@ -110,6 +105,8 @@
                   class="fas fa-chevron-down ml-1 text-xs transition-transform duration-300 group-hover:rotate-180"></i></button>
               <div
                 class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
+                <a href="mentorship.html"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Mentorship</a>
                 <a href="jobs.html"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200">Job
                   Board</a>
@@ -146,6 +143,10 @@
               <a href="profile.html"
                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><i
                   class="fas fa-user mr-2"></i>My Profile</a>
+              <a href="chat.html"
+                class="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-primary-indigo hover:text-white transition duration-200"><span><i
+                  class="fas fa-comments mr-2"></i>Chat</span><span id="chat-unread-badge"
+                  class="hidden min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold items-center justify-center"></span></a>
               <button id="dropdown-logout" type="button"
                 class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200"
                 link="portal.html#logout">

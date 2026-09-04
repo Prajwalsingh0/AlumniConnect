@@ -58,6 +58,7 @@ All endpoints are under `/api`:
 
 - `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
 - `GET/PUT /api/users/profile`, `POST /api/users/profile/image`, `PUT /api/users/password`
+- `GET /api/home` — public homepage data: live member/job/story counts, upcoming events, latest stories, recently joined alumni
 - `GET /api/users/directory` — paginated alumni listing (`page`, `limit` ≤ 48, `q`, `graduationYear`, `department`, `degree`, `location`, `mentorship=available`, `sort`: `name_asc`/`name_desc`/`newest`/`grad_year`)
 - `GET /api/users/directory/facets` — distinct filter values from real user data
 - `GET /api/users/public/:userId`, `GET /api/users/directory`, `GET /api/users/search`
@@ -105,4 +106,5 @@ Message content is validated server-side (non-empty, ≤ 5000 chars); sender ide
 | `npm run test:mentorship` | Run the mentorship API test suite (server must be running) |
 | `npm run test:chat` | Run the chat/messaging test suite, including Socket.IO (server must be running) |
 | `npm run test:chatbot` | Run the assistant test suite (server must be running) |
+| `npm run test:home` | Run the homepage data API test suite (server must be running) |
 | `npm run check-mongodb` | Verify MongoDB connectivity |
