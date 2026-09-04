@@ -32,6 +32,7 @@ const Group = require('../models/Group');
 const ForumPost = require('../models/ForumPost');
 const Story = require('../models/Story');
 const Mentorship = require('../models/Mentorship');
+const Notification = require('../models/Notification');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/alumni-website';
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'Demo@1234';
@@ -508,6 +509,37 @@ async function seed() {
     respondedAt: new Date(now2.getTime() - 5 * 24 * 60 * 60 * 1000)
   });
 
+  // ---------- Notifications (matching the mentorship states above) ----------
+  await Notification.create({
+    recipient: aarav._id,
+    actor: rahul._id,
+    type: 'mentorship_request',
+    refType: 'Mentorship',
+    refId: (await Mentorship.findOne({ mentee: rahul._id, mentor: aarav._id, status: 'pending' }))._id,
+    message: 'Rahul Patel requested mentorship',
+    read: false
+  });
+
+  await Notification.create({
+    recipient: rahul._id,
+    actor: sneha._id,
+    type: 'mentorship_accepted',
+    refType: 'Mentorship',
+    refId: (await Mentorship.findOne({ mentee: rahul._id, mentor: sneha._id, status: 'accepted' }))._id,
+    message: 'Sneha Verma accepted your mentorship request',
+    read: false
+  });
+
+  await Notification.create({
+    recipient: rahul._id,
+    actor: createdAlumni['arjun.mehta']._id,
+    type: 'mentorship_rejected',
+    refType: 'Mentorship',
+    refId: (await Mentorship.findOne({ mentee: rahul._id, mentor: createdAlumni['arjun.mehta']._id, status: 'rejected' }))._id,
+    message: 'Arjun Mehta declined your mentorship request',
+    read: false
+  });
+
   // ---------- Groups & forum ----------
   const group = await Group.create({
     name: 'CSE Alumni Network',
@@ -616,6 +648,7 @@ async function seed() {
   console.log('  Stories: 2 published');
   console.log('  Messaging: 2 conversations (1 with unread badge)');
   console.log('  Mentorships: 1 pending, 1 accepted, 1 rejected');
+  console.log('  Notifications: 3 (matching the mentorship states)');
 }
 
 async function init() {
