@@ -18,6 +18,7 @@ const storyRoutes = require('./routes/stories');
 const mentorshipRoutes = require('./routes/mentorships');
 const chatbotRoutes = require('./routes/chatbot');
 const homeRoutes = require('./routes/home');
+const notificationRoutes = require('./routes/notifications');
 const adminRoutes = require('./routes/admin');
 
 const http = require('http');
@@ -104,6 +105,7 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/mentorships', mentorshipRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/home', homeRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Serve uploads directory
@@ -190,6 +192,9 @@ const io = socketIO(server, {
 
 // Expose the Socket.IO instance to Express routes (e.g. read receipts)
 app.set('io', io);
+
+// Give the notification service the same instance for live pushes
+require('./services/notificationService').setIo(io);
 
 // Socket.io authentication middleware
 io.use(async (socket, next) => {
