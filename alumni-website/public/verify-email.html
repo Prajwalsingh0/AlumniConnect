@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Email - University Alumni Network</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn { animation: fadeIn 0.6s ease-out; }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary-indigo": "#4F46E5",
+            "primary-dark-blue": "#312E81",
+            "accent-teal": "#14B8A6",
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex items-center justify-center px-4">
+
+  <div class="w-full max-w-md animate-fadeIn">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-extrabold text-primary-indigo tracking-wider mb-2">
+        MPU Alumni Network
+      </h1>
+      <p class="text-gray-500">Account email verification</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+
+      <!-- Loading state -->
+      <div id="state-loading" class="text-center py-6">
+        <i class="fas fa-spinner fa-spin text-3xl text-primary-indigo mb-4" aria-hidden="true"></i>
+        <p class="text-gray-500">Verifying your email…</p>
+      </div>
+
+      <!-- Success state -->
+      <div id="state-success" class="hidden text-center py-6">
+        <i class="fas fa-circle-check text-5xl text-green-500 mb-4" aria-hidden="true"></i>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Email verified!</h2>
+        <p class="text-gray-500 mb-6">Thank you. Your email address has been verified and you can now log in.</p>
+        <a href="portal.html#login"
+          class="inline-block bg-primary-indigo text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary-dark-blue transition">
+          <i class="fas fa-sign-in-alt mr-1" aria-hidden="true"></i>Go to Login
+        </a>
+      </div>
+
+      <!-- Invalid / expired token state (with resend option) -->
+      <div id="state-invalid" class="hidden text-center py-4">
+        <i class="fas fa-envelope-circle-check text-5xl text-indigo-300 mb-4" aria-hidden="true"></i>
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Could not verify your email</h2>
+        <p id="invalid-reason" class="text-gray-500 mb-5">
+          The verification link is invalid or has expired. Enter your email below to receive a fresh link.
+        </p>
+
+        <form id="resend-form" class="mb-3">
+          <label for="resend-email" class="block text-left text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email address</label>
+          <input type="email" id="resend-email" required placeholder="you@example.com"
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+          <p id="resend-message" class="text-xs text-left mb-3 min-h-[16px] text-gray-400" aria-live="polite"></p>
+          <button type="submit" id="resend-btn"
+            class="w-full bg-primary-indigo text-white py-3 rounded-lg font-semibold hover:bg-primary-dark-blue disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <i class="fas fa-paper-plane mr-1" aria-hidden="true"></i>Send new verification link
+          </button>
+        </form>
+
+        <a href="portal.html#login" class="text-sm text-primary-indigo font-semibold hover:text-accent-teal transition">
+          Back to login
+        </a>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-6">
+      &copy; 2026 PGOI Alumni Network
+    </p>
+  </div>
+
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      // Don't leave the verification token sitting in the address bar
+      if (token) {
+        try { window.history.replaceState({}, document.title, window.location.pathname); } catch (e) { /* noop */ }
+      }
+
+      const stateLoading = document.getElementById('state-loading');
+      const stateSuccess = document.getElementById('state-success');
+      const stateInvalid = document.getElementById('state-invalid');
+
+      function show(el) {
+        [stateLoading, stateSuccess, stateInvalid].forEach(function (s) { s.classList.add('hidden'); });
+        el.classList.remove('hidden');
+      }
+
+      if (!token) {
+        show(stateInvalid);
+        return;
+      }
+
+      // Call the existing verification endpoint
+      fetch('/api/auth/verify-email?token=' + encodeURIComponent(token))
+        .then(function (response) {
+          return response.json().catch(function () { return {}; }).then(function (data) {
+            return { ok: response.ok, data: data };
+          });
+        })
+        .then(function (result) {
+          if (result.ok) {
+            show(stateSuccess);
+          } else {
+            document.getElementById('invalid-reason').textContent =
+              (result.data && result.data.error
+                ? result.data.error + '.'
+                : 'The verification link is invalid or has expired.') +
+              ' Enter your email below to receive a fresh link.';
+            show(stateInvalid);
+          }
+        })
+        .catch(function () {
+          document.getElementById('invalid-reason').textContent =
+            'We could not reach the server. Please check your connection and try again, or log in and request a fresh link.';
+          show(stateInvalid);
+        });
+
+      // Resend flow
+      document.getElementById('resend-form').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const email = document.getElementById('resend-email').value.trim();
+        const btn = document.getElementById('resend-btn');
+        const msg = document.getElementById('resend-message');
+
+        if (!email) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Sending…';
+        msg.textContent = '';
+
+        try {
+          const response = await fetch('/api/auth/resend-verification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email })
+          });
+          const data = await response.json().catch(function () { return {}; });
+          msg.textContent = data.message || 'If that email needs verification, a new verification link has been sent.';
+          msg.className = 'text-xs text-left mb-3 min-h-[16px] text-green-600';
+        } catch (error) {
+          msg.textContent = 'Network error. Please try again.';
+          msg.className = 'text-xs text-left mb-3 min-h-[16px] text-red-500';
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-paper-plane mr-1" aria-hidden="true"></i>Send new verification link';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

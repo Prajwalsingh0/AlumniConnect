@@ -86,6 +86,13 @@ router.post('/register', validateRegistration, async (req, res) => {
     newUser.emailVerificationToken = verificationToken;
     newUser.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
 
+    // When no mail provider is configured the verification email cannot be
+    // delivered, so the account is auto-verified to keep registration usable.
+    const emailConfigured = !!process.env.EMAIL_USER;
+    if (!emailConfigured) {
+      newUser.emailVerified = true;
+    }
+
     await newUser.save();
 
     // Send verification email (best effort - registration still succeeds if SMTP is not configured)
@@ -192,6 +199,35 @@ router.post('/reset-password/:token', async (req, res) => {
   }
 });
 
+// Resend the verification email (response is always generic to prevent
+// account enumeration; only acts when a mail provider is configured)
+router.post('/resend-verification', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const genericResponse = { message: 'If that email needs verification, a new verification link has been sent.' };
+
+    if (!email || !process.env.EMAIL_USER) {
+      return res.json(genericResponse);
+    }
+
+    const user = await User.findOne({ email: String(email).toLowerCase().trim() });
+    if (!user || user.emailVerified) {
+      return res.json(genericResponse);
+    }
+
+    const verificationToken = generateVerificationToken();
+    user.emailVerificationToken = verificationToken;
+    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    await user.save();
+
+    await sendVerificationEmail(user.email, verificationToken);
+    res.json(genericResponse);
+  } catch (error) {
+    console.error('Resend verification error:', error.message);
+    res.json({ message: 'If that email needs verification, a new verification link has been sent.' });
+  }
+});
+
 // Login user
 router.post('/login', validateLogin, async (req, res) => {
   try {
@@ -217,6 +253,16 @@ router.post('/login', validateLogin, async (req, res) => {
     // Check if user is active
     if (!user.isActive) {
       return res.status(403).json({ error: 'Account is deactivated' });
+    }
+
+    // Email verification is enforced only when a mail provider is configured,
+    // so accounts created before SMTP setup (or without SMTP entirely) are
+    // never locked out.
+    if (process.env.EMAIL_USER && !user.emailVerified) {
+      return res.status(403).json({
+        error: 'Please verify your email address before logging in. Check your inbox for the verification link.',
+        code: 'EMAIL_NOT_VERIFIED'
+      });
     }
 
     // Generate JWT token
