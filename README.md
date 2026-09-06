@@ -6,7 +6,7 @@ Alumni network platform for a university: alumni/student profiles, events with r
 
 - **Backend:** Node.js, Express, Mongoose (MongoDB), Socket.IO
 - **Frontend:** Static HTML/CSS/JS (Tailwind via CDN) served by Express
-- **Auth:** JWT (Bearer tokens), bcrypt password hashing
+- **Auth:** JWT (Bearer tokens), bcrypt password hashing, in-memory rate limiting on login/register/password-reset/verification endpoints
 
 ## Getting Started
 
