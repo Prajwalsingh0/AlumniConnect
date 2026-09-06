@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const Mentorship = require('../models/Mentorship');
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
+const { createNotification } = require('../services/notificationService');
 const router = express.Router();
 
 const ACTIVE_OR_PENDING = ['pending', 'accepted'];
@@ -107,6 +108,14 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
     const populated = await populateParticipants(Mentorship.findById(mentorship._id));
+
+    await createNotification({
+      recipient: mentorId,
+      actor: req.user.userId,
+      type: 'mentorship_request',
+      refId: mentorship._id,
+      message: `${populated.mentee.name} requested mentorship`
+    });
 
     res.status(201).json({
       message: 'Mentorship request sent.',
@@ -266,6 +275,14 @@ router.patch('/:id/accept', authenticateToken, async (req, res) => {
     mentorship.respondedAt = new Date();
     await mentorship.save();
 
+    await createNotification({
+      recipient: mentorship.mentee._id,
+      actor: mentorship.mentor._id,
+      type: 'mentorship_accepted',
+      refId: mentorship._id,
+      message: `${mentorship.mentor.name} accepted your mentorship request`
+    });
+
     res.json({ message: 'Mentorship accepted.', mentorship });
   } catch (error) {
     console.error('Accept mentorship error:', error);
@@ -290,6 +307,14 @@ router.patch('/:id/reject', authenticateToken, async (req, res) => {
     mentorship.status = 'rejected';
     mentorship.respondedAt = new Date();
     await mentorship.save();
+
+    await createNotification({
+      recipient: mentorship.mentee._id,
+      actor: mentorship.mentor._id,
+      type: 'mentorship_rejected',
+      refId: mentorship._id,
+      message: `${mentorship.mentor.name} declined your mentorship request`
+    });
 
     res.json({ message: 'Mentorship request rejected.', mentorship });
   } catch (error) {
@@ -316,6 +341,14 @@ router.patch('/:id/cancel', authenticateToken, async (req, res) => {
     mentorship.respondedAt = new Date();
     await mentorship.save();
 
+    await createNotification({
+      recipient: mentorship.mentor._id,
+      actor: mentorship.mentee._id,
+      type: 'mentorship_cancelled',
+      refId: mentorship._id,
+      message: `${mentorship.mentee.name} cancelled the mentorship request`
+    });
+
     res.json({ message: 'Mentorship request cancelled.', mentorship });
   } catch (error) {
     console.error('Cancel mentorship error:', error);
@@ -337,6 +370,16 @@ router.patch('/:id/complete', authenticateToken, async (req, res) => {
     mentorship.status = 'completed';
     mentorship.completedAt = new Date();
     await mentorship.save();
+
+    const completerName = found.isMentor ? mentorship.mentor.name : mentorship.mentee.name;
+    const recipient = found.isMentor ? mentorship.mentee._id : mentorship.mentor._id;
+    await createNotification({
+      recipient,
+      actor: req.user.userId,
+      type: 'mentorship_completed',
+      refId: mentorship._id,
+      message: `${completerName} marked your mentorship as completed`
+    });
 
     res.json({ message: 'Mentorship completed. Thank you both!', mentorship });
   } catch (error) {

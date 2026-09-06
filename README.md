@@ -75,6 +75,8 @@ All endpoints are under `/api`:
 - `GET/POST /api/messages/conversations`, `GET /api/messages/conversations/:conversationId` (cursor paginated via `before` + `limit`)
 - `POST /api/messages/conversations/:conversationId/read` — mark conversation read (server-persisted)
 - `GET /api/messages/unread/count` — total unread messages for the navbar badge
+- `GET /api/notifications` - own notifications (`page`, `limit`, `unread=true`)
+- `GET /api/notifications/unread/count`, `POST /api/notifications/:id/read`, `POST /api/notifications/read-all`
 - `POST /api/chatbot` — website assistant (auth; per-user rate limit; provider abstraction with optional OpenAI-compatible API via `CHATBOT_API_URL`/`CHATBOT_API_KEY`/`CHATBOT_MODEL`, local knowledge-base fallback)
 - `GET/POST /api/groups`, `POST /api/groups/:id/join`, `GET/POST /api/groups/:id/posts`
 - Admin (role `admin` required): `/api/admin/stats`, `/api/admin/users`, `/api/admin/events`, `/api/admin/jobs`, `/api/admin/campaigns`
@@ -90,6 +92,7 @@ Real-time messaging runs on Socket.IO with JWT authentication (`auth.token`):
 | `new_message` | server → client | Message | Delivery to the recipient |
 | `typing` | both ways | `{ conversationId, isTyping }` | Typing indicator (relayed to the other participant only) |
 | `messages_read` | server → client | `{ conversationId, readBy, readAt }` | Read receipt after the recipient marks read |
+| `notification` | server > client | `{ id, type, refId, message, createdAt, read }` | Mentorship lifecycle notification (request/accepted/rejected/cancelled/completed) |
 | `error` | server → client | `{ message }` | Validation/authorization failures |
 
 Message content is validated server-side (non-empty, ≤ 5000 chars); sender identity is always derived from the JWT; only conversation participants can send, read history, mark read, or receive relays.
