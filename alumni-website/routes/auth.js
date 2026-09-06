@@ -10,6 +10,55 @@ const {
   sendPasswordResetEmail
 } = require('../services/emailService');
 const router = express.Router();
+const { createRateLimiter } = require('../middleware/rateLimit');
+
+// Brute-force protection for the public auth endpoints. Limits are keyed by
+// client IP, and - where the request carries an email - additionally per
+// account, so one attacker cannot lock out a shared network and one IP
+// cannot focus on a single account.
+const clientKey = (req) => (req.ip || 'unknown');
+
+const loginIpLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  key: (req) => `login-ip:${clientKey(req)}`,
+  message: 'Too many login attempts from this network. Please try again later.'
+});
+
+const loginAccountLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  key: (req) => `login-acct:${clientKey(req)}:${String((req.body && req.body.email) || '').toLowerCase().trim()}`,
+  message: 'Too many login attempts for this account. Please try again later.'
+});
+
+const registerIpLimit = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  key: (req) => `register-ip:${clientKey(req)}`,
+  message: 'Too many accounts created from this network. Please try again later.'
+});
+
+const forgotIpLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  key: (req) => `forgot-ip:${clientKey(req)}`,
+  message: 'Too many password reset requests. Please try again later.'
+});
+
+const forgotEmailLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 3,
+  key: (req) => `forgot-acct:${clientKey(req)}:${String((req.body && req.body.email) || '').toLowerCase().trim()}`,
+  message: 'Too many password reset requests. Please try again later.'
+});
+
+const resendIpLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  key: (req) => `resend-ip:${clientKey(req)}`,
+  message: 'Too many verification requests. Please try again later.'
+});
 
 // JWT secret key
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
@@ -31,7 +80,7 @@ const validateLogin = [
 ];
 
 // Register new user
-router.post('/register', validateRegistration, async (req, res) => {
+router.post('/register', registerIpLimit, validateRegistration, async (req, res) => {
   try {
     const errors = validationResult(req);
 
@@ -146,7 +195,7 @@ router.get('/verify-email', async (req, res) => {
 });
 
 // Request password reset
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', forgotIpLimit, forgotEmailLimit, async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
@@ -201,7 +250,7 @@ router.post('/reset-password/:token', async (req, res) => {
 
 // Resend the verification email (response is always generic to prevent
 // account enumeration; only acts when a mail provider is configured)
-router.post('/resend-verification', async (req, res) => {
+router.post('/resend-verification', resendIpLimit, async (req, res) => {
   try {
     const { email } = req.body;
     const genericResponse = { message: 'If that email needs verification, a new verification link has been sent.' };
@@ -229,7 +278,7 @@ router.post('/resend-verification', async (req, res) => {
 });
 
 // Login user
-router.post('/login', validateLogin, async (req, res) => {
+router.post('/login', loginIpLimit, loginAccountLimit, validateLogin, async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
