@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard — Alumni Network</title>
+  <title>Admin Dashboard - Alumni Network</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -101,19 +101,19 @@
       </a>
       <a href="#" onclick="switchSection('users')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-users">
         <i class="fas fa-users"></i> Manage Users
-        <span class="ml-auto bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full" id="userCountBadge">—</span>
+        <span class="ml-auto bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full" id="userCountBadge">-</span>
       </a>
       <a href="#" onclick="switchSection('events')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-events">
         <i class="fas fa-calendar-alt"></i> Events
-        <span class="ml-auto bg-green-600 text-white text-xs px-2 py-0.5 rounded-full" id="eventCountBadge">—</span>
+        <span class="ml-auto bg-green-600 text-white text-xs px-2 py-0.5 rounded-full" id="eventCountBadge">-</span>
       </a>
       <a href="#" onclick="switchSection('jobs')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-jobs">
         <i class="fas fa-briefcase"></i> Job Board
-        <span class="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full" id="jobCountBadge">—</span>
+        <span class="ml-auto bg-yellow-500 text-white text-xs px-2 py-0.5 rounded-full" id="jobCountBadge">-</span>
       </a>
       <a href="#" onclick="switchSection('campaigns')" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition" id="nav-campaigns">
         <i class="fas fa-donate"></i> Campaigns
-        <span class="ml-auto bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full" id="campaignCountBadge">—</span>
+        <span class="ml-auto bg-purple-500 text-white text-xs px-2 py-0.5 rounded-full" id="campaignCountBadge">-</span>
       </a>
     </nav>
     <div class="p-4 border-t border-slate-800 space-y-1">
@@ -167,7 +167,7 @@
             </div>
             <div>
               <p class="text-gray-500 text-sm">Total Users</p>
-              <p class="text-2xl font-bold stat-val" id="statUsers">—</p>
+              <p class="text-2xl font-bold stat-val" id="statUsers">-</p>
             </div>
           </div>
           <!-- Active Events -->
@@ -177,7 +177,7 @@
             </div>
             <div>
               <p class="text-gray-500 text-sm">Active Events</p>
-              <p class="text-2xl font-bold stat-val" id="statEvents">—</p>
+              <p class="text-2xl font-bold stat-val" id="statEvents">-</p>
             </div>
           </div>
           <!-- Open Jobs -->
@@ -187,7 +187,7 @@
             </div>
             <div>
               <p class="text-gray-500 text-sm">Open Jobs</p>
-              <p class="text-2xl font-bold stat-val" id="statJobs">—</p>
+              <p class="text-2xl font-bold stat-val" id="statJobs">-</p>
             </div>
           </div>
           <!-- Donations -->
@@ -197,7 +197,7 @@
             </div>
             <div>
               <p class="text-gray-500 text-sm">Donations</p>
-              <p class="text-2xl font-bold stat-val" id="statDonations">—</p>
+              <p class="text-2xl font-bold stat-val" id="statDonations">-</p>
             </div>
           </div>
         </div>
@@ -248,11 +248,11 @@
             <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
               <div class="flex justify-between text-sm">
                 <span class="text-gray-500 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>Active</span>
-                <span class="font-semibold text-gray-800" id="statActiveUsers">—</span>
+                <span class="font-semibold text-gray-800" id="statActiveUsers">-</span>
               </div>
               <div class="flex justify-between text-sm">
                 <span class="text-gray-500 flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-red-500 inline-block"></span>Banned</span>
-                <span class="font-semibold text-gray-800" id="statBannedUsers">—</span>
+                <span class="font-semibold text-gray-800" id="statBannedUsers">-</span>
               </div>
             </div>
           </div>
@@ -270,7 +270,7 @@
             <!-- Search -->
             <div class="relative flex-1">
               <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input type="text" id="userSearch" placeholder="Search by name, email or department…"
+              <input type="text" id="userSearch" placeholder="Search by name, email or department..."
                 class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             </div>
             <!-- Role filter -->
@@ -323,7 +323,7 @@
 
           <!-- Pagination -->
           <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-            <p class="text-sm text-gray-500" id="paginationInfo">—</p>
+            <p class="text-sm text-gray-500" id="paginationInfo">-</p>
             <div class="flex gap-2" id="paginationBtns"></div>
           </div>
         </div>
@@ -339,7 +339,7 @@
           <div class="flex flex-col md:flex-row gap-4">
             <div class="relative flex-1">
               <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input type="text" id="eventSearch" placeholder="Search events by title, description or city…"
+              <input type="text" id="eventSearch" placeholder="Search events by title, description or city..."
                 class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
             </div>
             <select id="eventStatusFilter" onchange="loadEvents()"
@@ -382,7 +382,7 @@
             <p class="text-gray-300 text-sm">Create your first event using the button above</p>
           </div>
           <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-            <p class="text-sm text-gray-500" id="eventPaginationInfo">—</p>
+            <p class="text-sm text-gray-500" id="eventPaginationInfo">-</p>
             <div class="flex gap-2" id="eventPaginationBtns"></div>
           </div>
         </div>
@@ -397,7 +397,7 @@
           <div class="flex flex-col md:flex-row gap-4">
             <div class="relative flex-1">
               <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-              <input type="text" id="jobSearch" placeholder="Search by title, company…"
+              <input type="text" id="jobSearch" placeholder="Search by title, company..."
                 class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
                 oninput="clearTimeout(jobDebounceTimer); jobDebounceTimer = setTimeout(loadJobs, 350)">
             </div>
@@ -524,7 +524,7 @@
           </div>
           <div class="md:col-span-2">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Description *</label>
-            <textarea id="evDesc" required rows="3" placeholder="Event description…"
+            <textarea id="evDesc" required rows="3" placeholder="Event description..."
               class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"></textarea>
           </div>
           <div>
@@ -674,12 +674,12 @@
           </div>
           <div class="md:col-span-2">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Job Description *</label>
-            <textarea id="jbDescription" required rows="4" placeholder="Describe the role, responsibilities, work environment…"
+            <textarea id="jbDescription" required rows="4" placeholder="Describe the role, responsibilities, work environment..."
               class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
           </div>
           <div class="md:col-span-2">
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Requirements *</label>
-            <textarea id="jbRequirements" required rows="3" placeholder="Qualifications, skills, must-haves…"
+            <textarea id="jbRequirements" required rows="3" placeholder="Qualifications, skills, must-haves..."
               class="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
           </div>
         </div>
@@ -790,6 +790,12 @@
     }
 
     // ── Toast ────────────────────────────────────────────────────────
+    function esc(value) {
+      return String(value === null || value === undefined ? '' : value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
     function showToast(msg, type = 'success') {
       const t = document.getElementById('toast');
       const icons = { success: 'fa-check', error: 'fa-times-circle', info: 'fa-info-circle' };
@@ -821,12 +827,12 @@
         });
         if (!res.ok) return;
         const d = await res.json();
-        document.getElementById('statUsers').textContent   = d.users?.toLocaleString() ?? '—';
-        document.getElementById('statEvents').textContent  = d.events?.toLocaleString() ?? '—';
-        document.getElementById('statJobs').textContent    = d.jobs?.toLocaleString() ?? '—';
+        document.getElementById('statUsers').textContent   = d.users?.toLocaleString() ?? '-';
+        document.getElementById('statEvents').textContent  = d.events?.toLocaleString() ?? '-';
+        document.getElementById('statJobs').textContent    = d.jobs?.toLocaleString() ?? '-';
         document.getElementById('statDonations').textContent = d.donations ? '$' + d.donations.toLocaleString() : '$0';
-        document.getElementById('statActiveUsers').textContent = d.activeUsers?.toLocaleString() ?? '—';
-        document.getElementById('statBannedUsers').textContent = d.bannedUsers?.toLocaleString() ?? '—';
+        document.getElementById('statActiveUsers').textContent = d.activeUsers?.toLocaleString() ?? '-';
+        document.getElementById('statBannedUsers').textContent = d.bannedUsers?.toLocaleString() ?? '-';
         if (d.users) document.getElementById('userCountBadge').textContent = d.users;
       } catch (_) {}
     }
@@ -886,6 +892,7 @@
         if (!res.ok) { showToast(data.error || 'Failed to load users', 'error'); tbody.innerHTML = ''; return; }
 
         const { users, pagination } = data;
+        window.__adminUsersCache = users;
         if (users.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); renderPagination(pagination); return; }
 
         tbody.innerHTML = users.map(u => {
@@ -905,8 +912,8 @@
                 <div class="flex items-center gap-3">
                   <img src="${avatar}" class="w-10 h-10 rounded-full object-cover border border-gray-200" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=e2e8f0&color=64748b'">
                   <div>
-                    <p class="font-semibold text-gray-900">${u.name}</p>
-                    <p class="text-xs text-gray-400">${u.email}</p>
+                    <p class="font-semibold text-gray-900">${esc(u.name)}</p>
+                    <p class="text-xs text-gray-400">${esc(u.email)}</p>
                   </div>
                 </div>
               </td>
@@ -932,7 +939,7 @@
                     class="p-2 rounded-lg ${isActive ? 'text-orange-500 hover:bg-orange-50' : 'text-green-500 hover:bg-green-50'} transition">
                     <i class="fas ${isActive ? 'fa-ban' : 'fa-check-circle'}"></i>
                   </button>
-                  <button onclick="deleteUser('${u._id}', '${u.name.replace(/'/g, "\\'")}')"
+                  <button onclick="deleteUser('${u._id}')""
                     title="Delete user permanently"
                     class="p-2 rounded-lg text-red-500 hover:bg-red-50 transition">
                     <i class="fas fa-trash-alt"></i>
@@ -955,7 +962,7 @@
       const start = (page - 1) * limit + 1;
       const end   = Math.min(page * limit, total);
       document.getElementById('paginationInfo').textContent =
-        total ? `Showing ${start}–${end} of ${total} users` : '0 users';
+        total ? `Showing ${start}-${end} of ${total} users` : '0 users';
 
       const container = document.getElementById('paginationBtns');
       container.innerHTML = '';
@@ -1010,7 +1017,9 @@
     }
 
     // ── Delete user ──────────────────────────────────────────────────
-    async function deleteUser(userId, name) {
+    async function deleteUser(userId) {
+      const user = (window.__adminUsersCache || []).find(u => u._id === userId);
+      const name = user ? user.name : 'this user';
       showConfirm(
         `Delete "${name}"?`,
         'This will permanently delete the user and all their data. This cannot be undone.',
@@ -1056,6 +1065,7 @@
         if (!res.ok) { showToast(data.error || 'Failed to load events', 'error'); tbody.innerHTML = ''; return; }
 
         const { events, pagination } = data;
+        window.__adminEventsCache = events;
         const badge = document.getElementById('eventCountBadge');
         if (badge) badge.textContent = pagination.total || '0';
 
@@ -1076,32 +1086,32 @@
         tbody.innerHTML = events.map(ev => {
           const s = statusCfg[ev.status] || statusCfg.draft;
           const t = typeCfg[ev.type] || typeCfg.other;
-          const startDate = ev.startDate ? new Date(ev.startDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '—';
+          const startDate = ev.startDate ? new Date(ev.startDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '-';
           const attendeeCount = ev.attendees?.length || 0;
           const maxStr = ev.maxAttendees ? `/ ${ev.maxAttendees}` : '';
           return `
             <tr class="hover:bg-gray-50 transition">
               <td class="px-6 py-4">
-                <p class="font-semibold text-gray-900 truncate max-w-xs">${ev.title}</p>
-                <p class="text-xs text-gray-400 mt-0.5">${ev.location?.city || 'Online'} ${ev.isVirtual ? '🌐' : '📍'}</p>
+                <p class="font-semibold text-gray-900 truncate max-w-xs">${esc(ev.title)}</p>
+                <p class="text-xs text-gray-400 mt-0.5">${esc(ev.location?.city || 'Online')} ${ev.isVirtual ? '🌐' : '📍'}</p>
               </td>
               <td class="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">${startDate}</td>
               <td class="px-6 py-4">
-                <span class="text-xs font-semibold px-2.5 py-1 rounded-lg ${t} capitalize">${ev.type}</span>
+                <span class="text-xs font-semibold px-2.5 py-1 rounded-lg ${t} capitalize">${esc(ev.type)}</span>
               </td>
               <td class="px-6 py-4">
                 <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${s.cls}">
-                  <i class="fas ${s.icon} text-xs"></i> ${ev.status}
+                  <i class="fas ${s.icon} text-xs"></i> ${esc(ev.status)}
                 </span>
               </td>
               <td class="px-6 py-4 text-sm text-gray-600">${attendeeCount}${maxStr}</td>
               <td class="px-6 py-4">
                 <div class="flex items-center justify-center gap-2">
-                  <button onclick="openEventModal(${JSON.stringify(ev).replace(/"/g,'&quot;')})"
+                  <button onclick="openEventModal('${ev._id}')""
                     title="Edit event" class="p-2 rounded-lg text-blue-500 hover:bg-blue-50 transition">
                     <i class="fas fa-pencil-alt"></i>
                   </button>
-                  <button onclick="deleteEvent('${ev._id}','${ev.title.replace(/'/g,"\\'")}')"
+                  <button onclick="deleteEvent('${ev._id}')""
                     title="Delete event" class="p-2 rounded-lg text-red-500 hover:bg-red-50 transition">
                     <i class="fas fa-trash-alt"></i>
                   </button>
@@ -1121,7 +1131,7 @@
       const start = (page - 1) * limit + 1;
       const end   = Math.min(page * limit, total);
       document.getElementById('eventPaginationInfo').textContent =
-        total ? `Showing ${start}–${end} of ${total} events` : '0 events';
+        total ? `Showing ${start}-${end} of ${total} events` : '0 events';
       const c = document.getElementById('eventPaginationBtns');
       c.innerHTML = '';
       for (let i = 1; i <= pages; i++) {
@@ -1134,7 +1144,8 @@
     }
 
     // ── Events: Modal ─────────────────────────────────────────────────
-    function openEventModal(ev) {
+    function openEventModal(id) {
+      const ev = (window.__adminEventsCache || []).find(e => e._id === id) || null;
       document.getElementById('eventModalTitle').textContent  = ev ? 'Edit Event' : 'Create Event';
       document.getElementById('eventSubmitLabel').textContent = ev ? 'Save Changes' : 'Create Event';
       document.getElementById('eventId').value       = ev?._id || '';
@@ -1153,7 +1164,7 @@
       else document.getElementById('evStartDate').value = '';
       if (ev?.endDate) document.getElementById('evEndDate').value = new Date(ev.endDate).toISOString().slice(0,16);
       else document.getElementById('evEndDate').value = '';
-      
+
       document.getElementById('evImageFile').value = '';
       const imgPreview = document.getElementById('evImagePreview');
       if (ev?.images && ev.images.length > 0) {
@@ -1185,7 +1196,7 @@
       const file = e.target.files[0];
       const preview = document.getElementById('evImagePreview');
       const hiddenBase64 = document.getElementById('evImageBase64');
-      
+
       if (file) {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -1254,7 +1265,9 @@
     });
 
     // ── Events: Delete ────────────────────────────────────────────────
-    function deleteEvent(id, title) {
+    function deleteEvent(id) {
+      const ev = (window.__adminEventsCache || []).find(e => e._id === id);
+      const title = ev ? ev.title : 'this event';
       showConfirm(
         `Delete "${title}"?`,
         'This event and all registrations will be permanently deleted.',
@@ -1317,7 +1330,7 @@
         if (badge) badge.textContent = data.pagination.total;
       } catch (err) {
         showToast(err.message, 'error');
-        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-400">${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-400">${esc(err.message)}</td></tr>`;
       }
     }
 
@@ -1344,6 +1357,7 @@
 
     // ── Jobs: Table rows ──────────────────────────────────────────────
     function renderJobsTable(jobs) {
+      window.__adminJobsCache = jobs;
       const tbody = document.getElementById('jobsTableBody');
       if (!jobs.length) {
         tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-gray-400">No jobs found</td></tr>`;
@@ -1366,9 +1380,9 @@
       };
 
       tbody.innerHTML = jobs.map(j => {
-        const poster  = j.postedBy ? `${j.postedBy.name || '—'}<br><span class="text-xs text-gray-400">${j.postedBy.email||''}</span>` : '—';
+        const poster  = j.postedBy ? `${esc(j.postedBy.name || '-')}<br><span class="text-xs text-gray-400">${esc(j.postedBy.email || '')}</span>` : '-';
         const apps    = j.applications?.length || 0;
-        const loc     = [j.company?.location?.city, j.company?.location?.country].filter(Boolean).join(', ') || '—';
+        const loc     = [j.company?.location?.city, j.company?.location?.country].filter(Boolean).join(', ') || '-';
         const sbClass = statusBadge[j.status] || 'bg-gray-100 text-gray-600';
         const tbClass = typeBadge[j.type]     || 'bg-gray-100 text-gray-600';
         const isFeat  = j.isFeatured;
@@ -1382,16 +1396,16 @@
               </div>
               <div>
                 <p class="font-semibold text-gray-900 flex items-center gap-2">
-                  ${j.title}
+                  ${esc(j.title)}
                   ${isFeat ? '<span class="text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full font-medium">⭐ Featured</span>' : ''}
                 </p>
-                <p class="text-xs text-gray-500">${j.company?.name || '—'} · ${loc}</p>
+                <p class="text-xs text-gray-500">${esc(j.company?.name || '-')} · ${esc(loc)}</p>
                 <p class="text-xs text-gray-400">${posted}</p>
               </div>
             </div>
           </td>
           <td class="px-6 py-4">
-            <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${tbClass} capitalize">${j.type||'—'}</span>
+            <span class="inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full ${tbClass} capitalize">${j.type||'-'}</span>
           </td>
           <td class="px-6 py-4 text-sm text-gray-700">${poster}</td>
           <td class="px-6 py-4">
@@ -1415,7 +1429,7 @@
                 class="p-2 rounded-lg ${isFeat ? 'text-purple-500 hover:bg-purple-50' : 'text-gray-400 hover:bg-gray-100'} transition">
                 <i class="fas fa-star"></i>
               </button>
-              <button onclick="deleteJob('${j._id}', '${j.title.replace(/'/g,"\\'")}')"
+              <button onclick="deleteJob('${j._id}')""
                 title="Delete job"
                 class="p-2 rounded-lg text-red-400 hover:bg-red-50 transition">
                 <i class="fas fa-trash"></i>
@@ -1430,7 +1444,7 @@
     function renderJobsPagination({ page, pages, total, limit }) {
       const start = (page - 1) * limit + 1;
       const end   = Math.min(page * limit, total);
-      const info  = total ? `Showing ${start}–${end} of ${total} jobs` : '0 jobs';
+      const info  = total ? `Showing ${start}-${end} of ${total} jobs` : '0 jobs';
       document.getElementById('jobPaginationInfo').textContent  = info;
       document.getElementById('jobPaginationInfo2').textContent = info;
       const c = document.getElementById('jobPaginationBtns');
@@ -1481,7 +1495,9 @@
     }
 
     // ── Jobs: Delete ──────────────────────────────────────────────────
-    function deleteJob(id, title) {
+    function deleteJob(id) {
+      const job = (window.__adminJobsCache || []).find(j => j._id === id);
+      const title = job ? job.title : 'this job';
       showConfirm(
         `Delete "${title}"?`,
         'This job and all applications will be permanently deleted.',
@@ -1523,7 +1539,7 @@
       const btn   = document.getElementById('jobSubmitBtn');
       errEl.classList.add('hidden');
       btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting…';
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Posting...';
 
       const payload = {
         title:          document.getElementById('jbTitle').value.trim(),
@@ -1564,12 +1580,12 @@
     async function loadCampaigns() {
       const tbody = document.getElementById('campaignsTableBody');
       tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400"><i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i> Loading...</td></tr>`;
-      
+
       try {
         const res = await fetch('/api/admin/campaigns', { headers: { Authorization: `Bearer ${TOKEN()}` } });
         const data = await res.json();
         const campaigns = data.campaigns || [];
-        
+
         const badge = document.getElementById('campaignCountBadge');
         if (badge) badge.textContent = campaigns.length;
 
@@ -1581,10 +1597,10 @@
         tbody.innerHTML = campaigns.map(c => `
           <tr class="hover:bg-gray-50/50 transition">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-bold text-gray-900">${c.title}</div>
+              <div class="text-sm font-bold text-gray-900">${esc(c.title)}</div>
               <div class="text-xs text-gray-500">Ends: ${new Date(c.endDate).toLocaleDateString()}</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">${c.category}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">${esc(c.category)}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">₹${c.goalAmount.toLocaleString()}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center gap-2">
@@ -1614,7 +1630,7 @@
           </tr>
         `).join('');
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Error: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">Error: ${esc(err.message)}</td></tr>`;
       }
     }
 

@@ -161,6 +161,12 @@ async function handleLogin(e) {
 
         const data = await response.json();
 
+        if (response.status === 403 && data.code === 'EMAIL_NOT_VERIFIED') {
+            showNotification(data.error, 'error');
+            offerResendVerification(email);
+            return;
+        }
+
         if (!response.ok) {
             throw new Error(data.error || 'Login failed');
         }
@@ -177,6 +183,54 @@ async function handleLogin(e) {
     } catch (error) {
         showNotification(error.message, 'error');
     }
+}
+
+/**
+ * Offers a resend of the verification email when login is blocked by the
+ * email-verification gate. Renders a small inline form under the login form.
+ */
+function offerResendVerification(email) {
+    const loginForm = document.getElementById('login-form');
+    if (!loginForm || document.getElementById('resend-verification-box')) return;
+
+    const box = document.createElement('div');
+    box.id = 'resend-verification-box';
+    box.className = 'mt-4 p-4 rounded-lg bg-blue-50 border border-blue-100 text-sm';
+    const safeEmail = email.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    box.innerHTML = `
+        <p class="text-gray-700 mb-2">Need a new verification link?</p>
+        <div class="flex gap-2">
+            <input type="email" id="resend-email" value="${safeEmail}" required
+                class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo" />
+            <button type="button" id="resend-verification-btn"
+                class="bg-primary-indigo text-white px-3 py-2 rounded-lg text-xs font-semibold hover:bg-primary-dark-blue transition">Resend</button>
+        </div>
+        <p id="resend-result" class="text-xs mt-2 text-gray-500"></p>
+    `;
+    loginForm.after(box);
+
+    box.querySelector('#resend-verification-btn').addEventListener('click', async function () {
+        const btn = this;
+        const result = box.querySelector('#resend-result');
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+            const response = await fetch('/api/auth/resend-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: box.querySelector('#resend-email').value.trim() })
+            });
+            const data = await response.json().catch(() => ({}));
+            result.textContent = data.message || 'If that email needs verification, a new link has been sent.';
+            result.className = 'text-xs mt-2 text-gray-500';
+        } catch (error) {
+            result.textContent = 'Network error. Please try again.';
+            result.className = 'text-xs mt-2 text-gray-500';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Resend';
+        }
+    });
 }
 
 async function handleRegistration(e) {
