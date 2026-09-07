@@ -41,6 +41,7 @@ See `alumni-website/.env.example`. Key variables:
 | `index.html` | Landing page |
 | `alumni.html` | Alumni directory (search, filters, pagination) |
 | `chat.html` | Real-time chat (conversations, typing, unread badges) |
+| `groups.html` | Alumni groups & forum (browse, join, discussions) |
 | `assistant` (floating widget) | AI website assistant on every page (feature guide) |
 | `mentorship.html` | Mentorship dashboard (requests, active mentorships, chat) |
 | `portal.html` | Login / registration |
