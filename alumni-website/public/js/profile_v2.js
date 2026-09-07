@@ -119,6 +119,71 @@ function renderQuickInfo(user) {
     if (emptyEl) emptyEl.style.display = anyVisible ? 'none' : 'block';
 }
 
+function getMyId() {
+    try {
+        const raw = localStorage.getItem('userData') || localStorage.getItem('user');
+        const user = raw ? JSON.parse(raw) : null;
+        return user ? (user._id || user.id) : null;
+    } catch {
+        return null;
+    }
+}
+
+function escHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+const escAttr = escHtml;
+
+async function toggleEndorsement(button, targetUserId, skillName) {
+    if (button.disabled) return;
+    const wasEndorsed = button.classList.contains('endorsed');
+    button.disabled = true;
+
+    try {
+        const response = await fetch(`/api/users/skills/${encodeURIComponent(skillName)}/endorse`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ targetUserId })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (response.status === 401 || response.status === 403) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('user');
+            window.location.href = 'portal.html#login';
+            return;
+        }
+        if (!response.ok) {
+            alert(data.error || 'Could not update the endorsement');
+            return;
+        }
+
+        const endorsedNow = !wasEndorsed;
+        button.classList.toggle('endorsed', endorsedNow);
+        button.textContent = endorsedNow ? 'ðŸ‘ Endorsed' : 'ðŸ‘ Endorse';
+        const countEl = button.parentElement.querySelector('.endorse-count');
+        if (countEl && typeof data.endorsementsCount === 'number') {
+            countEl.textContent = `${data.endorsementsCount} endorsement${data.endorsementsCount === 1 ? '' : 's'}`;
+        }
+    } catch (error) {
+        alert('Network error. Please try again.');
+    } finally {
+        button.disabled = false;
+    }
+}
+
 async function renderStats(user, token) {
     const connEl = document.getElementById('connection-count');
     if (connEl) countUp(connEl, user.connections?.length || 0);
@@ -175,21 +240,36 @@ function renderOverview(user) {
         skillsContainer.innerHTML = '';
         const skills = user.profile?.skills;
         if (skills && skills.length > 0) {
-            skills.forEach(skill => {
-                const level = (skill.level || 'Intermediate').toLowerCase();
-                const div = document.createElement('div');
-                div.className = 'skill-item';
-                div.innerHTML = `
-                    <div class="skill-header">
-                        <span class="skill-name">${skill.name}</span>
-                        <span class="skill-level-badge level-${level}">${skill.level || 'Intermediate'}</span>
-                    </div>
-                    <div class="skill-bar-track">
-                        <div class="skill-bar-fill fill-${level}" data-level="${level}"></div>
-                    </div>
-                `;
-                skillsContainer.appendChild(div);
-            });
+                const myId = getMyId();
+                // Endorsements are only offered on other people's profiles
+                const canEndorse = !!userId && !!myId && userId !== myId;
+                skills.forEach(skill => {
+                    const level = (skill.level || 'Intermediate').toLowerCase();
+                    const endorsements = Array.isArray(skill.endorsements) ? skill.endorsements : [];
+                    const endorsed = canEndorse && endorsements.some(id => String(id) === myId);
+                    const count = endorsements.length;
+                    const div = document.createElement('div');
+                    div.className = 'skill-item';
+                    div.innerHTML = `
+                        <div class="skill-header">
+                            <span class="skill-name">${escHtml(skill.name)}</span>
+                            <span class="skill-level-badge level-${level}">${escHtml(skill.level || 'Intermediate')}</span>
+                        </div>
+                        <div class="skill-bar-track">
+                            <div class="skill-bar-fill fill-${level}" data-level="${level}"></div>
+                        </div>
+                        <div class="skill-endorse-row">
+                            ${canEndorse ? `<button type="button" class="endorse-btn${endorsed ? ' endorsed' : ''}" data-skill="${escAttr(skill.name)}">${endorsed ? 'ðŸ‘ Endorsed' : 'ðŸ‘ Endorse'}</button>` : ''}
+                            <span class="endorse-count">${count} endorsement${count === 1 ? '' : 's'}</span>
+                        </div>
+                    `;
+                    if (canEndorse) {
+                        div.querySelector('.endorse-btn').addEventListener('click', async function () {
+                            await toggleEndorsement(this, userId, skill.name);
+                        });
+                    }
+                    skillsContainer.appendChild(div);
+                });
         } else {
             skillsContainer.innerHTML = `
                 <div class="empty-state">
