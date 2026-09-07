@@ -193,7 +193,80 @@
 
             <!-- Jobs List -->
             <div class="flex-1">
-                <p id="jobsCount" class="text-sm text-gray-500 mb-4"></p>
+                <div class="flex items-center justify-between gap-3 mb-4">
+                    <p id="jobsCount" class="text-sm text-gray-500"></p>
+                    <button type="button" id="togglePostJobBtn"
+                        class="bg-primary-indigo text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark-blue transition flex-shrink-0">
+                        <i class="fas fa-plus mr-1" aria-hidden="true"></i>Post a Job
+                    </button>
+                </div>
+                <div id="postJobSection" class="hidden bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">Post a Job</h3>
+                    <p class="text-sm text-gray-500 mb-4">Share an opening with the alumni network â€” it will be visible to everyone.</p>
+                    <div id="postJobError" class="hidden mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm" role="alert"></div>
+                    <form id="postJobForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label for="pjTitle" class="block text-xs font-bold text-gray-500 uppercase mb-1">Job title *</label>
+                            <input type="text" id="pjTitle" required maxlength="120" placeholder="e.g. Senior Backend Engineer"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+                        </div>
+                        <div>
+                            <label for="pjCompany" class="block text-xs font-bold text-gray-500 uppercase mb-1">Company *</label>
+                            <input type="text" id="pjCompany" required maxlength="80" placeholder="Company name"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+                        </div>
+                        <div>
+                            <label for="pjWebsite" class="block text-xs font-bold text-gray-500 uppercase mb-1">Company website</label>
+                            <input type="url" id="pjWebsite" placeholder="https://company.com"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+                        </div>
+                        <div>
+                            <label for="pjType" class="block text-xs font-bold text-gray-500 uppercase mb-1">Job type *</label>
+                            <select id="pjType" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+                                <option value="full-time">Full-time</option>
+                                <option value="part-time">Part-time</option>
+                                <option value="contract">Contract</option>
+                                <option value="internship">Internship</option>
+                                <option value="freelance">Freelance</option>
+                                <option value="remote">Remote</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="pjLocation" class="block text-xs font-bold text-gray-500 uppercase mb-1">Location (city)</label>
+                            <input type="text" id="pjLocation" maxlength="60" placeholder="e.g. Bengaluru, Karnataka"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+                        </div>
+                        <div>
+                            <label for="pjSalaryMin" class="block text-xs font-bold text-gray-500 uppercase mb-1">Salary min (INR/year)</label>
+                            <input type="number" id="pjSalaryMin" min="0" placeholder="e.g. 1200000"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+                        </div>
+                        <div>
+                            <label for="pjSalaryMax" class="block text-xs font-bold text-gray-500 uppercase mb-1">Salary max (INR/year)</label>
+                            <input type="number" id="pjSalaryMax" min="0" placeholder="e.g. 1800000"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="pjDescription" class="block text-xs font-bold text-gray-500 uppercase mb-1">Description *</label>
+                            <textarea id="pjDescription" rows="4" required placeholder="What the role involves, the team, and growthâ€¦"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="pjRequirements" class="block text-xs font-bold text-gray-500 uppercase mb-1">Requirements *</label>
+                            <textarea id="pjRequirements" rows="3" required placeholder="Skills, experience and qualificationsâ€¦"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition"></textarea>
+                        </div>
+                        <div class="md:col-span-2 flex justify-end gap-3">
+                            <button type="button" id="pjCancel"
+                                class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">Cancel</button>
+                            <button type="submit" id="pjSubmit"
+                                class="bg-primary-indigo text-white px-6 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark-blue disabled:opacity-50 disabled:cursor-not-allowed transition">
+                                <i class="fas fa-paper-plane mr-1" aria-hidden="true"></i>Publish job
+                            </button>
+                        </div>
+                    </form>
+                </div>
                 <div id="jobsGrid" class="space-y-6">
                     <div class="skeleton rounded-xl h-40"></div>
                     <div class="skeleton rounded-xl h-40"></div>
@@ -489,6 +562,114 @@
 
         // Initial load
         fetchJobs();
+        // ===== Post a Job (alumni job sharing) =====
+        const postJobSection = document.getElementById('postJobSection');
+        const postJobError = document.getElementById('postJobError');
+        const pjSubmitBtn = document.getElementById('pjSubmit');
+
+        document.getElementById('togglePostJobBtn').addEventListener('click', () => {
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'portal.html#login';
+                return;
+            }
+            postJobSection.classList.toggle('hidden');
+            if (!postJobSection.classList.contains('hidden')) {
+                postJobSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+
+        document.getElementById('pjCancel').addEventListener('click', () => {
+            postJobSection.classList.add('hidden');
+            postJobError.classList.add('hidden');
+        });
+
+        function showPostJobError(message) {
+            postJobError.textContent = message;
+            postJobError.classList.remove('hidden');
+        }
+
+        document.getElementById('postJobForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'portal.html#login';
+                return;
+            }
+
+            const title = document.getElementById('pjTitle').value.trim();
+            const companyName = document.getElementById('pjCompany').value.trim();
+            const description = document.getElementById('pjDescription').value.trim();
+            const requirements = document.getElementById('pjRequirements').value.trim();
+
+            if (!title || !companyName || !description || !requirements) {
+                showPostJobError('Title, company, description and requirements are required.');
+                return;
+            }
+
+            const salaryMinRaw = document.getElementById('pjSalaryMin').value.trim();
+            const salaryMaxRaw = document.getElementById('pjSalaryMax').value.trim();
+
+            const payload = {
+                title,
+                company: {
+                    name: companyName,
+                    website: document.getElementById('pjWebsite').value.trim(),
+                    location: { city: document.getElementById('pjLocation').value.trim() }
+                },
+                description,
+                requirements,
+                type: document.getElementById('pjType').value,
+                status: 'published'
+            };
+
+            if (salaryMinRaw) {
+                payload.salary = {
+                    min: parseInt(salaryMinRaw, 10),
+                    max: salaryMaxRaw ? parseInt(salaryMaxRaw, 10) : undefined,
+                    currency: 'INR',
+                    period: 'yearly'
+                };
+            }
+
+            pjSubmitBtn.disabled = true;
+            pjSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Publishingâ€¦';
+
+            try {
+                const res = await fetch('/api/jobs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('user');
+                    window.location.href = 'portal.html#login';
+                    return;
+                }
+                if (!res.ok) {
+                    showPostJobError(data.error || 'Could not publish the job. Please try again.');
+                    return;
+                }
+
+                postJobSection.classList.add('hidden');
+                document.getElementById('postJobForm').reset();
+                if (typeof showToast === 'function') { showToast('Job published successfully!', 'success'); } else { alert('Job published successfully!'); }
+                fetchJobs();
+                loadStats && loadStats();
+            } catch (err) {
+                showPostJobError('Network error. Please check your connection and try again.');
+            } finally {
+                pjSubmitBtn.disabled = false;
+                pjSubmitBtn.innerHTML = '<i class="fas fa-paper-plane mr-1" aria-hidden="true"></i>Publish job';
+            }
+        });
     </script>
     <script src="js/script.js"></script>
   <script src="js/chat-badge.js"></script>
