@@ -14,13 +14,13 @@ function setIo(io) {
  * Create a notification and push it live to the recipient's room.
  * Never throws: notification creation must not break the triggering action.
  */
-async function createNotification({ recipient, actor, type, refId, message }) {
+async function createNotification({ recipient, actor, type, refType = 'Mentorship', refId, message }) {
   try {
     const notification = await Notification.create({
       recipient,
       actor,
       type,
-      refType: 'Mentorship',
+      refType,
       refId,
       message: String(message).slice(0, 300)
     });
@@ -29,7 +29,9 @@ async function createNotification({ recipient, actor, type, refId, message }) {
       ioInstance.to(recipient.toString()).emit('notification', {
         id: notification._id,
         type: notification.type,
+        refType: notification.refType,
         refId: notification.refId,
+        actor: notification.actor,
         message: notification.message,
         createdAt: notification.createdAt,
         read: false

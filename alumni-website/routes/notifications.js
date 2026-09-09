@@ -95,11 +95,22 @@ router.post('/:id/read', authenticateToken, async (req, res) => {
     }
 });
 
-// Mark all of the user's notifications as read
+// Mark all of the user's notifications as read. Optionally scoped to a
+// single conversation (used when the recipient opens that chat).
 router.post('/read-all', authenticateToken, async (req, res) => {
     try {
+        const filter = { recipient: req.user.userId, read: false };
+
+        if (req.body && req.body.refType) {
+            if (req.body.refType !== 'Conversation' || !isValidObjectId(req.body.refId)) {
+                return res.status(400).json({ error: 'Invalid notification scope' });
+            }
+            filter.refType = 'Conversation';
+            filter.refId = req.body.refId;
+        }
+
         const result = await Notification.updateMany(
-            { recipient: req.user.userId, read: false },
+            filter,
             { $set: { read: true, readAt: new Date() } }
         );
         res.json({ modifiedCount: result.modifiedCount });

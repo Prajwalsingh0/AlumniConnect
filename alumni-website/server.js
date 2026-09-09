@@ -20,6 +20,8 @@ const chatbotRoutes = require('./routes/chatbot');
 const homeRoutes = require('./routes/home');
 const notificationRoutes = require('./routes/notifications');
 const adminRoutes = require('./routes/admin');
+const { createNotification } = require('./services/notificationService');
+const notificationService = require('./services/notificationService');
 
 const http = require('http');
 const socketIO = require('socket.io');
@@ -194,7 +196,7 @@ const io = socketIO(server, {
 app.set('io', io);
 
 // Give the notification service the same instance for live pushes
-require('./services/notificationService').setIo(io);
+notificationService.setIo(io);
 
 // Socket.io authentication middleware
 io.use(async (socket, next) => {
@@ -253,6 +255,23 @@ io.on('connection', (socket) => {
         lastMessage: message._id,
         $inc: { [`unreadCount.${recipientId}`]: 1 }
       });
+
+      // Notify the recipient about the new message. Best effort, never a
+      // duplicate: one notification per persisted message, never sent to the
+      // sender. Content stays out of the notification.
+      try {
+        const sender = await User.findById(socket.userId).select('name');
+        await createNotification({
+          recipient: recipientId,
+          actor: socket.userId,
+          type: 'message',
+          refType: 'Conversation',
+          refId: conversationId,
+          message: `${sender && sender.name ? sender.name : 'An alumni'} sent you a message`
+        });
+      } catch (notifyError) {
+        console.error('Message notification failed:', notifyError.message);
+      }
 
       io.to(recipientId).emit('new_message', message);
       socket.emit('message_sent', message);
