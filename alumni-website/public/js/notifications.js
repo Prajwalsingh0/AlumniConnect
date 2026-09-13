@@ -168,6 +168,10 @@
     }
   }
 
+  // Exposed for pages that clear notification state themselves (e.g. chat
+  // marks message-type notifications read when a conversation is opened)
+  window.refreshNotificationBadge = refreshCount;
+
   async function loadList() {
     const listEl = document.getElementById('notification-list');
     if (!listEl) return;
@@ -228,7 +232,13 @@
           renderList();
         }
         closeDropdown();
-        window.location.href = 'mentorship.html';
+        // Chat-message notifications open the conversation with the sender;
+        // mentorship notifications open the mentorship dashboard.
+        if (item.type === 'message') {
+          window.location.href = `chat.html?to=${encodeURIComponent(item.actor)}`;
+        } else {
+          window.location.href = 'mentorship.html';
+        }
       });
       row.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' || e.key === ' ') row.click();

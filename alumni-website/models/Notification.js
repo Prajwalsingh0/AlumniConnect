@@ -21,12 +21,12 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: NOTIFICATION_TYPES,
+    enum: NOTIFICATION_TYPES.concat(['message']),
     required: true
   },
   refType: {
     type: String,
-    enum: ['Mentorship'],
+    enum: ['Mentorship', 'Conversation'],
     default: 'Mentorship'
   },
   refId: {

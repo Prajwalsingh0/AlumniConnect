@@ -396,6 +396,7 @@ async function openConversation(conversationId) {
 
     // Mark read + reset unread in list + navbar badge
     markConversationRead(conversationId);
+    clearConversationNotifications(conversationId);
     conversation.unreadCount = conversation.unreadCount || {};
     conversation.unreadCount[chatState.myId] = 0;
     updateConversationInList(conversationId, { unreadCount: conversation.unreadCount });
@@ -713,6 +714,7 @@ function connectSocket() {
       scrollMessagesToBottom();
       chatState.messages.push(message);
       markConversationRead(message.conversationId);
+      clearConversationNotifications(message.conversationId);
 
       // Update list preview + bump to top without a refetch
       updateConversationInList(message.conversationId, {
@@ -787,6 +789,25 @@ function emitTyping(isTyping) {
   });
 }
 
+// Clear the message-type notifications tied to a conversation (the chat
+// unread badge is a separate, per-message count that stays independent)
+async function clearConversationNotifications(conversationId) {
+    try {
+        await fetch('/api/notifications/read-all', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({ refType: 'Conversation', refId: conversationId })
+        });
+        if (typeof window.refreshNotificationBadge === 'function') {
+            window.refreshNotificationBadge();
+        }
+    } catch (error) {
+        // Non-fatal: notifications re-sync on the next poll
+    }
+}
 // ── Mark read & navbar badge ─────────────────────────────────────────────────
 
 async function markConversationRead(conversationId) {
