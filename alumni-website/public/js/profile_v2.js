@@ -46,6 +46,7 @@ async function initProfile(userId) {
         renderEducation(user.profile?.education);
         renderActivityFeed();
         renderStats(user, token);
+        loadProfileReviews(user._id);
         setupSocialMediaLinks(user);
 
         // Show edit button only for own profile
@@ -459,4 +460,80 @@ function setupSocialMediaLinks(user) {
     applyLink('link-linkedin', user.profile?.linkedin);
     applyLink('link-twitter', user.profile?.twitter);
     applyLink('link-github', user.profile?.github);
+}
+
+// ── Mentorship reviews section ──────────────────────────────────────────────
+
+async function loadProfileReviews(profileUserId) {
+    const container = document.getElementById('reviews-container');
+    if (!container || !profileUserId) return;
+
+    container.innerHTML = '<p class="text-sm text-gray-400">Loading reviews…</p>';
+
+    try {
+        const response = await fetch(`/api/reviews/user/${encodeURIComponent(profileUserId)}`);
+        if (!response.ok) throw new Error('Failed to load reviews');
+
+        const data = await response.json();
+        container.innerHTML = '';
+
+        if (!data.count) {
+            const empty = document.createElement('div');
+            empty.className = 'empty-state';
+            empty.innerHTML = '<i class="fas fa-star"></i>';
+            const text = document.createElement('p');
+            text.textContent = 'No mentorship reviews yet.';
+            empty.appendChild(text);
+            container.appendChild(empty);
+            return;
+        }
+
+        const summary = document.createElement('div');
+        summary.className = 'flex items-center gap-3 mb-4';
+        const stars = document.createElement('span');
+        stars.className = 'text-lg text-amber-500';
+        const rounded = Math.round(data.average);
+        stars.textContent = '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+        const score = document.createElement('span');
+        score.className = 'text-sm text-gray-600';
+        score.textContent = `${data.average} out of 5 · ${data.count} review${data.count === 1 ? '' : 's'}`;
+        summary.append(stars, score);
+        container.appendChild(summary);
+
+        data.reviews.forEach(review => {
+            const item = document.createElement('div');
+            item.className = 'mb-4 pb-4 border-b border-gray-100 last:border-b-0';
+
+            const header = document.createElement('div');
+            header.className = 'flex items-center gap-2 mb-1';
+            const avatar = document.createElement('img');
+            avatar.src = (review.reviewer && review.reviewer.image) || 'images/singlee person.webp';
+            avatar.alt = '';
+            avatar.className = 'w-8 h-8 rounded-full object-cover border border-gray-200';
+            avatar.onerror = function () { this.onerror = null; this.src = 'images/singlee person.webp'; };
+
+            const who = document.createElement('div');
+            const name = document.createElement('p');
+            name.className = 'text-sm font-semibold text-gray-900';
+            name.textContent = (review.reviewer && review.reviewer.name) || 'Alumni Member';
+            const meta = document.createElement('p');
+            meta.className = 'text-xs text-amber-500';
+            meta.textContent = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating) + '  ' +
+                new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            who.append(name, meta);
+            header.append(avatar, who);
+            item.appendChild(header);
+
+            if (review.comment) {
+                const comment = document.createElement('p');
+                comment.className = 'text-sm text-gray-600 leading-relaxed';
+                comment.textContent = review.comment;
+                item.appendChild(comment);
+            }
+
+            container.appendChild(item);
+        });
+    } catch (error) {
+        container.innerHTML = '<p class="text-sm text-gray-400">Reviews are unavailable right now.</p>';
+    }
 }

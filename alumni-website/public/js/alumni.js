@@ -264,6 +264,10 @@ function createAlumniCardHtml(user) {
 
   const profileUrl = `profile.html?id=${encodeURIComponent(user._id)}`;
 
+  const rating = user.rating;
+  const ratingBadge = rating && rating.count > 0
+    ? `<div class="w-full mb-2"><span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">â˜… ${rating.average} Â· ${rating.count} mentorship review${rating.count === 1 ? '' : 's'}</span></div>`
+    : '';
   const mentorshipBadge = profile.openToMentorship
     ? `<div class="w-full mb-3"><span class="inline-flex items-center gap-1 text-[11px] font-semibold text-accent-teal bg-teal-50 px-2 py-0.5 rounded-full"><i class="fas fa-hands-helping" aria-hidden="true"></i>Available for mentorship</span></div>`
     : '';
@@ -279,6 +283,7 @@ function createAlumniCardHtml(user) {
         ${company ? `<p class="text-sm text-gray-500 mb-3">${escapeHtml(company)}</p>` : '<p class="mb-3"></p>'}
         <p class="text-xs text-gray-500 mb-1">${escapeHtml(degreeDept)}${year ? ` · Class of ${escapeHtml(String(year))}` : ''}</p>
         ${location ? `<p class="text-xs text-gray-400 mb-3"><i class="fas fa-location-dot mr-1" aria-hidden="true"></i>${escapeHtml(location)}</p>` : '<p class="mb-3"></p>'}
+        ${ratingBadge}
         ${mentorshipBadge}
         ${skills.length ? `
           <div class="flex flex-wrap justify-center gap-1.5 mt-auto pt-3">

@@ -15,7 +15,7 @@ const myUserId = () => {
   }
 };
 
-const mentorshipState = { items: [], requestId: 0, socket: null, chat: { mentorshipId: null, conversationId: null, recipientId: null } };
+const mentorshipState = { items: [], myReviews: {}, requestId: 0, socket: null, chat: { mentorshipId: null, conversationId: null, recipientId: null } };
 
 document.addEventListener('DOMContentLoaded', function () {
   const token = localStorage.getItem('token');
@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initChatDrawer();
 
   loadMentorships(getToken());
+  loadMyReviews();
 });
 
 function getToken() {
@@ -280,11 +281,18 @@ function renderActiveCard(m) {
 function renderCompletedCard(m) {
   const me = myUserId();
   const other = (m.mentor && m.mentor._id === me) ? m.mentee : m.mentor;
+  const myReview = mentorshipState.myReviews[m._id];
   const card = document.createElement('div');
   card.className = 'border border-gray-100 rounded-xl p-4 opacity-90';
   card.innerHTML = `
     ${personLine(other)}
-    <p class="text-xs text-gray-400 mt-2"><i class="fas fa-circle-check text-green-500 mr-1" aria-hidden="true"></i>Completed ${formatDate(m.completedAt || m.updatedAt)}</p>`;
+    <p class="text-xs text-gray-400 mt-2"><i class="fas fa-circle-check text-green-500 mr-1" aria-hidden="true"></i>Completed ${formatDate(m.completedAt || m.updatedAt)}</p>
+    <div class="mt-3 flex items-center justify-between gap-3 flex-wrap">
+      ${myReview
+        ? `<span class="text-sm text-amber-500 font-semibold" title="Your rating">${'★'.repeat(myReview.rating)}${'☆'.repeat(5 - myReview.rating)}<span class="text-xs text-gray-400 font-normal ml-2">You rated this mentorship</span></span>`
+        : '<span class="text-xs text-gray-400">Share how it went to help future mentees.</span>'}
+      ${myReview ? '' : '<button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-amber-500 text-white hover:bg-amber-600 transition" data-act="review" data-mid="' + escapeHtmlAttr(m._id) + '"><i class="fas fa-star mr-1" aria-hidden="true"></i>Leave a Review</button>'}
+    </div>`;
   return card;
 }
 
@@ -311,6 +319,11 @@ document.getElementById('mentorship-content').addEventListener('click', async fu
 
   if (act === 'chat') {
     openChat(mid);
+    return;
+  }
+
+  if (act === 'review') {
+    openReviewModal(mid);
     return;
   }
 
@@ -525,3 +538,133 @@ function escapeHtml(text) {
 function escapeHtmlAttr(text) {
   return escapeHtml(text);
 }
+
+// ── Mentorship reviews ───────────────────────────────────────────────────────
+
+async function loadMyReviews() {
+  try {
+    const result = await api('GET', '/api/reviews/mine');
+    if (result.status !== 200 || !Array.isArray(result.data.reviews)) return;
+
+    mentorshipState.myReviews = {};
+    result.data.reviews.forEach(function (review) {
+      mentorshipState.myReviews[review.mentorship] = review;
+    });
+
+    if (mentorshipState.items.length > 0) renderSections();
+  } catch (error) {
+    // Non-fatal: the review button simply stays visible
+  }
+}
+
+function openReviewModal(mentorshipId) {
+  if (document.getElementById('review-modal-overlay')) return;
+
+  const mentorship = mentorshipState.items.find(function (m) { return m._id === mentorshipId; });
+  if (!mentorship) return;
+
+  const me = myUserId();
+  const other = (mentorship.mentor && mentorship.mentor._id === me) ? mentorship.mentee : mentorship.mentor;
+  const otherName = (other && other.name) || 'this alumni';
+
+  let selectedRating = 0;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'review-modal-overlay';
+  overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4';
+  overlay.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Review your mentorship</h3>
+        <button type="button" id="review-modal-close" class="w-8 h-8 rounded-full hover:bg-gray-100 transition" aria-label="Close">
+          <i class="fas fa-times text-gray-500"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">How was your mentorship with <strong id="review-modal-name"></strong>?</p>
+        <div id="review-stars" class="flex items-center gap-2 mb-4" role="radiogroup" aria-label="Rating from 1 to 5 stars"></div>
+        <div id="review-error" class="hidden mb-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm" role="alert"></div>
+        <label for="review-comment" class="block text-xs font-bold text-gray-500 uppercase mb-1">Comment (optional)</label>
+        <textarea id="review-comment" rows="3" maxlength="500" placeholder="What went well? Anything future mentees should know?"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition"></textarea>
+        <div class="flex justify-end gap-3 mt-4">
+          <button type="button" id="review-cancel" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">Cancel</button>
+          <button type="button" id="review-submit" class="bg-amber-500 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <i class="fas fa-star mr-1" aria-hidden="true"></i>Submit review
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  overlay.querySelector('#review-modal-name').textContent = otherName;
+
+  const starsWrap = overlay.querySelector('#review-stars');
+  const errorEl = overlay.querySelector('#review-error');
+  const submitBtn = overlay.querySelector('#review-submit');
+
+  function renderStars() {
+    starsWrap.innerHTML = '';
+    for (let value = 1; value <= 5; value++) {
+      const star = document.createElement('button');
+      star.type = 'button';
+      star.setAttribute('role', 'radio');
+      star.setAttribute('aria-checked', String(value === selectedRating));
+      star.setAttribute('aria-label', value + ' star' + (value === 1 ? '' : 's'));
+      star.className = 'text-2xl transition ' + (value <= selectedRating ? 'text-amber-500' : 'text-gray-300 hover:text-amber-400');
+      star.textContent = value <= selectedRating ? '★' : '☆';
+      star.addEventListener('click', function () {
+        selectedRating = value;
+        renderStars();
+      });
+      starsWrap.appendChild(star);
+    }
+  }
+  renderStars();
+
+  function close() { overlay.remove(); }
+  overlay.querySelector('#review-modal-close').addEventListener('click', close);
+  overlay.querySelector('#review-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+
+  submitBtn.addEventListener('click', async function () {
+    errorEl.classList.add('hidden');
+
+    if (selectedRating < 1) {
+      errorEl.textContent = 'Please choose a rating between 1 and 5 stars.';
+      errorEl.classList.remove('hidden');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Submitting…';
+
+    try {
+      const result = await api('POST', '/api/reviews', {
+        mentorshipId: mentorshipId,
+        rating: selectedRating,
+        comment: overlay.querySelector('#review-comment').value.trim()
+      });
+
+      if (result.status === 401 || result.status === 403) { clearSession(); return; }
+
+      if (result.status === 201) {
+        mentorshipState.myReviews[mentorshipId] = result.data.review;
+        close();
+        renderSections();
+        showToast('Review submitted. Thank you!');
+        return;
+      }
+
+      errorEl.textContent = (result.data && result.data.error) || 'Could not submit the review.';
+      errorEl.classList.remove('hidden');
+    } catch (error) {
+      errorEl.textContent = 'Network error. Please try again.';
+      errorEl.classList.remove('hidden');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-star mr-1" aria-hidden="true"></i>Submit review';
+    }
+  });
+}
+
