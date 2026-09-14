@@ -21,7 +21,7 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: NOTIFICATION_TYPES.concat(['message']),
+    enum: NOTIFICATION_TYPES.concat(['message', 'review']),
     required: true
   },
   refType: {
