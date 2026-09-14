@@ -72,6 +72,7 @@ All endpoints are under `/api`:
 - `GET /api/mentorships` — own mentorships (`status`, `role`, `page`, `limit`)
 - `GET /api/mentorships/requests/received` / `requests/sent` — pending inbox
 - `GET /api/mentorships/status/:userId` — relationship state for the profile CTA
+- `POST /api/reviews` — review the other participant of a completed mentorship (rating 1-5, optional comment); `GET /api/reviews/mine`; `GET /api/reviews/user/:userId` (public rating summary + latest reviews)
 - `GET/PATCH /api/mentorships/:id` — detail (participants only); `accept`/`reject` (mentor), `cancel` (mentee), `complete` (either participant)
 - `GET/POST /api/messages/conversations`, `GET /api/messages/conversations/:conversationId` (cursor paginated via `before` + `limit`)
 - `POST /api/messages/conversations/:conversationId/read` — mark conversation read (server-persisted)

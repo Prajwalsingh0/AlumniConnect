@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
 const User = require('../models/User');
+const Review = require('../models/Review');
 const upload = require('../middleware/upload');
 const { processImage, generateThumbnail } = require('../services/imageService');
 const path = require('path');
@@ -208,6 +209,15 @@ router.get('/public/:userId', authenticateToken, async (req, res) => {
     if (checkPrivacy('skills')) {
       result.profile.skills = profile.profile.skills;
     }
+
+    // Mentorship rating summary (public information about the member)
+    const ratingAggregate = await Review.aggregate([
+      { $match: { reviewee: targetUser._id } },
+      { $group: { _id: null, average: { $avg: '$rating' }, count: { $sum: 1 } } }
+    ]);
+    result.rating = ratingAggregate[0]
+      ? { average: Math.round(ratingAggregate[0].average * 10) / 10, count: ratingAggregate[0].count }
+      : null;
 
     res.json({ profile: result });
 
@@ -428,8 +438,22 @@ router.get('/directory', authenticateToken, async (req, res) => {
       User.countDocuments(filter)
     ]);
 
+    // Attach mentorship rating summaries for this page in a single query
+    const userIds = users.map(function (user) { return user._id; });
+    const ratingAggregates = userIds.length
+      ? await Review.aggregate([
+          { $match: { reviewee: { $in: userIds } } },
+          { $group: { _id: '$reviewee', average: { $avg: '$rating' }, count: { $sum: 1 } } }
+        ])
+      : [];
+    const ratingByUser = new Map(ratingAggregates.map(function (entry) {
+      return [entry._id.toString(), { average: Math.round(entry.average * 10) / 10, count: entry.count }];
+    }));
+
     res.json({
-      users,
+      users: users.map(function (user) {
+        return Object.assign({}, user, { rating: ratingByUser.get(user._id.toString()) || null });
+      }),
       pagination: {
         page,
         limit,
