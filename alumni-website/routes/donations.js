@@ -15,6 +15,26 @@ router.get('/campaigns', async (req, res) => {
     }
 });
 
+// Donations made by the authenticated user (donation history)
+router.get('/mine', authenticateToken, async (req, res) => {
+    try {
+        const donations = await Donation.find({ donor: req.user.userId })
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .populate('campaign', 'title category status')
+            .lean();
+
+        const total = donations.reduce(function (sum, donation) {
+            return sum + (donation.amount || 0);
+        }, 0);
+
+        res.json({ donations, total });
+    } catch (error) {
+        console.error('My donations error:', error);
+        res.status(500).json({ error: 'Failed to load your donations' });
+    }
+});
+
 // Create a campaign (Admin only in production, but open for now)
 router.post('/campaigns', authenticateToken, async (req, res) => {
     try {

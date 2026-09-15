@@ -67,6 +67,7 @@ All endpoints are under `/api`:
 - `GET /api/events`, `GET /api/events/:id`, `POST/DELETE /api/events/:id/register`, `GET /api/events/user/registrations`
 - `GET /api/jobs`, `GET /api/jobs/:id`, `POST /api/jobs`, `POST /api/jobs/:id/apply`
 - `GET /api/donations/campaigns`, `POST /api/donations/campaigns`, `POST /api/donations/donate`
+- `GET /api/donations/mine` — own donation history with total given
 - `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`
 - `POST /api/mentorships` — request mentorship (`mentorId` + `message`)
 - `GET /api/mentorships` — own mentorships (`status`, `role`, `page`, `limit`)
