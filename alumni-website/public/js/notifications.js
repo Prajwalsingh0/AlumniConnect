@@ -33,9 +33,16 @@
   }
 
   function injectBell() {
-    const dropdown = document.getElementById('user-dropdown');
-    const anchor = dropdown || document.getElementById('login-button-container');
-    if (!anchor || document.getElementById('notification-bell')) return false;
+    // Standard navbar anchors first; then the custom layouts used by the
+    // profile, edit-profile and admin pages.
+    const beforeAnchor = document.getElementById('user-dropdown')
+      || document.getElementById('login-button-container');
+    const appendContainer = document.querySelector('.nav-right')
+      || document.getElementById('edit-profile-actions')
+      || document.querySelector('header.h-16');
+
+    if (!beforeAnchor && !appendContainer) return false;
+    if (document.getElementById('notification-bell')) return false;
 
     const bell = document.createElement('div');
     bell.id = 'notification-bell';
@@ -102,7 +109,11 @@
         <div id="notification-list"><div class="notification-empty">Loading…</div></div>
       </div>`;
 
-    anchor.parentElement.insertBefore(bell, anchor);
+    if (beforeAnchor) {
+      beforeAnchor.parentElement.insertBefore(bell, beforeAnchor);
+    } else {
+      appendContainer.appendChild(bell);
+    }
 
     bell.querySelector('.bell-btn').addEventListener('click', function (e) {
       e.stopPropagation();
