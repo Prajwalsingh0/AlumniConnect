@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  ok: owner delegation + my postings   ok: openApplyModal lookup   ok: jobs cache assignment   ok: owner actions computed   ok: owner actions slot   ok: location escape   ok: description escape   ok: title escape   ok: apply onclick (id only)   ok: helpers + cache <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -195,10 +195,21 @@
             <div class="flex-1">
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <p id="jobsCount" class="text-sm text-gray-500"></p>
-                    <button type="button" id="togglePostJobBtn"
-                        class="bg-primary-indigo text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark-blue transition flex-shrink-0">
-                        <i class="fas fa-plus mr-1" aria-hidden="true"></i>Post a Job
-                    </button>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button type="button" id="toggleMyPostingsBtn"
+                            class="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
+                            <i class="fas fa-briefcase mr-1" aria-hidden="true"></i>My postings
+                        </button>
+                        <button type="button" id="togglePostJobBtn"
+                            class="bg-primary-indigo text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark-blue transition">
+                            <i class="fas fa-plus mr-1" aria-hidden="true"></i>Post a Job
+                        </button>
+                    </div>
+                </div>
+                <div id="myPostingsSection" class="hidden bg-white rounded-2xl shadow-lg p-6 mb-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-1">My job postings</h3>
+                    <p class="text-sm text-gray-500 mb-4">Manage the jobs you posted â€” close, reopen or delete them. Closed jobs are hidden from the public board.</p>
+                    <div id="myPostingsList" class="space-y-3"></div>
                 </div>
                 <div id="postJobSection" class="hidden bg-white rounded-2xl shadow-lg p-6 mb-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-1">Post a Job</h3>
@@ -343,6 +354,24 @@
             return new Date(date).toLocaleDateString('en-IN', {day:'numeric', month:'short'});
         }
 
+        // Current user id, HTML escaping and a job cache for owner actions
+        function myId() {
+            try {
+                const raw = localStorage.getItem('userData') || localStorage.getItem('user');
+                const user = raw ? JSON.parse(raw) : null;
+                return user ? (user._id || user.id) : null;
+            } catch { return null; }
+        }
+
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        let jobsCache = [];
+
         function renderCard(j) {
             const initial  = (j.company?.name || 'J')[0].toUpperCase();
             const tc       = TYPE_COLORS[j.type] || 'bg-gray-100 text-gray-600';
@@ -360,7 +389,7 @@
             
             if (token) {
                 // If logged in, show apply button that opens modal
-                actionButton = `<button onclick="openApplyModal('${j._id}', '${j.title.replace(/'/g, "\\'")}')"
+                actionButton = `<button onclick="openApplyModal('${j._id}')"
                     class="bg-primary-indigo text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 transition">
                     Apply Now
                 </button>`;
@@ -372,6 +401,21 @@
                 </a>`;
             }
 
+            const me = myId();
+            const ownerId = j.postedBy && (j.postedBy._id || j.postedBy);
+            const isOwner = !!me && String(ownerId) === me;
+            const ownerActions = isOwner
+                ? `<div class="flex items-center gap-2 flex-wrap w-full mt-3">
+                     <button type="button" data-owner-act="status" data-job-id="${j._id}" data-next-status="${j.status === 'published' ? 'closed' : 'published'}"
+                       class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+                       ${j.status === 'published' ? 'Close job' : 'Reopen job'}
+                     </button>
+                     <button type="button" data-owner-act="delete" data-job-id="${j._id}"
+                       class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition">Delete</button>
+                     <span class="text-xs text-gray-400">Your posting${j.status ? ' &middot; ' + escapeHtml(j.status) : ''}</span>
+                   </div>`
+                : '';
+
             return `
             <div class="job-card bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-xl group">
                 <div class="flex items-start justify-between flex-wrap gap-3">
@@ -381,20 +425,21 @@
                         </div>
                         <div>
                             <h3 class="text-lg font-bold text-gray-900 group-hover:text-primary-indigo transition flex flex-wrap items-center gap-2">
-                                ${j.title} ${featured}
+                                ${escapeHtml(j.title)} ${featured}
                             </h3>
                             <p class="text-gray-500 text-sm mt-0.5">
-                                ${j.company?.name || '—'}${location ? ` &bull; <i class="fas fa-map-marker-alt text-xs"></i> ${location}` : ''}
+                                ${escapeHtml(j.company?.name || '-')}${location ? ` &bull; <i class="fas fa-map-marker-alt text-xs"></i> ${escapeHtml(location)}` : ''}
                             </p>
                         </div>
                     </div>
                     <span class="type-badge ${tc} capitalize">${j.type || '—'}</span>
                 </div>
-                <p class="mt-4 text-gray-600 text-sm line-clamp-2">${j.description || ''}</p>
+                <p class="mt-4 text-gray-600 text-sm line-clamp-2">${escapeHtml(j.description || '')}</p>
                 <div class="mt-4 flex flex-wrap gap-2">${salBadge}${expBadge}</div>
                 <div class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4">
                     <span class="text-xs text-gray-400"><i class="far fa-clock mr-1"></i>${relTime(j.createdAt)}</span>
                     ${actionButton}
+                    ${ownerActions}
                 </div>
             </div>`;
         }
@@ -403,6 +448,10 @@
 
         // Apply Modal Logic
         function openApplyModal(id, title) {
+            if (!title) {
+                const cached = jobsCache.find(item => item._id === id);
+                title = (cached && cached.title) || 'this job';
+            }
             document.getElementById('applyJobId').value = id;
             document.getElementById('applyModalTitle').textContent = `Apply for: ${title}`;
             document.getElementById('applyForm').reset();
@@ -531,6 +580,7 @@
         }
 
         function renderJobs(jobs) {
+            jobsCache = jobs;
             const grid  = document.getElementById('jobsGrid');
             const count = document.getElementById('jobsCount');
             if (!jobs.length) {
@@ -559,6 +609,134 @@
             clearTimeout(searchTimer);
             searchTimer = setTimeout(fetchJobs, 400);
         });
+
+        // Owner actions: close/reopen/delete own postings
+        document.getElementById('jobsGrid').addEventListener('click', async (e) => {
+            const btn = e.target.closest('button[data-owner-act]');
+            if (!btn) return;
+
+            const jobId = btn.dataset.jobId;
+            const act = btn.dataset.ownerAct;
+            const token = localStorage.getItem('token');
+            if (!token) { window.location.href = 'portal.html#login'; return; }
+
+            if (act === 'delete') {
+                if (!confirm('Delete this job posting? This cannot be undone.')) return;
+            }
+
+            btn.disabled = true;
+            try {
+                let res;
+                if (act === 'delete') {
+                    res = await fetch(`/api/jobs/${encodeURIComponent(jobId)}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                } else {
+                    res = await fetch(`/api/jobs/${encodeURIComponent(jobId)}/status`, {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ status: btn.dataset.nextStatus })
+                    });
+                }
+
+                const data = await res.json().catch(() => ({}));
+
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('user');
+                    window.location.href = 'portal.html#login';
+                    return;
+                }
+                if (!res.ok) throw new Error(data.error || 'Could not update the job');
+
+                fetchJobs();
+                loadMyPostings();
+            } catch (err) {
+                alert(err.message);
+                btn.disabled = false;
+            }
+        });
+
+        // ===== My postings (any status) =====
+        const myPostingsSection = document.getElementById('myPostingsSection');
+
+        document.getElementById('toggleMyPostingsBtn').addEventListener('click', () => {
+            if (!localStorage.getItem('token')) { window.location.href = 'portal.html#login'; return; }
+            myPostingsSection.classList.toggle('hidden');
+            if (!myPostingsSection.classList.contains('hidden')) loadMyPostings();
+        });
+
+        async function loadMyPostings() {
+            const list = document.getElementById('myPostingsList');
+            if (!list || myPostingsSection.classList.contains('hidden')) return;
+
+            list.innerHTML = '<p class="text-sm text-gray-400">Loading your postingsâ€¦</p>';
+
+            try {
+                const res = await fetch('/api/jobs/mine', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('user');
+                    window.location.href = 'portal.html#login';
+                    return;
+                }
+                if (!res.ok) throw new Error('Failed');
+
+                const jobs = await res.json();
+                list.innerHTML = '';
+
+                if (jobs.length === 0) {
+                    const empty = document.createElement('p');
+                    empty.className = 'text-sm text-gray-400';
+                    empty.textContent = 'You have not posted any jobs yet.';
+                    list.appendChild(empty);
+                    return;
+                }
+
+                jobs.forEach(job => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center justify-between gap-3 border border-gray-100 rounded-xl p-4 flex-wrap';
+
+                    const info = document.createElement('div');
+                    const title = document.createElement('p');
+                    title.className = 'font-semibold text-gray-900 text-sm';
+                    title.textContent = job.title;
+                    const meta = document.createElement('p');
+                    meta.className = 'text-xs text-gray-500';
+                    meta.textContent = [(job.company && job.company.name) || '', (job.status || '')].filter(Boolean).join(' Â· ');
+                    info.append(title, meta);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'flex items-center gap-2';
+
+                    const statusBtn = document.createElement('button');
+                    statusBtn.type = 'button';
+                    statusBtn.dataset.ownerAct = 'status';
+                    statusBtn.dataset.jobId = job._id;
+                    statusBtn.dataset.nextStatus = job.status === 'published' ? 'closed' : 'published';
+                    statusBtn.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition';
+                    statusBtn.textContent = job.status === 'published' ? 'Close job' : 'Reopen job';
+
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.type = 'button';
+                    deleteBtn.dataset.ownerAct = 'delete';
+                    deleteBtn.dataset.jobId = job._id;
+                    deleteBtn.className = 'text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition';
+                    deleteBtn.textContent = 'Delete';
+
+                    actions.append(statusBtn, deleteBtn);
+                    row.append(info, actions);
+                    list.appendChild(row);
+                });
+            } catch (error) {
+                list.innerHTML = '<p class="text-sm text-red-500">Could not load your postings.</p>';
+            }
+        }
 
         // Initial load
         fetchJobs();

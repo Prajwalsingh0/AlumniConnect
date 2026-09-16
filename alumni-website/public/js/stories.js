@@ -7,6 +7,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   loadStories();
   initStoryForm();
+  initStoryDeleteHandlers();
 });
 
 /**
@@ -187,6 +188,7 @@ function createStoryCardHtml(story) {
           </div>
         </div>
       </div>
+      ${ownStoryDeleteButton(story)}
     </article>`;
 }
 
@@ -276,4 +278,70 @@ function escapeHtml(text) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+// â”€â”€ Owner management: delete your own story â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+function myId() {
+  try {
+    const raw = localStorage.getItem('userData') || localStorage.getItem('user');
+    const user = raw ? JSON.parse(raw) : null;
+    return user ? (user._id || user.id) : null;
+  } catch {
+    return null;
+  }
+}
+
+function ownStoryDeleteButton(story) {
+  const me = myId();
+  const authorId = story.author && (story.author._id || story.author);
+  if (!me || String(authorId) !== me) return '';
+  return `<div class="px-6 pb-6 md:pl-8">
+    <button type="button" class="story-delete-btn text-xs font-semibold text-red-600 border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50 transition"
+      data-delete-story="${escapeHtml(story._id)}">
+      <i class="fas fa-trash mr-1" aria-hidden="true"></i>Delete my story
+    </button>
+  </div>`;
+}
+
+function initStoryDeleteHandlers() {
+  const container = document.getElementById('alumni-stories-container');
+  if (!container || container.dataset.deleteHandler) return;
+  container.dataset.deleteHandler = 'true';
+
+  container.addEventListener('click', async function (e) {
+    const button = e.target.closest('button[data-delete-story]');
+    if (!button) return;
+
+    const storyId = button.dataset.deleteStory;
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = 'portal.html#login'; return; }
+    if (!window.confirm('Delete your story? This cannot be undone.')) return;
+
+    const original = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Deletingâ€¦';
+
+    try {
+      const response = await fetch(`/api/stories/${encodeURIComponent(storyId)}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json().catch(function () { return {}; });
+
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+        localStorage.removeItem('user');
+        window.location.href = 'portal.html#login';
+        return;
+      }
+      if (!response.ok) throw new Error(data.error || 'Could not delete the story');
+
+      loadStories();
+    } catch (error) {
+      alert(error.message);
+      button.disabled = false;
+      button.innerHTML = original;
+    }
+  });
 }

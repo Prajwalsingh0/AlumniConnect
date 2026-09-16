@@ -75,6 +75,20 @@ router.post('/:id/apply', authenticateToken, async (req, res) => {
     }
 });
 
+// My job postings (any status) - drives the owner management section
+router.get('/mine', authenticateToken, async (req, res) => {
+    try {
+        const jobs = await Job.find({ postedBy: req.user.userId })
+            .sort({ createdAt: -1 })
+            .limit(50);
+
+        res.json(jobs);
+    } catch (error) {
+        console.error('My jobs error:', error);
+        res.status(500).json({ error: 'Failed to load your job postings' });
+    }
+});
+
 // Get job by ID
 router.get('/:id', async (req, res) => {
     try {
@@ -92,6 +106,68 @@ router.get('/:id', async (req, res) => {
         res.json(job);
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Update a job's status (author or admin): published <-> closed
+router.patch('/:id/status', authenticateToken, async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ error: 'Job not found' });
+        }
+
+        const { status } = req.body;
+        if (status !== 'published' && status !== 'closed') {
+            return res.status(400).json({ error: 'Status must be "published" or "closed"' });
+        }
+
+        const job = await Job.findById(req.params.id);
+        if (!job) return res.status(404).json({ error: 'Job not found' });
+
+        const postedBy = job.postedBy ? job.postedBy.toString() : '';
+        const isOwner = postedBy === req.user.userId;
+        const isAdmin = req.user.role === 'admin';
+        if (!isOwner && !isAdmin) {
+            return res.status(403).json({ error: 'You can only manage jobs you posted' });
+        }
+
+        job.status = status;
+        job.isActive = status === 'published';
+        await job.save();
+
+        res.json({
+            message: status === 'closed' ? 'Job closed' : 'Job reopened',
+            job
+        });
+    } catch (error) {
+        console.error('Update job status error:', error);
+        res.status(500).json({ error: 'Failed to update the job' });
+    }
+});
+
+// Delete a job (author or admin)
+router.delete('/:id', authenticateToken, async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(404).json({ error: 'Job not found' });
+        }
+
+        const job = await Job.findById(req.params.id).select('postedBy');
+        if (!job) return res.status(404).json({ error: 'Job not found' });
+
+        const postedBy = job.postedBy ? job.postedBy.toString() : '';
+        const isOwner = postedBy === req.user.userId;
+        const isAdmin = req.user.role === 'admin';
+        if (!isOwner && !isAdmin) {
+            return res.status(403).json({ error: 'You can only delete jobs you posted' });
+        }
+
+        await Job.findByIdAndDelete(req.params.id);
+
+        res.json({ message: 'Job deleted' });
+    } catch (error) {
+        console.error('Delete job error:', error);
+        res.status(500).json({ error: 'Failed to delete the job' });
     }
 });
 

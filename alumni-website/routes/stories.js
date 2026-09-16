@@ -102,4 +102,31 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
+// Delete a story (author or admin only)
+router.delete('/:id', authenticateToken, async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).json({ error: 'Story not found' });
+    }
+
+    const story = await Story.findById(req.params.id).select('author');
+    if (!story) {
+      return res.status(404).json({ error: 'Story not found' });
+    }
+
+    const isAuthor = story.author.toString() === req.user.userId;
+    const isAdmin = req.user.role === 'admin';
+    if (!isAuthor && !isAdmin) {
+      return res.status(403).json({ error: 'You can only delete your own story' });
+    }
+
+    await Story.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Story deleted' });
+  } catch (error) {
+    console.error('Delete story error:', error);
+    res.status(500).json({ error: 'Failed to delete story' });
+  }
+});
+
 module.exports = router;
