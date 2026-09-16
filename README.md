@@ -66,8 +66,9 @@ All endpoints are under `/api`:
 - `POST /api/users/skills/:skillName/endorse`
 - `GET /api/events`, `GET /api/events/:id`, `POST/DELETE /api/events/:id/register`, `GET /api/events/user/registrations`
 - `GET /api/jobs`, `GET /api/jobs/:id`, `POST /api/jobs`, `POST /api/jobs/:id/apply`
+- `GET /api/jobs/mine` — own postings in any status; `PATCH /api/jobs/:id/status` (owner/admin: published/closed); `DELETE /api/jobs/:id` (owner/admin)
 - `GET /api/donations/campaigns`, `POST /api/donations/campaigns`, `POST /api/donations/donate`
-- `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`
+- `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`; `DELETE /api/stories/:id` (author/admin)
 - `POST /api/mentorships` — request mentorship (`mentorId` + `message`)
 - `GET /api/mentorships` — own mentorships (`status`, `role`, `page`, `limit`)
 - `GET /api/mentorships/requests/received` / `requests/sent` — pending inbox
