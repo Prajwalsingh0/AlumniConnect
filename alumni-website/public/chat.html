@@ -73,7 +73,17 @@
     .conversation-item.active { background: #eef2ff; border-color: #c7d2fe; }
 
     #typing-indicator { min-height: 1.4rem; }
-  </style>
+    /* Per-message delete (for me) control */
+    .chat-bubble { position: relative; }
+    .chat-delete {
+      position: absolute; top: -6px; right: -6px;
+      width: 18px; height: 18px; border-radius: 9999px; border: none;
+      background: #94a3b8; color: #ffffff; font-size: 12px; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; opacity: 0.35; transition: opacity 0.15s, background 0.15s;
+    }
+    .chat-bubble:hover .chat-delete { opacity: 1; background: #ef4444; }
+    .chat-delete:hover { opacity: 1; background: #dc2626; }  </style>
   <script>
     tailwind.config = {
       theme: {

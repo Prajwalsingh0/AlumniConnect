@@ -130,6 +130,36 @@ function initChatUi() {
 
   els.composer.addEventListener('submit', submitMessage);
 
+  // Delete a message for the current user (soft delete; stays for the other side)
+  els.messagesScroll.addEventListener('click', async function (e) {
+    const button = e.target.closest('button[data-delete-message]');
+    if (!button) return;
+
+    const messageId = button.dataset.deleteMessage;
+
+    try {
+      const response = await fetch(`/api/messages/${encodeURIComponent(messageId)}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      });
+
+      if (response.status === 401 || response.status === 403) {
+        clearSessionAndRedirect();
+        return;
+      }
+      if (!response.ok && response.status !== 404) {
+        throw new Error('Could not delete the message');
+      }
+
+      // 200 (deleted now) or 404 (already hidden) both mean: remove from view
+      const bubble = button.closest('.chat-bubble');
+      if (bubble) bubble.remove();
+      chatState.messages = chatState.messages.filter(function (message) { return message._id !== messageId; });
+    } catch (error) {
+      // Non-fatal: leave the bubble in place
+    }
+  });
+
   els.input.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -480,7 +510,22 @@ function appendMessageElement(message, mine) {
   meta.textContent = time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   bubble.appendChild(meta);
 
+  appendDeleteControl(bubble, message, mine);
+
   els.messagesScroll.appendChild(bubble);
+}
+
+// Small "delete for me" control on the user's own messages
+function appendDeleteControl(bubble, message, mine) {
+  if (!mine || !message._id) return;
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'chat-delete';
+  button.dataset.deleteMessage = message._id;
+  button.setAttribute('aria-label', 'Delete this message for you');
+  button.title = 'Delete for me';
+  button.textContent = 'Ã—';
+  bubble.appendChild(button);
 }
 
 function scrollMessagesToBottom() {
@@ -568,6 +613,8 @@ function buildMessageBubble(message, mine) {
   meta.className = 'chat-meta';
   meta.textContent = new Date(message.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   bubble.appendChild(meta);
+
+  appendDeleteControl(bubble, message, mine);
   return bubble;
 }
 
