@@ -192,4 +192,36 @@ router.post('/conversations', authenticateToken, async (req, res) => {
     }
 });
 
+// Delete a message for the authenticated user only (soft, per-user:
+// the message stays visible to the other participant)
+router.delete('/:messageId', authenticateToken, async (req, res) => {
+    try {
+        if (!isValidObjectId(req.params.messageId)) {
+            return res.status(400).json({ error: 'Invalid message id' });
+        }
+
+        const message = await Message.findById(req.params.messageId).select('sender recipient deletedBy');
+        if (!message) {
+            return res.status(404).json({ error: 'Message not found' });
+        }
+
+        const me = req.user.userId;
+        const isParticipant = message.sender.toString() === me || message.recipient.toString() === me;
+        const alreadyDeleted = (message.deletedBy || []).some(id => id.toString() === me);
+
+        // Non-participants and already-hidden messages both look "not found"
+        if (!isParticipant || alreadyDeleted) {
+            return res.status(404).json({ error: 'Message not found' });
+        }
+
+        message.deletedBy.push(me);
+        await message.save();
+
+        res.json({ message: 'Message deleted for you' });
+    } catch (error) {
+        console.error('Delete message error:', error);
+        res.status(500).json({ error: 'Failed to delete the message' });
+    }
+});
+
 module.exports = router;
