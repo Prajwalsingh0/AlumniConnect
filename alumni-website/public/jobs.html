@@ -108,13 +108,36 @@
                               class="fas fa-comments mr-2"></i>Chat</span><span id="chat-unread-badge"
                               class="hidden min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold items-center justify-center"></span></a>
                           <button id="dropdown-logout" type="button"
-                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200"
-                            link="portal.html#logout">
+                            class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition duration-200">
                             <i class="fas fa-sign-out-alt mr-2"></i>Logout
                           </button>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="md:hidden">
+            <button id="mobile-menu-button" aria-label="Open menu"
+                class="text-gray-700 hover:text-primary-indigo focus:outline-none transition duration-300">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        <div id="mobile-menu" class="md:hidden mobile-sidebar hidden">
+            <button id="close-mobile-menu" class="sidebar-close-btn" aria-label="Close Menu">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-100">
+                <a href="index.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Home</a>
+                <a href="alumni.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Directory</a>
+                <a href="mentorship.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Mentorship</a>
+                <a href="chat.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Chat</a>
+                <a href="groups.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Groups</a>
+                <a href="events.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Events</a>
+                <a href="stories.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Alumni Stories</a>
+                <a href="jobs.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Job Board</a>
+                <a href="donations.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Give Back</a>
+                <a href="about.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">About Us</a>
+                <a href="portal.html" class="text-primary-indigo block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-100 transition duration-200">Login</a>
             </div>
         </div>
     </nav>
