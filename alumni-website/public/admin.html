@@ -825,7 +825,13 @@
         const res = await fetch('/api/admin/stats', {
           headers: { Authorization: `Bearer ${TOKEN()}` }
         });
-        if (!res.ok) return;
+        if (!res.ok) {
+          // No admin session: hand over to the admin login instead of showing an empty panel
+          if (res.status === 401 || res.status === 403) {
+            window.location.href = 'admin-login.html?redirect=admin.html';
+          }
+          return;
+        }
         const d = await res.json();
         document.getElementById('statUsers').textContent   = d.users?.toLocaleString() ?? '-';
         document.getElementById('statEvents').textContent  = d.events?.toLocaleString() ?? '-';
@@ -1288,7 +1294,11 @@
     }
 
     // ── Init ─────────────────────────────────────────────────────────
-    loadStats();
+    if (!TOKEN()) {
+      window.location.href = 'admin-login.html?redirect=admin.html';
+    } else {
+      loadStats();
+    }
 
     // Wire up search inputs
     document.getElementById('userSearch').addEventListener('input', function() {
