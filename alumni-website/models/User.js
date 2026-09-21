@@ -107,6 +107,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  deletedAt: Date,
   emailVerified: {
     type: Boolean,
     default: false
