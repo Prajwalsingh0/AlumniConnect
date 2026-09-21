@@ -391,3 +391,80 @@ function setupImageUpload() {
         }
     });
 }
+
+// Account deletion (danger zone)
+(function setupAccountDeletion() {
+    const openBtn = document.getElementById('delete-account-btn');
+    const modal = document.getElementById('delete-account-modal');
+    if (!openBtn || !modal) return;
+
+    const passwordInput = document.getElementById('delete-account-password');
+    const confirmInput = document.getElementById('delete-account-confirm');
+    const errorEl = document.getElementById('delete-account-error');
+    const cancelBtn = document.getElementById('delete-account-cancel');
+    const submitBtn = document.getElementById('delete-account-submit');
+
+    function showError(message) {
+        errorEl.textContent = message;
+        errorEl.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        errorEl.classList.add('hidden');
+        passwordInput.value = '';
+        confirmInput.value = '';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Delete account';
+    }
+
+    openBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        passwordInput.focus();
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+    });
+
+    submitBtn.addEventListener('click', async () => {
+        const password = passwordInput.value;
+        const confirm = confirmInput.value.trim();
+
+        if (!password) return showError('Please enter your password.');
+        if (confirm !== 'DELETE') return showError('Type DELETE in capitals to confirm.');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Deleting...';
+
+        try {
+            const response = await fetch('/api/users/me', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ password, confirm })
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Delete account';
+                return showError(data.error || 'Could not delete your account.');
+            }
+
+            // The account is gone: drop the local session and leave the page
+            ['token', 'userData', 'user'].forEach(key => localStorage.removeItem(key));
+            window.location.href = 'index.html';
+        } catch (error) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Delete account';
+            showError('Something went wrong. Please try again.');
+        }
+    });
+})();

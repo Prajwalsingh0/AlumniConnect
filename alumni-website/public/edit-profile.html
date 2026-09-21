@@ -277,6 +277,49 @@
                 </div>
             </section>
         </form>
+
+        <!-- Danger zone -->
+        <section class="section-card" style="border:1px solid #fecaca;background:#fffbfb">
+            <h2 class="text-lg font-bold text-red-700 mb-2 flex items-center gap-2">
+                <i class="fas fa-triangle-exclamation"></i> Danger zone
+            </h2>
+            <p class="text-sm text-gray-600 mb-4">
+                Deleting your account removes your profile details, notifications, mentorship requests, group
+                memberships, event sign-ups and reviews. Your name is replaced with "Former Member" wherever you
+                posted, and your email address is freed so you can register again. This cannot be undone.
+            </p>
+            <button type="button" id="delete-account-btn"
+                class="px-5 py-2.5 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition shadow-sm">
+                <i class="fas fa-user-slash mr-2"></i>Delete my account
+            </button>
+        </section>
+
+        <!-- Delete confirmation -->
+        <div id="delete-account-modal" class="hidden fixed inset-0 z-[9999] items-center justify-center bg-black/50 p-4">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-1">Delete your account?</h3>
+                <p class="text-sm text-gray-600 mb-5">Confirm with your password. This cannot be undone.</p>
+
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+                <input type="password" id="delete-account-password" class="form-input w-full mb-4"
+                    autocomplete="current-password">
+
+                <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Type DELETE to
+                    confirm</label>
+                <input type="text" id="delete-account-confirm" class="form-input w-full mb-4" placeholder="DELETE"
+                    autocomplete="off">
+
+                <p id="delete-account-error" class="hidden text-sm font-semibold text-red-600 mb-3"></p>
+
+                <div class="flex gap-3 justify-end">
+                    <button type="button" id="delete-account-cancel"
+                        class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-bold hover:bg-gray-200 transition">Cancel</button>
+                    <button type="button" id="delete-account-submit"
+                        class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition">Delete
+                        account</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="js/edit-profile_v2.js?v=6"></script>
