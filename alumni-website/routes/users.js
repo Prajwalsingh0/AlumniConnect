@@ -4,9 +4,19 @@ const { authenticateToken } = require('../middleware/auth');
 const User = require('../models/User');
 const Review = require('../models/Review');
 const upload = require('../middleware/upload');
+const { createRateLimiter } = require('../middleware/rateLimit');
+const { deactivateAccount } = require('../services/accountService');
 const { processImage, generateThumbnail } = require('../services/imageService');
 const path = require('path');
 const router = express.Router();
+
+// Removing an account needs the password, so limit the guesses
+const accountDeletionLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  key: (req) => `account-delete:${req.ip}`,
+  message: 'Too many deletion attempts. Please try again later.'
+});
 
 // Validation middleware
 const validateProfileUpdate = [
@@ -536,6 +546,43 @@ router.get('/search', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Search users error:', error);
     res.status(500).json({ error: 'Failed to search users' });
+  }
+});
+
+// Delete the signed-in account (anonymised, not hard-deleted)
+router.delete('/me', authenticateToken, accountDeletionLimit, async (req, res) => {
+  try {
+    const { password, confirm } = req.body || {};
+
+    if (confirm !== 'DELETE') {
+      return res.status(400).json({ error: 'Type DELETE to confirm account removal' });
+    }
+
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Verify the password before anything is removed
+    const isValidPassword = await user.comparePassword(password);
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Password is incorrect' });
+    }
+
+    await deactivateAccount(user);
+
+    res.json({
+      message: 'Your account has been deleted and you have been signed out.',
+      deletedAt: user.deletedAt
+    });
+
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({ error: 'Failed to delete account' });
   }
 });
 
