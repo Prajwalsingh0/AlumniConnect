@@ -44,8 +44,11 @@ async function initProfile(userId) {
         renderOverview(user);
         renderExperience(user.profile?.workHistory);
         renderEducation(user.profile?.education);
-        renderActivityFeed();
-        renderStats(user, token);
+        // Registered events power the activity feed and the events stat on your own profile
+        const isOwnProfile = !userId;
+        const myRegistrations = isOwnProfile ? await loadMyRegistrations(token) : null;
+        renderActivityFeed(myRegistrations);
+        renderStats(user, token, myRegistrations);
         loadProfileReviews(user._id);
         setupSocialMediaLinks(user);
 
@@ -185,12 +188,23 @@ async function toggleEndorsement(button, targetUserId, skillName) {
     }
 }
 
-async function renderStats(user, token) {
+async function renderStats(user, token, registrations) {
     const connEl = document.getElementById('connection-count');
     if (connEl) countUp(connEl, user.connections?.length || 0);
 
     const eventEl = document.getElementById('events-count');
     if (eventEl) {
+        // On your own profile the counter reflects the events you have signed up for
+        if (Array.isArray(registrations)) {
+            const now = new Date();
+            const upcoming = registrations.filter(r => {
+                const when = r.event && r.event.date ? new Date(r.event.date) : null;
+                return when && !isNaN(when.getTime()) && when >= now;
+            }).length;
+            countUp(eventEl, upcoming);
+            return;
+        }
+
         try {
             const res = await fetch('/api/events', {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -383,14 +397,63 @@ function renderEducation(education) {
     });
 }
 
-function renderActivityFeed() {
+async function loadMyRegistrations(token) {
+    try {
+        const res = await fetch('/api/events/user/registrations', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return Array.isArray(data.registrations) ? data.registrations : [];
+    } catch (e) {
+        return [];
+    }
+}
+
+const ACTIVITY_BADGE = 'display:inline-block;margin-left:6px;padding:1px 7px;border-radius:9999px;background:#eef2ff;color:#4F46E5;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em';
+
+// registrations is null when viewing someone else's profile
+function renderActivityFeed(registrations) {
     const feed = document.getElementById('activity-feed');
     if (!feed) return;
 
-    const activities = [
-        { icon: 'fa-user-edit',    bg: '#eef2ff', iconColor: '#4F46E5', text: 'Updated profile information',  time: 'Recently' },
-        { icon: 'fa-network-wired', bg: '#f0fdfa', iconColor: '#0d9488', text: 'Joined the Alumni Network',    time: 'Member since account creation' },
-    ];
+    const activities = [];
+
+    if (Array.isArray(registrations) && registrations.length) {
+        const now = Date.now();
+        registrations
+            .slice()
+            .sort((a, b) => {
+                const at = new Date(a.registeredAt || (a.event && a.event.date) || 0).getTime() || 0;
+                const bt = new Date(b.registeredAt || (b.event && b.event.date) || 0).getTime() || 0;
+                return bt - at;
+            })
+            .slice(0, 8)
+            .forEach(r => {
+                const ev = r.event || {};
+                const when = ev.date ? new Date(ev.date) : null;
+                const valid = when && !isNaN(when.getTime());
+                const upcoming = valid && when.getTime() >= now;
+
+                const meta = [];
+                if (valid) meta.push(when.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }));
+                if (ev.isVirtual) meta.push('Virtual');
+                else if (ev.location && (ev.location.venue || ev.location.city || ev.location.address)) {
+                    meta.push(escHtml(ev.location.venue || ev.location.city || ev.location.address));
+                }
+
+                activities.push({
+                    icon: 'fa-calendar-check',
+                    bg: upcoming ? '#eef2ff' : '#f8fafc',
+                    iconColor: upcoming ? '#4F46E5' : '#64748b',
+                    text: `Registered for <strong>${escHtml(ev.title || 'an event')}</strong>` +
+                          (upcoming ? ` <span style="${ACTIVITY_BADGE}">Upcoming</span>` : ''),
+                    time: meta.join(' &middot; ') || 'Registered event'
+                });
+            });
+    }
+
+    activities.push({ icon: 'fa-network-wired', bg: '#f0fdfa', iconColor: '#0d9488', text: 'Joined the Alumni Network',    time: 'Member since account creation' });
 
     feed.innerHTML = activities.map(a => `
         <div class="activity-item">
