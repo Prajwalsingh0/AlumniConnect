@@ -77,6 +77,7 @@ All endpoints are under `/api`:
 - `GET/PATCH /api/mentorships/:id` — detail (participants only); `accept`/`reject` (mentor), `cancel` (mentee), `complete` (either participant)
 - `GET/POST /api/messages/conversations`, `GET /api/messages/conversations/:conversationId` (cursor paginated via `before` + `limit`)
 - `POST /api/messages/conversations/:conversationId/read` — mark conversation read (server-persisted)
+- `DELETE /api/messages/:messageId` - delete a message for yourself only (stays visible to the other participant)
 - `GET /api/messages/unread/count` — total unread messages for the navbar badge
 - `GET /api/notifications` - own notifications (`page`, `limit`, `unread=true`)
 - `GET /api/notifications/unread/count`, `POST /api/notifications/:id/read`, `POST /api/notifications/read-all`
