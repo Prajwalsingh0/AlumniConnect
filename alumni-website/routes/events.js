@@ -135,11 +135,15 @@ router.delete('/:id/register', authenticateToken, async (req, res) => {
 router.get('/user/registrations', authenticateToken, async (req, res) => {
   try {
     const events = await Event.find({ 'attendees.user': req.user.userId }).lean();
-    const mapped = events.map(ev => ({
-        eventId: ev._id.toString(),
-        userId: req.user.userId,
-        event: { ...ev, id: ev._id.toString(), date: ev.startDate }
-    }));
+    const mapped = events.map(ev => {
+        const mine = (ev.attendees || []).find(a => a && a.user && a.user.toString() === req.user.userId);
+        return {
+            eventId: ev._id.toString(),
+            userId: req.user.userId,
+            registeredAt: mine && mine.registeredAt ? mine.registeredAt : null,
+            event: { ...ev, id: ev._id.toString(), date: ev.startDate }
+        };
+    });
     res.json({ registrations: mapped });
   } catch (error) {
     console.error('Get user registrations error:', error);
