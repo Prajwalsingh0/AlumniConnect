@@ -16,6 +16,10 @@ npm install
 copy .env.example .env        # then edit values (Windows) / cp .env.example .env (macOS/Linux)
 npm run seed                  # creates collections and seeds demo data if the DB is empty
 node scripts/create-admin.js  # creates/promotes the admin account (set ADMIN_EMAIL / ADMIN_PASSWORD in .env first)
+
+> **Admin access:** the Admin Panel link only appears for accounts whose `role` is `admin`.
+> Promote an existing account with `ADMIN_EMAIL=you@example.com npm run create-admin` (or create one);
+> visiting `admin.html` without an admin session now redirects to `admin-login.html`.
 npm start                     # serves http://localhost:3000
 ```
 

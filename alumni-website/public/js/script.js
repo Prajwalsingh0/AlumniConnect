@@ -175,6 +175,20 @@ function showNotification(message, type = "info") {
 // LOGIN STATE IN THE NAVBAR
 // ==============================================
 
+// The admin panel is only for admin accounts, so the link stays hidden for
+// everyone else. Server-side checks remain the real gate.
+function applyAdminLinkVisibility(user) {
+  const isAdmin = !!user && user.role === "admin";
+  document.querySelectorAll('a[href="admin.html"]').forEach((link) => {
+    link.style.display = isAdmin ? "" : "none";
+    if (isAdmin) {
+      link.removeAttribute("aria-hidden");
+    } else {
+      link.setAttribute("aria-hidden", "true");
+    }
+  });
+}
+
 function loadUserStatus() {
   const token = localStorage.getItem("token");
   const userData =
@@ -201,6 +215,8 @@ function loadUserStatus() {
       `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
       "User";
     const userEmail = user.email || "";
+
+    applyAdminLinkVisibility(user);
 
     // Hide Login CTA on desktop when logged in
     const loginButtonContainer = document.getElementById(
@@ -266,6 +282,8 @@ function loadUserStatus() {
 }
 
 function loadUserStatusForLoggedOut() {
+  applyAdminLinkVisibility(null);
+
   const loginButtonContainer = document.getElementById(
     "login-button-container"
   );
