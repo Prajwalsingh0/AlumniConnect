@@ -188,9 +188,31 @@ async function toggleEndorsement(button, targetUserId, skillName) {
     }
 }
 
+async function countMentorships(token) {
+    try {
+        const res = await fetch('/api/mentorships?limit=1', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) return 0;
+        const data = await res.json();
+        return data && data.pagination && Number.isInteger(data.pagination.total) ? data.pagination.total : 0;
+    } catch (e) {
+        return 0;
+    }
+}
+
 async function renderStats(user, token, registrations) {
-    const connEl = document.getElementById('connection-count');
-    if (connEl) countUp(connEl, user.connections?.length || 0);
+    // There is no connections feature; mentorship relationships are the real number
+    const mentorshipEl = document.getElementById('mentorship-count');
+    if (mentorshipEl) {
+        if (Array.isArray(registrations)) {
+            countUp(mentorshipEl, await countMentorships(token));
+        } else {
+            // Somebody else's mentorships are not public data
+            const card = mentorshipEl.closest('.stat-card');
+            if (card) card.style.display = 'none';
+        }
+    }
 
     const eventEl = document.getElementById('events-count');
     if (eventEl) {
