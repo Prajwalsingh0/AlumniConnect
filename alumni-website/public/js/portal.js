@@ -285,43 +285,11 @@ async function handleRegistration(e) {
     }
 }
 
+// Kept for existing callers; the implementation now lives in js/ui-feedback.js
 function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 max-w-sm transform transition-all duration-300 translate-x-full`;
-
-    switch (type) {
-        case 'success':
-            notification.classList.add('bg-green-600', 'text-white');
-            break;
-        case 'error':
-            notification.classList.add('bg-red-600', 'text-white');
-            break;
-        case 'warning':
-            notification.classList.add('bg-yellow-600', 'text-white');
-            break;
-        default:
-            notification.classList.add('bg-blue-600', 'text-white');
+    if (typeof window.showToast === 'function') {
+        return window.showToast(message, type);
     }
-
-    notification.innerHTML = `
-        <div class="flex items-center justify-between">
-            <span>${message}</span>
-            <button class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-        notification.classList.remove('translate-x-full');
-    }, 100);
-
-    setTimeout(() => {
-        notification.classList.add('translate-x-full');
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
 }
 
 const loginForm = document.getElementById('login-form');

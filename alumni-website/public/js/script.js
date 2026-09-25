@@ -113,62 +113,11 @@ function initUserDropdownToggle() {
 // NOTIFICATION SYSTEM
 // ==============================================
 
+// Kept for existing callers; the implementation now lives in js/ui-feedback.js
 function showNotification(message, type = "info") {
-  // Create notification element
-  const notification = document.createElement("div");
-  notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 max-w-sm transform transition-all duration-300 translate-x-full`;
-
-  // Set colors based on type
-  switch (type) {
-    case "success":
-      notification.classList.add("bg-green-500", "text-white");
-      break;
-    case "error":
-      notification.classList.add("bg-red-500", "text-white");
-      break;
-    case "warning":
-      notification.classList.add("bg-yellow-500", "text-white");
-      break;
-    default:
-      notification.classList.add("bg-blue-500", "text-white");
+  if (typeof window.showToast === "function") {
+    return window.showToast(message, type);
   }
-
-  // Add content
-  notification.innerHTML = `
-        <div class="flex items-center">
-            <span class="flex-1">${message}</span>
-            <button class="ml-3 text-white hover:text-gray-200">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-
-  // Add to body
-  document.body.appendChild(notification);
-
-  // Animate in
-  setTimeout(() => {
-    notification.classList.remove("translate-x-full");
-  }, 100);
-
-  // Add close functionality
-  const closeBtn = notification.querySelector("button");
-  closeBtn.addEventListener("click", () => {
-    notification.classList.add("translate-x-full");
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
-  });
-
-  // Auto remove after 5 seconds
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.classList.add("translate-x-full");
-      setTimeout(() => {
-        notification.remove();
-      }, 300);
-    }
-  }, 5000);
 }
 
 // ==============================================
