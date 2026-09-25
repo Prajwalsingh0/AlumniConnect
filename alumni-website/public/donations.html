@@ -160,7 +160,21 @@
     <!-- Active Campaigns -->
     <section class="max-w-7xl mx-auto px-6 py-12">
         <h2 class="text-3xl font-bold text-gray-900 mb-2 border-l-4 border-blue-600 pl-4">Active Campaigns</h2>
-        <p class="text-gray-500 mb-8 pl-5">Your contribution directly helps students and alumni initiatives.</p>
+        <div class="flex items-start justify-between gap-4 flex-wrap mb-8">
+            <p class="text-gray-500 pl-5 flex-1 min-w-[240px]">Your contribution directly helps students and alumni initiatives.</p>
+            <button type="button" id="toggleMyDonationsBtn"
+                class="bg-white border border-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-100 transition">
+                <i class="fas fa-receipt mr-1" aria-hidden="true"></i>My donations
+            </button>
+        </div>
+
+        <!-- Donation history -->
+        <div id="myDonationsSection" class="hidden bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h3 class="text-lg font-bold text-gray-900 mb-1">My donations</h3>
+            <p class="text-sm text-gray-500 mb-4">Every contribution you have made through the platform.</p>
+            <div id="myDonationsSummary" class="mb-4"></div>
+            <div id="myDonationsList" class="space-y-3"></div>
+        </div>
 
         <!-- Loading / Grid -->
         <div id="campaignsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -447,6 +461,82 @@
         document.getElementById('donateModal').addEventListener('click', function(e) {
             if (e.target === this) closeDonateModal();
         });
+
+        // ===== My donations (history) =====
+        const myDonationsSection = document.getElementById('myDonationsSection');
+
+        document.getElementById('toggleMyDonationsBtn').addEventListener('click', function () {
+            if (!localStorage.getItem('token')) {
+                window.location.href = 'portal.html#login';
+                return;
+            }
+            myDonationsSection.classList.toggle('hidden');
+            if (!myDonationsSection.classList.contains('hidden')) loadMyDonations();
+        });
+
+        async function loadMyDonations() {
+            const summary = document.getElementById('myDonationsSummary');
+            const list = document.getElementById('myDonationsList');
+            list.innerHTML = '<p class="text-sm text-gray-400">Loading your donationsâ€¦</p>';
+
+            try {
+                const res = await fetch('/api/donations/mine', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userData');
+                    localStorage.removeItem('user');
+                    window.location.href = 'portal.html#login';
+                    return;
+                }
+                if (!res.ok) throw new Error('Failed');
+
+                const data = await res.json();
+                summary.innerHTML = '';
+                list.innerHTML = '';
+
+                if (!data.donations || data.donations.length === 0) {
+                    const empty = document.createElement('p');
+                    empty.className = 'text-sm text-gray-400';
+                    empty.textContent = 'You have not made any donations yet. Choose a campaign above to get started.';
+                    list.appendChild(empty);
+                    return;
+                }
+
+                const total = document.createElement('p');
+                total.className = 'text-sm font-semibold text-gray-800';
+                total.textContent = `Total given: â‚¹${Number(data.total).toLocaleString('en-IN')} across ${data.donations.length} donation${data.donations.length === 1 ? '' : 's'}`;
+                summary.appendChild(total);
+
+                data.donations.forEach(donation => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center justify-between gap-3 border border-gray-100 rounded-xl p-4 flex-wrap';
+
+                    const info = document.createElement('div');
+                    const title = document.createElement('p');
+                    title.className = 'font-semibold text-gray-900 text-sm';
+                    title.textContent = (donation.campaign && donation.campaign.title) || 'Campaign';
+                    const meta = document.createElement('p');
+                    meta.className = 'text-xs text-gray-500';
+                    const when = donation.createdAt
+                        ? new Date(donation.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                        : '';
+                    meta.textContent = [when, donation.paymentStatus || '', donation.isAnonymous ? 'anonymous' : ''].filter(Boolean).join(' Â· ');
+                    info.append(title, meta);
+
+                    const amount = document.createElement('span');
+                    amount.className = 'text-sm font-bold text-blue-700';
+                    amount.textContent = `â‚¹${Number(donation.amount || 0).toLocaleString('en-IN')}`;
+
+                    row.append(info, amount);
+                    list.appendChild(row);
+                });
+            } catch (error) {
+                list.innerHTML = '<p class="text-sm text-red-500">Could not load your donations.</p>';
+            }
+        }
 
         // Load campaigns on page load
         loadCampaigns();
