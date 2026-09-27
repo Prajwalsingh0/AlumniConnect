@@ -472,11 +472,12 @@ function setupImageUpload() {
 (function setupNotificationPreferences() {
     const saveBtn = document.getElementById('save-notification-prefs');
     const statusEl = document.getElementById('notification-prefs-status');
-    const KEYS = ['mentorship', 'messages', 'reviews'];
+    const KEYS = ['mentorship', 'messages', 'reviews', 'reminders'];
     const boxes = {
         mentorship: document.getElementById('pref-mentorship'),
         messages: document.getElementById('pref-messages'),
-        reviews: document.getElementById('pref-reviews')
+        reviews: document.getElementById('pref-reviews'),
+        reminders: document.getElementById('pref-reminders')
     };
 
     if (!saveBtn || !statusEl || !boxes.mentorship) return;
