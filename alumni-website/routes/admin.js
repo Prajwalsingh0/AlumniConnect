@@ -1,10 +1,15 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
 const User = require('../models/User');
 const Event = require('../models/Event');
 const Job = require('../models/Job');
 const Donation = require('../models/Donation');
 const Campaign = require('../models/Campaign');
+const Mentorship = require('../models/Mentorship');
+const Conversation = require('../models/Conversation');
+const Message = require('../models/Message');
+const AdminAuditLog = require('../models/AdminAuditLog');
 const { authenticateToken } = require('../middleware/auth');
 
 // ── Admin check middleware ────────────────────────────────────────────────────
@@ -425,6 +430,152 @@ router.delete('/campaigns/:id', authenticateToken, isAdmin, async (req, res) => 
         if (!campaign) return res.status(404).json({ error: 'Campaign not found' });
         // Optionally delete associated donations, but let's keep it simple
         res.json({ message: 'Campaign deleted permanently' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// â”€â”€ GET /api/admin/mentorships â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Oversight: every mentorship, with both participants and a per-row status.
+router.get('/mentorships', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const page   = parseInt(req.query.page)  || 1;
+        const limit  = Math.min(parseInt(req.query.limit) || 15, 50);
+        const skip   = (page - 1) * limit;
+        const search = (req.query.search || '').trim();
+        const status = req.query.status || '';
+
+        const filter = {};
+        if (status) filter.status = status;
+
+        if (search) {
+            const people = await User.find({ name: { $regex: search, $options: 'i' } }).select('_id').lean();
+            filter.$or = [
+                { mentor: { $in: people.map(p => p._id) } },
+                { mentee: { $in: people.map(p => p._id) } }
+            ];
+        }
+
+        const [mentorships, total] = await Promise.all([
+            Mentorship.find(filter)
+                .populate('mentor', 'name email role isActive')
+                .populate('mentee', 'name email role isActive')
+                .sort({ updatedAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Mentorship.countDocuments(filter)
+        ]);
+
+        res.json({
+            mentorships,
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// â”€â”€ GET /api/admin/conversations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Oversight: chat threads with their participants, volume and last activity.
+router.get('/conversations', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const page   = parseInt(req.query.page)  || 1;
+        const limit  = Math.min(parseInt(req.query.limit) || 15, 50);
+        const skip   = (page - 1) * limit;
+        const search = (req.query.search || '').trim();
+
+        const filter = {};
+        if (search) {
+            const people = await User.find({ name: { $regex: search, $options: 'i' } }).select('_id').lean();
+            filter.participants = { $in: people.map(p => p._id) };
+        }
+
+        const [conversations, total] = await Promise.all([
+            Conversation.find(filter)
+                .populate('participants', 'name email role isActive')
+                .sort({ updatedAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Conversation.countDocuments(filter)
+        ]);
+
+        // One aggregate for the whole page instead of a query per conversation
+        const counts = await Message.aggregate([
+            { $match: { conversationId: { $in: conversations.map(c => c._id) } } },
+            { $group: { _id: '$conversationId', messages: { $sum: 1 }, lastAt: { $max: '$createdAt' } } }
+        ]);
+        const countById = new Map(counts.map(c => [String(c._id), c]));
+
+        res.json({
+            conversations: conversations.map(conversation => {
+                const stats = countById.get(String(conversation._id)) || {};
+                return {
+                    _id: conversation._id,
+                    participants: conversation.participants,
+                    messageCount: stats.messages || 0,
+                    lastMessageAt: stats.lastAt || conversation.updatedAt,
+                    createdAt: conversation.createdAt
+                };
+            }),
+            pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// â”€â”€ GET /api/admin/conversations/:id â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Reads one thread. Access is recorded in the audit log.
+router.get('/conversations/:id', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid conversation id' });
+        }
+
+        const limit = Math.min(parseInt(req.query.limit) || 100, 200);
+
+        const conversation = await Conversation.findById(req.params.id)
+            .populate('participants', 'name email role isActive')
+            .lean();
+        if (!conversation) {
+            return res.status(404).json({ error: 'Conversation not found' });
+        }
+
+        const messages = await Message.find({ conversationId: conversation._id })
+            .populate('sender', 'name email')
+            .sort({ createdAt: 1 })
+            .limit(limit)
+            .lean();
+
+        await AdminAuditLog.create({
+            admin: req.user.userId,
+            action: 'view_conversation',
+            targetType: 'Conversation',
+            targetId: conversation._id,
+            detail: `Read ${messages.length} message(s)`
+        });
+
+        res.json({ conversation, messages });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// â”€â”€ GET /api/admin/audit-log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// What moderation has looked at, most recent first.
+router.get('/audit-log', authenticateToken, isAdmin, async (req, res) => {
+    try {
+        const limit = Math.min(parseInt(req.query.limit) || 25, 100);
+
+        const entries = await AdminAuditLog.find({})
+            .populate('admin', 'name email')
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .lean();
+
+        res.json({ entries });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
