@@ -587,7 +587,7 @@ router.delete('/me', authenticateToken, accountDeletionLimit, async (req, res) =
 });
 
 // The preference keys a member can control
-const NOTIFICATION_PREFERENCE_KEYS = ['mentorship', 'messages', 'reviews'];
+const NOTIFICATION_PREFERENCE_KEYS = ['mentorship', 'messages', 'reviews', 'reminders'];
 
 function readNotificationPreferences(user) {
   const stored = (user && user.notificationPreferences) || {};

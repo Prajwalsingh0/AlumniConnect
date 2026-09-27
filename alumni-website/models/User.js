@@ -111,7 +111,8 @@ const userSchema = new mongoose.Schema({
   notificationPreferences: {
     mentorship: { type: Boolean, default: true },
     messages: { type: Boolean, default: true },
-    reviews: { type: Boolean, default: true }
+    reviews: { type: Boolean, default: true },
+    reminders: { type: Boolean, default: true }
   },
   emailVerified: {
     type: Boolean,

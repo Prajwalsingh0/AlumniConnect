@@ -23,6 +23,7 @@ const reviewRoutes = require('./routes/reviews');
 const adminRoutes = require('./routes/admin');
 const { createNotification } = require('./services/notificationService');
 const notificationService = require('./services/notificationService');
+const { startEventReminderScheduler } = require('./services/reminderService');
 
 const http = require('http');
 const socketIO = require('socket.io');
@@ -199,6 +200,9 @@ app.set('io', io);
 
 // Give the notification service the same instance for live pushes
 notificationService.setIo(io);
+
+// Remind attendees about events that are about to start
+startEventReminderScheduler();
 
 // Socket.io authentication middleware
 io.use(async (socket, next) => {

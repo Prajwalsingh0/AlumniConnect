@@ -4,7 +4,8 @@ const User = require('../models/User');
 // Notification types grouped by the preference that controls them
 const TYPE_PREFERENCE = {
   message: 'messages',
-  review: 'reviews'
+  review: 'reviews',
+  event_reminder: 'reminders'
 };
 
 function preferenceKeyFor(type) {
