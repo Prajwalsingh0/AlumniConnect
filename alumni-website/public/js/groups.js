@@ -175,6 +175,14 @@ function renderGroupCard(group, isMine) {
   badge.textContent = categoryLabel(group.category);
 
   header.append(nameEl, badge);
+
+  if (group.isPrivate) {
+    const lock = document.createElement('span');
+    lock.className = 'text-[11px] font-semibold uppercase tracking-wide text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full';
+    lock.innerHTML = '<i class="fas fa-lock mr-1" aria-hidden="true"></i>Private';
+    lock.title = 'Private groups are not listed publicly';
+    header.appendChild(lock);
+  }
   card.appendChild(header);
 
   const description = document.createElement('p');
@@ -266,10 +274,13 @@ async function createGroup(e) {
   const button = document.getElementById('create-submit');
   errorEl.classList.add('hidden');
 
+  const privateToggle = document.getElementById('group-private');
+
   const payload = {
     name: document.getElementById('group-name').value.trim(),
     category: document.getElementById('group-category').value,
-    description: document.getElementById('group-description').value.trim()
+    description: document.getElementById('group-description').value.trim(),
+    isPrivate: !!(privateToggle && privateToggle.checked)
   };
 
   if (!payload.name) {
@@ -285,8 +296,8 @@ async function createGroup(e) {
     const result = await api('POST', '/api/groups', payload);
 
     if (result.status === 401 || result.status === 403) { clearSessionAndRedirect(); return; }
-    if (result.status === 400) {
-      errorEl.textContent = result.data.error || 'Could not create the group (the name may already be taken).';
+    if (result.status === 400 || result.status === 409) {
+      errorEl.textContent = (result.data && result.data.error) || 'Could not create the group (the name may already be taken).';
       errorEl.classList.remove('hidden');
     } else if (result.status === 201) {
       groupsState.groups.push(result.data);
@@ -357,7 +368,9 @@ async function openGroup(groupId) {
   renderComposer(group);
 
   try {
-    const response = await fetch(`/api/groups/${encodeURIComponent(groupId)}/posts`);
+    const response = await fetch(`/api/groups/${encodeURIComponent(groupId)}/posts`, {
+      headers: isLoggedIn() ? { 'Authorization': `Bearer ${getToken()}` } : {}
+    });
     if (!response.ok) throw new Error('Failed');
     groupsState.posts = await response.json();
     renderPosts();
@@ -410,6 +423,36 @@ function renderGroupHeader(group) {
   top.appendChild(side);
 
   header.appendChild(top);
+
+  if (isLoggedIn() && isMemberOf(group)) {
+    const controls = document.createElement('div');
+    controls.className = 'mt-5 flex flex-wrap gap-3';
+
+    if (isManagerOf(group)) {
+      const edit = document.createElement('button');
+      edit.type = 'button';
+      edit.className = 'bg-white border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition';
+      edit.innerHTML = '<i class="fas fa-pen mr-1" aria-hidden="true"></i>Edit details';
+      edit.addEventListener('click', function () { openGroupEditModal(group._id); });
+      controls.appendChild(edit);
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'bg-white border border-red-200 text-red-600 px-5 py-2.5 rounded-lg font-semibold hover:bg-red-50 transition';
+      remove.innerHTML = '<i class="fas fa-trash-can mr-1" aria-hidden="true"></i>Delete group';
+      remove.addEventListener('click', function () { deleteGroup(group._id); });
+      controls.appendChild(remove);
+    } else {
+      const leave = document.createElement('button');
+      leave.type = 'button';
+      leave.className = 'bg-white border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition';
+      leave.innerHTML = '<i class="fas fa-right-from-bracket mr-1" aria-hidden="true"></i>Leave group';
+      leave.addEventListener('click', function () { leaveGroup(group._id); });
+      controls.appendChild(leave);
+    }
+
+    header.appendChild(controls);
+  }
 
   const member = isMemberOf(group);
   if (!member && isLoggedIn()) {
@@ -507,7 +550,7 @@ async function submitPost(e) {
     }
 
     const post = result.data;
-    post.author = { name: myName(), profile: { profileImage: null } };
+    post.author = { _id: resolveMyId(), name: myName(), profile: { profileImage: null } };
     groupsState.posts.unshift(post);
     renderPosts();
 
@@ -589,6 +632,35 @@ function renderPosts() {
     content.textContent = post.content;
 
     card.append(head, title, content);
+
+    const group = activeGroup();
+    const myId = resolveMyId();
+    const mine = !!(post.author && (post.author._id === myId || post.author === myId));
+    const manager = !!group && isManagerOf(group);
+
+    if (isLoggedIn() && (mine || manager)) {
+      const actions = document.createElement('div');
+      actions.className = 'flex gap-3 mt-4 pt-3 border-t border-gray-100';
+
+      if (manager) {
+        const pin = document.createElement('button');
+        pin.type = 'button';
+        pin.className = 'text-xs font-semibold text-gray-500 hover:text-primary-indigo transition';
+        pin.innerHTML = '<i class="fas fa-thumbtack mr-1" aria-hidden="true"></i>' + (post.isPinned ? 'Unpin' : 'Pin');
+        pin.addEventListener('click', function () { togglePin(post._id, !post.isPinned); });
+        actions.appendChild(pin);
+      }
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'text-xs font-semibold text-red-500 hover:text-red-700 transition';
+      remove.innerHTML = '<i class="fas fa-trash-can mr-1" aria-hidden="true"></i>Delete';
+      remove.addEventListener('click', function () { deletePost(post._id); });
+      actions.appendChild(remove);
+
+      card.appendChild(actions);
+    }
+
     list.appendChild(card);
   });
 }
@@ -603,4 +675,207 @@ function escapeHtml(text) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// ---------- Group ownership helpers ----------
+
+function isManagerOf(group) {
+  if (!group) return false;
+  const me = resolveMyId();
+  if (!me) return false;
+  if (group.createdBy === me) return true;
+  const entry = (group.members || []).find(function (m) {
+    return (m.user === me || (m.user && m.user._id === me));
+  });
+  return !!entry && entry.role === 'admin';
+}
+
+function activeGroup() {
+  return groupsState.groups.find(function (g) { return g._id === groupsState.activeGroupId; }) || null;
+}
+
+async function reloadPosts() {
+  const groupId = groupsState.activeGroupId;
+  if (!groupId) return;
+
+  try {
+    const response = await fetch(`/api/groups/${encodeURIComponent(groupId)}/posts`, {
+      headers: isLoggedIn() ? { 'Authorization': `Bearer ${getToken()}` } : {}
+    });
+    if (!response.ok) throw new Error('Failed');
+    groupsState.posts = await response.json();
+    renderPosts();
+  } catch (error) {
+    // Leave the current list in place on failure
+  }
+}
+
+async function leaveGroup(groupId) {
+  if (!window.confirm('Leave this group?')) return;
+
+  const result = await api('POST', `/api/groups/${encodeURIComponent(groupId)}/leave`);
+  if (result.status === 401) { clearSessionAndRedirect(); return; }
+
+  if (result.status !== 200) {
+    alert((result.data && result.data.error) || 'Could not leave the group.');
+    return;
+  }
+
+  showToast((result.data && result.data.message) || 'Left the group');
+  await loadGroups();
+  closeGroup();
+}
+
+async function deleteGroup(groupId) {
+  const group = groupsState.groups.find(function (g) { return g._id === groupId; });
+  const name = (group && group.name) || 'this group';
+  if (!window.confirm('Delete ' + name + '? Its discussions are removed too. This cannot be undone.')) return;
+
+  const result = await api('DELETE', `/api/groups/${encodeURIComponent(groupId)}`);
+  if (result.status === 401) { clearSessionAndRedirect(); return; }
+
+  if (result.status !== 200) {
+    alert((result.data && result.data.error) || 'Could not delete the group.');
+    return;
+  }
+
+  showToast('Group deleted');
+  await loadGroups();
+  closeGroup();
+}
+
+async function deletePost(postId) {
+  if (!window.confirm('Delete this post?')) return;
+
+  const groupId = groupsState.activeGroupId;
+  const result = await api('DELETE', `/api/groups/${encodeURIComponent(groupId)}/posts/${encodeURIComponent(postId)}`);
+  if (result.status === 401) { clearSessionAndRedirect(); return; }
+
+  if (result.status !== 200) {
+    alert((result.data && result.data.error) || 'Could not delete the post.');
+    return;
+  }
+
+  groupsState.posts = groupsState.posts.filter(function (p) { return p._id !== postId; });
+  renderPosts();
+  showToast('Post deleted');
+}
+
+async function togglePin(postId, pinned) {
+  const groupId = groupsState.activeGroupId;
+  const result = await api('PATCH', `/api/groups/${encodeURIComponent(groupId)}/posts/${encodeURIComponent(postId)}/pin`, { isPinned: pinned });
+  if (result.status === 401) { clearSessionAndRedirect(); return; }
+
+  if (result.status !== 200) {
+    alert((result.data && result.data.error) || 'Could not update the post.');
+    return;
+  }
+
+  await reloadPosts();
+}
+
+function openGroupEditModal(groupId) {
+  if (document.getElementById('group-edit-overlay')) return;
+
+  const group = groupsState.groups.find(function (g) { return g._id === groupId; });
+  if (!group) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'group-edit-overlay';
+  overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4';
+  overlay.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Edit group details</h3>
+        <button type="button" id="group-edit-close" class="w-8 h-8 rounded-full hover:bg-gray-100 transition" aria-label="Close">
+          <i class="fas fa-times text-gray-500"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <label for="group-edit-name" class="block text-xs font-bold text-gray-500 uppercase mb-1">Name</label>
+        <input type="text" id="group-edit-name" maxlength="80"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+
+        <label for="group-edit-description" class="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
+        <textarea id="group-edit-description" rows="3" maxlength="500"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition"></textarea>
+
+        <label for="group-edit-category" class="block text-xs font-bold text-gray-500 uppercase mb-1">Category</label>
+        <select id="group-edit-category"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+          <option value="department">Department</option>
+          <option value="industry">Industry</option>
+          <option value="hobby">Hobby</option>
+          <option value="location">Location</option>
+          <option value="other">Other</option>
+        </select>
+
+        <label class="flex items-start justify-between gap-4 cursor-pointer">
+          <span>
+            <span class="block text-sm font-semibold text-gray-900">Private group</span>
+            <span class="block text-xs text-gray-500">Not listed publicly. Members join through a direct link.</span>
+          </span>
+          <input type="checkbox" id="group-edit-private" class="mt-1 h-5 w-5 rounded border-gray-300 text-primary-indigo focus:ring-primary-indigo">
+        </label>
+
+        <div id="group-edit-error" class="hidden mt-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm" role="alert"></div>
+
+        <div class="flex justify-end gap-3 mt-5">
+          <button type="button" id="group-edit-cancel" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">Cancel</button>
+          <button type="button" id="group-edit-save" class="bg-primary-indigo text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-primary-dark-blue disabled:opacity-50 transition">Save changes</button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+
+  overlay.querySelector('#group-edit-name').value = group.name || '';
+  overlay.querySelector('#group-edit-description').value = group.description || '';
+  overlay.querySelector('#group-edit-category').value = group.category || 'other';
+  overlay.querySelector('#group-edit-private').checked = !!group.isPrivate;
+
+  const errorEl = overlay.querySelector('#group-edit-error');
+  const saveBtn = overlay.querySelector('#group-edit-save');
+
+  function close() { overlay.remove(); }
+  overlay.querySelector('#group-edit-close').addEventListener('click', close);
+  overlay.querySelector('#group-edit-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+
+  saveBtn.addEventListener('click', async function () {
+    errorEl.classList.add('hidden');
+    saveBtn.disabled = true;
+
+    const payload = {
+      name: overlay.querySelector('#group-edit-name').value.trim(),
+      description: overlay.querySelector('#group-edit-description').value.trim(),
+      category: overlay.querySelector('#group-edit-category').value,
+      isPrivate: overlay.querySelector('#group-edit-private').checked
+    };
+
+    try {
+      const result = await api('PATCH', `/api/groups/${encodeURIComponent(groupId)}`, payload);
+
+      if (result.status === 401) { clearSessionAndRedirect(); return; }
+
+      if (result.status !== 200) {
+        errorEl.textContent = (result.data && result.data.error) || 'Could not save the changes.';
+        errorEl.classList.remove('hidden');
+        return;
+      }
+
+      const index = groupsState.groups.findIndex(function (g) { return g._id === groupId; });
+      if (index !== -1) groupsState.groups[index] = result.data;
+
+      close();
+      renderGroupHeader(result.data);
+      renderLists();
+      showToast('Group updated');
+    } catch (error) {
+      errorEl.textContent = 'Network error. Please try again.';
+      errorEl.classList.remove('hidden');
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
 }
