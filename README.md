@@ -93,6 +93,7 @@ All endpoints are under `/api`:
 - `GET /api/notifications/unread/count`, `POST /api/notifications/:id/read`, `POST /api/notifications/read-all`
 - `POST /api/chatbot` — website assistant (auth; per-user rate limit; provider abstraction with optional OpenAI-compatible API via `CHATBOT_API_URL`/`CHATBOT_API_KEY`/`CHATBOT_MODEL`, local knowledge-base fallback)
 - `GET/POST /api/groups`, `POST /api/groups/:id/join`, `GET/POST /api/groups/:id/posts`
+- `PATCH /api/groups/:id`, `DELETE /api/groups/:id`, `POST /api/groups/:id/leave`, `DELETE /api/groups/:id/posts/:postId`, `PATCH /api/groups/:id/posts/:postId/pin` - group management and post moderation (owner or group admin; private groups are unlisted)
 - Admin (role `admin` required): `/api/admin/stats`, `/api/admin/users`, `/api/admin/events`, `/api/admin/jobs`, `/api/admin/campaigns`
 
 ## Socket.IO Events

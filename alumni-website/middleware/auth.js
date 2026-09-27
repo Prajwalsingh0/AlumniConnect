@@ -19,7 +19,6 @@ function authenticateToken(req, res, next) {
     if (!user || !user.userId || !mongoose.Types.ObjectId.isValid(user.userId)) {
       return res.status(403).json({ error: 'Invalid or expired token' });
     }
-
     // Tokens are stateless, so without this lookup a deleted account could keep
     // using an unexpired token. Single indexed read by _id.
     try {
@@ -37,4 +36,36 @@ function authenticateToken(req, res, next) {
   });
 }
 
-module.exports = { authenticateToken };
+/**
+ * Populate req.user when a valid token is present, but never reject the request.
+ * Used where the response depends on membership - a group listing, for example,
+ * shows private groups only to their members while still serving visitors.
+ */
+function optionalAuth(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return next();
+  }
+
+  jwt.verify(token, JWT_SECRET, async (err, user) => {
+    if (err || !user || !user.userId || !mongoose.Types.ObjectId.isValid(user.userId)) {
+      return next();
+    }
+
+    try {
+      const account = await User.findById(user.userId).select('isActive').lean();
+      if (account && account.isActive !== false) {
+        req.user = user;
+      }
+    } catch (error) {
+      // Treat an unreadable account as anonymous
+      console.error('Optional auth lookup error:', error.message);
+    }
+
+    next();
+  });
+}
+
+module.exports = { authenticateToken, optionalAuth };
