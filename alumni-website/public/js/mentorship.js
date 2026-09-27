@@ -15,7 +15,7 @@ const myUserId = () => {
   }
 };
 
-const mentorshipState = { items: [], myReviews: {}, requestId: 0, socket: null, chat: { mentorshipId: null, conversationId: null, recipientId: null } };
+const mentorshipState = { items: [], sessions: [], myReviews: {}, requestId: 0, socket: null, chat: { mentorshipId: null, conversationId: null, recipientId: null } };
 
 document.addEventListener('DOMContentLoaded', function () {
   const token = localStorage.getItem('token');
@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   loadMentorships(getToken());
   loadMyReviews();
+  loadSessions();
 });
 
 function getToken() {
@@ -139,6 +140,7 @@ function renderSections() {
     'Mentorships currently in progress.',
     groups.active, renderActiveCard
   ));
+  content.appendChild(renderSessionSection());
   content.appendChild(renderSection(
     'Completed', 'fa-circle-check',
     'Mentorships you have completed together.',
@@ -271,6 +273,8 @@ function renderActiveCard(m) {
           <i class="fas fa-comments mr-1" aria-hidden="true"></i>Open Chat</button>
         <a href="chat.html?to=${encodeURIComponent(other ? other._id : '')}" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
           <i class="fas fa-up-right-from-square mr-1" aria-hidden="true"></i>Full Chat</a>
+        <button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-primary-indigo text-white hover:bg-indigo-700 transition" data-act="schedule" data-mid="${escapeHtmlAttr(m._id)}">
+          <i class="fas fa-calendar-plus mr-1" aria-hidden="true"></i>Schedule session</button>
       </div>
       <button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition" data-act="complete" data-mid="${escapeHtmlAttr(m._id)}">
         <i class="fas fa-circle-check mr-1" aria-hidden="true"></i>Complete Mentorship</button>
@@ -327,6 +331,46 @@ document.getElementById('mentorship-content').addEventListener('click', async fu
     return;
   }
 
+  if (act === 'schedule') {
+    openSessionModal(mid);
+    return;
+  }
+
+  if (act.indexOf('session-') === 0) {
+    const sid = button.dataset.sid;
+    const sessionAct = act.slice('session-'.length);
+    const originalHtml = button.innerHTML;
+
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Working';
+
+    try {
+      const result = await api('PATCH', `/api/sessions/${sid}/${sessionAct}`);
+
+      // 401 means the session expired; 403 here is a business rule (for example
+      // confirming your own proposal), so it must not sign the user out.
+      if (result.status === 401) {
+        clearSession();
+        return;
+      }
+      if (result.status < 200 || result.status >= 300) {
+        alert((result.data && result.data.error) || 'Action failed. Please try again.');
+        button.disabled = false;
+        button.innerHTML = originalHtml;
+        return;
+      }
+
+      await loadSessions();
+      const messages = { confirm: 'Session confirmed', decline: 'Session declined', cancel: 'Session cancelled' };
+      showToast(messages[sessionAct] || 'Session updated');
+    } catch (error) {
+      alert('Network error. Please try again.');
+      button.disabled = false;
+      button.innerHTML = originalHtml;
+    }
+    return;
+  }
+
   const confirmMessages = {
     reject: 'Reject this mentorship request?',
     cancel: 'Cancel this mentorship request?'
@@ -347,7 +391,8 @@ document.getElementById('mentorship-content').addEventListener('click', async fu
       clearSession();
       return;
     }
-    if (!response.ok) {
+    // api() returns { status, data } - there is no response.ok to test
+    if (response.status < 200 || response.status >= 300) {
       alert((response.data && response.data.error) || 'Action failed. Please try again.');
       button.disabled = false;
       button.innerHTML = original;
@@ -541,6 +586,100 @@ function escapeHtmlAttr(text) {
 
 // ── Mentorship reviews ───────────────────────────────────────────────────────
 
+async function loadSessions() {
+  try {
+    const result = await api('GET', '/api/sessions/mine');
+    if (result.status !== 200 || !Array.isArray(result.data.sessions)) return;
+
+    mentorshipState.sessions = result.data.sessions;
+    if (mentorshipState.items.length > 0) renderSections();
+  } catch (error) {
+    // Non-fatal: the sessions section simply shows its empty state
+  }
+}
+
+function formatDateTime(value) {
+  if (!value) return '';
+  return new Date(value).toLocaleString('en-IN', {
+    weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit'
+  });
+}
+
+function renderSessionSection() {
+  const fragment = document.createDocumentFragment();
+  const now = Date.now();
+  const isUpcoming = function (s) {
+    return ['proposed', 'confirmed'].indexOf(s.status) !== -1 && new Date(s.scheduledFor).getTime() > now;
+  };
+
+  const upcoming = mentorshipState.sessions
+    .filter(isUpcoming)
+    .sort(function (a, b) { return new Date(a.scheduledFor) - new Date(b.scheduledFor); });
+
+  const earlier = mentorshipState.sessions
+    .filter(function (s) { return !isUpcoming(s); })
+    .sort(function (a, b) { return new Date(b.scheduledFor) - new Date(a.scheduledFor); })
+    .slice(0, 5);
+
+  fragment.appendChild(renderSection(
+    'Upcoming sessions', 'fa-calendar-check',
+    'Sessions you have agreed with your mentorship partners. Propose one from an active mentorship.',
+    upcoming, renderSessionCard
+  ));
+
+  if (earlier.length > 0) {
+    fragment.appendChild(renderSection(
+      'Earlier sessions', 'fa-clock-rotate-left',
+      'Sessions that have already happened, or were declined.',
+      earlier, renderSessionCard
+    ));
+  }
+
+  return fragment;
+}
+
+function renderSessionCard(s) {
+  const me = myUserId();
+  const mine = s.proposedBy === me;
+  const partnerName = (s.partner && s.partner.name) || 'your mentorship partner';
+  const upcoming = ['proposed', 'confirmed'].indexOf(s.status) !== -1 && new Date(s.scheduledFor).getTime() > Date.now();
+
+  const badges = {
+    proposed: 'bg-amber-100 text-amber-700',
+    confirmed: 'bg-green-100 text-green-700',
+    declined: 'bg-red-100 text-red-600',
+    cancelled: 'bg-gray-100 text-gray-500'
+  };
+
+  let actions = '';
+  if (s.status === 'proposed' && !mine) {
+    actions += `<button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-accent-teal text-white hover:bg-teal-600 transition" data-act="session-confirm" data-sid="${escapeHtmlAttr(s._id)}">
+      <i class="fas fa-check mr-1" aria-hidden="true"></i>Confirm</button>
+      <button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-white border border-gray-300 text-gray-600 hover:bg-gray-100 transition" data-act="session-decline" data-sid="${escapeHtmlAttr(s._id)}">
+      <i class="fas fa-xmark mr-1" aria-hidden="true"></i>Decline</button>`;
+  }
+  if (upcoming) {
+    actions += `<button type="button" class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition" data-act="session-cancel" data-sid="${escapeHtmlAttr(s._id)}">
+      <i class="fas fa-ban mr-1" aria-hidden="true"></i>Cancel</button>`;
+  }
+
+  const card = document.createElement('div');
+  card.className = 'border border-gray-100 rounded-xl p-4';
+  card.innerHTML = `
+    <div class="flex items-start justify-between gap-3 flex-wrap">
+      <div>
+        <p class="font-semibold text-gray-900">${escapeHtml(formatDateTime(s.scheduledFor))}
+          <span class="text-xs font-medium text-gray-400">&middot; ${Number(s.durationMinutes) || 60} min</span></p>
+        <p class="text-xs text-gray-500 mt-1">with ${escapeHtml(partnerName)}${mine ? ' &middot; proposed by you' : ''}</p>
+      </div>
+      <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${badges[s.status] || 'bg-gray-100 text-gray-600'}">${escapeHtml(s.status)}</span>
+    </div>
+    ${s.agenda ? `<p class="text-sm text-gray-600 mt-2">${escapeHtml(s.agenda)}</p>` : ''}
+    ${s.meetingLink ? `<p class="text-xs mt-2"><i class="fas fa-video mr-1" aria-hidden="true"></i><a class="text-accent-indigo hover:underline break-all" href="${escapeHtmlAttr(s.meetingLink)}" target="_blank" rel="noopener noreferrer">${escapeHtml(s.meetingLink)}</a></p>` : ''}
+    ${actions ? `<div class="flex gap-2 mt-3 flex-wrap">${actions}</div>` : ''}`;
+  return card;
+}
+
 async function loadMyReviews() {
   try {
     const result = await api('GET', '/api/reviews/mine');
@@ -668,3 +807,138 @@ function openReviewModal(mentorshipId) {
   });
 }
 
+
+// Propose a session inside an active mentorship
+function openSessionModal(mentorshipId) {
+  if (document.getElementById('session-modal-overlay')) return;
+
+  const mentorship = mentorshipState.items.find(function (m) { return m._id === mentorshipId; });
+  if (!mentorship) return;
+
+  const me = myUserId();
+  const other = (mentorship.mentor && mentorship.mentor._id === me) ? mentorship.mentee : mentorship.mentor;
+  const otherName = (other && other.name) || 'your mentorship partner';
+
+  // Suggest tomorrow at the top of the hour as a starting point
+  const suggested = new Date(Date.now() + 24 * 3600 * 1000);
+  suggested.setMinutes(0, 0, 0);
+  const suggestedLocal = new Date(suggested.getTime() - suggested.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  const nowLocal = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+
+  const overlay = document.createElement('div');
+  overlay.id = 'session-modal-overlay';
+  overlay.className = 'fixed inset-0 bg-black bg-opacity-50 z-[100] flex items-center justify-center p-4';
+  overlay.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h3 class="text-lg font-bold text-gray-900">Propose a session</h3>
+        <button type="button" id="session-modal-close" class="w-8 h-8 rounded-full hover:bg-gray-100 transition" aria-label="Close">
+          <i class="fas fa-times text-gray-500"></i>
+        </button>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600 mb-4">Suggest a time with <strong id="session-modal-name"></strong>. They can
+          confirm or decline.</p>
+
+        <label for="session-when" class="block text-xs font-bold text-gray-500 uppercase mb-1">Date and time</label>
+        <input type="datetime-local" id="session-when" min="${nowLocal}" value="${suggestedLocal}"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+
+        <label for="session-duration" class="block text-xs font-bold text-gray-500 uppercase mb-1">Duration</label>
+        <select id="session-duration"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+          <option value="30">30 minutes</option>
+          <option value="45">45 minutes</option>
+          <option value="60" selected>1 hour</option>
+          <option value="90">1 hour 30 minutes</option>
+          <option value="120">2 hours</option>
+        </select>
+
+        <label for="session-agenda" class="block text-xs font-bold text-gray-500 uppercase mb-1">What will you cover? (optional)</label>
+        <textarea id="session-agenda" rows="3" maxlength="300" placeholder="RÃ©sumÃ© review, interview prep, career questions..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition"></textarea>
+
+        <label for="session-link" class="block text-xs font-bold text-gray-500 uppercase mb-1">Meeting link (optional)</label>
+        <input type="url" id="session-link" placeholder="https://meet.example.com/your-room"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-indigo focus:border-primary-indigo transition">
+
+        <div id="session-error" class="hidden mt-3 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm" role="alert"></div>
+
+        <div class="flex justify-end gap-3 mt-5">
+          <button type="button" id="session-cancel" class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 transition">Cancel</button>
+          <button type="button" id="session-submit" class="bg-primary-indigo text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            <i class="fas fa-paper-plane mr-1" aria-hidden="true"></i>Send proposal
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  overlay.querySelector('#session-modal-name').textContent = otherName;
+
+  const errorEl = overlay.querySelector('#session-error');
+  const submitBtn = overlay.querySelector('#session-submit');
+
+  function showError(message) {
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+  }
+
+  function close() { overlay.remove(); }
+
+  overlay.querySelector('#session-modal-close').addEventListener('click', close);
+  overlay.querySelector('#session-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+
+  submitBtn.addEventListener('click', async function () {
+    errorEl.classList.add('hidden');
+
+    const rawWhen = overlay.querySelector('#session-when').value;
+    if (!rawWhen) {
+      showError('Pick a date and time.');
+      return;
+    }
+
+    const when = new Date(rawWhen);
+    if (isNaN(when.getTime())) {
+      showError('Pick a valid date and time.');
+      return;
+    }
+    if (when.getTime() <= Date.now()) {
+      showError('Pick a time in the future.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1" aria-hidden="true"></i>Sending';
+
+    try {
+      const result = await api('POST', '/api/sessions', {
+        mentorshipId: mentorshipId,
+        scheduledFor: when.toISOString(),
+        durationMinutes: Number(overlay.querySelector('#session-duration').value) || 60,
+        agenda: overlay.querySelector('#session-agenda').value.trim(),
+        meetingLink: overlay.querySelector('#session-link').value.trim()
+      });
+
+      if (result.status === 401) {
+        clearSession();
+        return;
+      }
+
+      if (result.status === 201) {
+        close();
+        await loadSessions();
+        showToast('Session proposed');
+        return;
+      }
+
+      showError((result.data && result.data.error) || 'Could not propose the session.');
+    } catch (error) {
+      showError('Network error. Please try again.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-1" aria-hidden="true"></i>Send proposal';
+    }
+  });
+}
