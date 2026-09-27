@@ -108,6 +108,12 @@ const userSchema = new mongoose.Schema({
     default: true
   },
   deletedAt: Date,
+  notificationPreferences: {
+    mentorship: { type: Boolean, default: true },
+    messages: { type: Boolean, default: true },
+    reviews: { type: Boolean, default: true },
+    reminders: { type: Boolean, default: true }
+  },
   emailVerified: {
     type: Boolean,
     default: false

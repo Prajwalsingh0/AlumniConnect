@@ -278,6 +278,63 @@
             </section>
         </form>
 
+        <!-- Notification preferences -->
+        <section class="section-card">
+            <h2 class="text-lg font-bold text-gray-900 mb-1 flex items-center gap-2">
+                <i class="fas fa-bell text-gray-400"></i> Notifications
+            </h2>
+            <p class="text-sm text-gray-500 mb-5">Choose what you get told about. Turning one off hides those alerts;
+                the activity itself still happens.</p>
+
+            <div class="space-y-4">
+                <label class="flex items-start justify-between gap-4 cursor-pointer">
+                    <span>
+                        <span class="block text-sm font-semibold text-gray-900">Mentorship updates</span>
+                        <span class="block text-xs text-gray-500">New requests, acceptances, cancellations and
+                            completions.</span>
+                    </span>
+                    <input type="checkbox" id="pref-mentorship"
+                        class="mt-1 h-5 w-5 rounded border-gray-300 text-primary-indigo focus:ring-primary-indigo">
+                </label>
+
+                <label class="flex items-start justify-between gap-4 cursor-pointer">
+                    <span>
+                        <span class="block text-sm font-semibold text-gray-900">Direct messages</span>
+                        <span class="block text-xs text-gray-500">Alerts when someone sends you a chat message.</span>
+                    </span>
+                    <input type="checkbox" id="pref-messages"
+                        class="mt-1 h-5 w-5 rounded border-gray-300 text-primary-indigo focus:ring-primary-indigo">
+                </label>
+
+                <label class="flex items-start justify-between gap-4 cursor-pointer">
+                    <span>
+                        <span class="block text-sm font-semibold text-gray-900">Mentorship reviews</span>
+                        <span class="block text-xs text-gray-500">When a mentorship partner leaves you a review.</span>
+                    </span>
+                    <input type="checkbox" id="pref-reviews"
+                        class="mt-1 h-5 w-5 rounded border-gray-300 text-primary-indigo focus:ring-primary-indigo">
+                </label>
+
+                <label class="flex items-start justify-between gap-4 cursor-pointer">
+                    <span>
+                        <span class="block text-sm font-semibold text-gray-900">Event reminders</span>
+                        <span class="block text-xs text-gray-500">A nudge the day before an event you signed up
+                            for.</span>
+                    </span>
+                    <input type="checkbox" id="pref-reminders"
+                        class="mt-1 h-5 w-5 rounded border-gray-300 text-primary-indigo focus:ring-primary-indigo">
+                </label>
+            </div>
+
+            <div class="flex items-center gap-3 mt-6">
+                <button type="button" id="save-notification-prefs"
+                    class="px-5 py-2.5 rounded-lg bg-primary-indigo text-white text-sm font-bold hover:opacity-90 transition shadow-sm">
+                    <i class="fas fa-save mr-2"></i>Save notification settings
+                </button>
+                <span id="notification-prefs-status" class="text-sm font-semibold"></span>
+            </div>
+        </section>
+
         <!-- Danger zone -->
         <section class="section-card" style="border:1px solid #fecaca;background:#fffbfb">
             <h2 class="text-lg font-bold text-red-700 mb-2 flex items-center gap-2">

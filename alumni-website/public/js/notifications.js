@@ -247,6 +247,8 @@
         // mentorship notifications open the mentorship dashboard.
         if (item.type === 'message') {
           window.location.href = `chat.html?to=${encodeURIComponent(item.actor)}`;
+        } else if (item.type === 'event_reminder') {
+          window.location.href = 'events.html';
         } else {
           window.location.href = 'mentorship.html';
         }
