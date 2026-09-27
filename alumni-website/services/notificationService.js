@@ -1,4 +1,36 @@
 const Notification = require('../models/Notification');
+const User = require('../models/User');
+
+// Notification types grouped by the preference that controls them
+const TYPE_PREFERENCE = {
+  message: 'messages',
+  review: 'reviews'
+};
+
+function preferenceKeyFor(type) {
+  if (TYPE_PREFERENCE[type]) return TYPE_PREFERENCE[type];
+  if (typeof type === 'string' && type.startsWith('mentorship')) return 'mentorship';
+  return null; // unknown types are never suppressed
+}
+
+/**
+ * Only an explicit opt-out suppresses a notification, and a lookup failure
+ * lets it through: a missed notification is worse than an unwanted one.
+ */
+async function isNotificationAllowed(recipient, type) {
+  const key = preferenceKeyFor(type);
+  if (!key) return true;
+
+  try {
+    const user = await User.findById(recipient).select('notificationPreferences').lean();
+    const preferences = user && user.notificationPreferences;
+    if (!preferences) return true;
+    return preferences[key] !== false;
+  } catch (error) {
+    console.error('Notification preference lookup failed:', error.message);
+    return true;
+  }
+}
 
 let ioInstance = null;
 
@@ -16,6 +48,12 @@ function setIo(io) {
  */
 async function createNotification({ recipient, actor, type, refType = 'Mentorship', refId, message }) {
   try {
+    // The triggering action has already happened; this only decides whether the
+    // recipient is told about it.
+    if (!(await isNotificationAllowed(recipient, type))) {
+      return null;
+    }
+
     const notification = await Notification.create({
       recipient,
       actor,
