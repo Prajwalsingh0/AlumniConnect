@@ -50,6 +50,7 @@ const eventSchema = new mongoose.Schema({
     type: Number,
     default: null
   },
+  remindersSentAt: Date,
   registrationRequired: {
     type: Boolean,
     default: true
