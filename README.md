@@ -77,6 +77,7 @@ All endpoints are under `/api`:
 - `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`
 - `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`; `DELETE /api/stories/:id` (author/admin)
 - `POST /api/mentorships` — request mentorship (`mentorId` + `message`)
+- `GET/POST /api/sessions`, `GET /api/sessions/mine`, `GET /api/sessions/mentorship/:id`, `PATCH /api/sessions/:id/confirm|decline|cancel` - scheduling sessions inside an accepted mentorship
 - `GET /api/mentorships` — own mentorships (`status`, `role`, `page`, `limit`)
 - `GET /api/mentorships/requests/received` / `requests/sent` — pending inbox
 - `GET /api/mentorships/status/:userId` — relationship state for the profile CTA
