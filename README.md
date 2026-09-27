@@ -69,6 +69,7 @@ All endpoints are under `/api`:
 - `GET /api/users/public/:userId`, `GET /api/users/directory`, `GET /api/users/search`
 - `POST /api/users/skills/:skillName/endorse`
 - `DELETE /api/users/me` - delete your own account (password + typed confirmation); the account is anonymised and every session token stops working
+- `GET/PUT /api/users/notification-preferences` - per-type notification opt-outs (mentorship, messages, reviews)
 - `GET /api/events`, `GET /api/events/:id`, `POST/DELETE /api/events/:id/register`, `GET /api/events/user/registrations`
 - `GET /api/jobs`, `GET /api/jobs/:id`, `POST /api/jobs`, `POST /api/jobs/:id/apply`
 - `GET /api/jobs/mine` — own postings in any status; `PATCH /api/jobs/:id/status` (owner/admin: published/closed); `DELETE /api/jobs/:id` (owner/admin)

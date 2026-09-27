@@ -586,4 +586,75 @@ router.delete('/me', authenticateToken, accountDeletionLimit, async (req, res) =
   }
 });
 
+// The preference keys a member can control
+const NOTIFICATION_PREFERENCE_KEYS = ['mentorship', 'messages', 'reviews'];
+
+function readNotificationPreferences(user) {
+  const stored = (user && user.notificationPreferences) || {};
+  const preferences = {};
+  // Absent values mean "on", which keeps existing accounts behaving as before
+  NOTIFICATION_PREFERENCE_KEYS.forEach((key) => {
+    preferences[key] = stored[key] !== false;
+  });
+  return preferences;
+}
+
+// Get my notification preferences
+router.get('/notification-preferences', authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select('notificationPreferences').lean();
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ preferences: readNotificationPreferences(user) });
+  } catch (error) {
+    console.error('Get notification preferences error:', error);
+    res.status(500).json({ error: 'Failed to load notification preferences' });
+  }
+});
+
+// Update my notification preferences
+router.put('/notification-preferences', authenticateToken, async (req, res) => {
+  try {
+    const body = req.body || {};
+    const update = {};
+    const invalid = [];
+
+    for (const key of NOTIFICATION_PREFERENCE_KEYS) {
+      if (body[key] === undefined) continue;
+      if (typeof body[key] !== 'boolean') {
+        invalid.push(key);
+        continue;
+      }
+      update[`notificationPreferences.${key}`] = body[key];
+    }
+
+    if (invalid.length) {
+      return res.status(400).json({ error: `These settings must be true or false: ${invalid.join(', ')}` });
+    }
+    if (!Object.keys(update).length) {
+      return res.status(400).json({ error: 'No notification settings were provided' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { $set: update },
+      { new: true, runValidators: true }
+    ).select('notificationPreferences').lean();
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      message: 'Notification settings saved',
+      preferences: readNotificationPreferences(user)
+    });
+  } catch (error) {
+    console.error('Update notification preferences error:', error);
+    res.status(500).json({ error: 'Failed to save notification preferences' });
+  }
+});
+
 module.exports = router;
