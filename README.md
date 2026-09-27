@@ -91,6 +91,7 @@ All endpoints are under `/api`:
 - `POST /api/chatbot` — website assistant (auth; per-user rate limit; provider abstraction with optional OpenAI-compatible API via `CHATBOT_API_URL`/`CHATBOT_API_KEY`/`CHATBOT_MODEL`, local knowledge-base fallback)
 - `GET/POST /api/groups`, `POST /api/groups/:id/join`, `GET/POST /api/groups/:id/posts`
 - Admin (role `admin` required): `/api/admin/stats`, `/api/admin/users`, `/api/admin/events`, `/api/admin/jobs`, `/api/admin/campaigns`
+- `GET /api/admin/mentorships`, `GET /api/admin/conversations`, `GET /api/admin/conversations/:id`, `GET /api/admin/audit-log` - moderation oversight; reading a thread writes an audit entry
 
 ## Socket.IO Events
 
