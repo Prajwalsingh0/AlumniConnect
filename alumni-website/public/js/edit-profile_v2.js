@@ -468,3 +468,81 @@ function setupImageUpload() {
         }
     });
 })();
+// Notification preferences
+(function setupNotificationPreferences() {
+    const saveBtn = document.getElementById('save-notification-prefs');
+    const statusEl = document.getElementById('notification-prefs-status');
+    const KEYS = ['mentorship', 'messages', 'reviews'];
+    const boxes = {
+        mentorship: document.getElementById('pref-mentorship'),
+        messages: document.getElementById('pref-messages'),
+        reviews: document.getElementById('pref-reviews')
+    };
+
+    if (!saveBtn || !statusEl || !boxes.mentorship) return;
+
+    function setStatus(text, ok) {
+        statusEl.textContent = text;
+        statusEl.className = 'text-sm font-semibold ' + (ok ? 'text-green-600' : 'text-red-600');
+    }
+
+    function applyPreferences(preferences) {
+        if (!preferences) return;
+        KEYS.forEach((key) => {
+            if (boxes[key]) boxes[key].checked = preferences[key] !== false;
+        });
+    }
+
+    async function loadPreferences() {
+        try {
+            const res = await fetch('/api/users/notification-preferences', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            applyPreferences(data.preferences);
+        } catch (error) {
+            // keep the defaults; the save button still reports failures
+        }
+    }
+
+    saveBtn.addEventListener('click', async () => {
+        const payload = {};
+        KEYS.forEach((key) => {
+            if (boxes[key]) payload[key] = boxes[key].checked;
+        });
+
+        saveBtn.disabled = true;
+        setStatus('Saving...', true);
+
+        try {
+            const res = await fetch('/api/users/notification-preferences', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (!res.ok) {
+                setStatus(data.error || 'Could not save', false);
+                return;
+            }
+
+            applyPreferences(data.preferences);
+            setStatus('Saved', true);
+            setTimeout(() => {
+                if (statusEl.textContent === 'Saved') statusEl.textContent = '';
+            }, 3000);
+        } catch (error) {
+            setStatus('Could not save', false);
+        } finally {
+            saveBtn.disabled = false;
+        }
+    });
+
+    loadPreferences();
+})();
