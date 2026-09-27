@@ -5,7 +5,11 @@ const NOTIFICATION_TYPES = [
   'mentorship_accepted',
   'mentorship_rejected',
   'mentorship_cancelled',
-  'mentorship_completed'
+  'mentorship_completed',
+  'mentorship_session_proposed',
+  'mentorship_session_confirmed',
+  'mentorship_session_declined',
+  'mentorship_session_cancelled'
 ];
 
 const notificationSchema = new mongoose.Schema({

@@ -20,6 +20,7 @@ const chatbotRoutes = require('./routes/chatbot');
 const homeRoutes = require('./routes/home');
 const notificationRoutes = require('./routes/notifications');
 const reviewRoutes = require('./routes/reviews');
+const sessionRoutes = require('./routes/sessions');
 const adminRoutes = require('./routes/admin');
 const { createNotification } = require('./services/notificationService');
 const notificationService = require('./services/notificationService');
@@ -110,6 +111,7 @@ app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/sessions', sessionRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Serve uploads directory
