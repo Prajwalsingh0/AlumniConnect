@@ -71,6 +71,7 @@ All endpoints are under `/api`:
 - `DELETE /api/users/me` - delete your own account (password + typed confirmation); the account is anonymised and every session token stops working
 - `GET/PUT /api/users/notification-preferences` - per-type notification opt-outs (mentorship, messages, reviews)
 - Event reminders - registered attendees get a notification the day before a published event starts (checked every 15 minutes; opt out via the `reminders` preference)
+- Weekly email digest - unread messages, pending requests, reviews, group activity and upcoming events; personal activity only, so quiet members are skipped (needs EMAIL_USER/EMAIL_PASSWORD to actually send; `GET /api/users/digest/preview` shows the content without sending)
 - `GET /api/events`, `GET /api/events/:id`, `POST/DELETE /api/events/:id/register`, `GET /api/events/user/registrations`
 - `GET /api/jobs`, `GET /api/jobs/:id`, `POST /api/jobs`, `POST /api/jobs/:id/apply`
 - `GET /api/jobs/mine` — own postings in any status; `PATCH /api/jobs/:id/status` (owner/admin: published/closed); `DELETE /api/jobs/:id` (owner/admin)

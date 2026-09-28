@@ -472,12 +472,13 @@ function setupImageUpload() {
 (function setupNotificationPreferences() {
     const saveBtn = document.getElementById('save-notification-prefs');
     const statusEl = document.getElementById('notification-prefs-status');
-    const KEYS = ['mentorship', 'messages', 'reviews', 'reminders'];
+    const KEYS = ['mentorship', 'messages', 'reviews', 'reminders', 'digests'];
     const boxes = {
         mentorship: document.getElementById('pref-mentorship'),
         messages: document.getElementById('pref-messages'),
         reviews: document.getElementById('pref-reviews'),
-        reminders: document.getElementById('pref-reminders')
+        reminders: document.getElementById('pref-reminders'),
+        digests: document.getElementById('pref-digests')
     };
 
     if (!saveBtn || !statusEl || !boxes.mentorship) return;
@@ -546,4 +547,78 @@ function setupImageUpload() {
     });
 
     loadPreferences();
+})();
+// Digest preview: what the next digest email would contain
+(function setupDigestPreview() {
+    const button = document.getElementById('preview-digest-btn');
+    const panel = document.getElementById('digest-preview');
+    if (!button || !panel) return;
+
+    function line(label, value) {
+        const row = document.createElement('p');
+        row.className = 'flex items-center justify-between py-1';
+        const name = document.createElement('span');
+        name.textContent = label;
+        const count = document.createElement('span');
+        count.className = 'font-semibold text-gray-900';
+        count.textContent = String(value);
+        row.append(name, count);
+        return row;
+    }
+
+    button.addEventListener('click', async function () {
+        button.disabled = true;
+        panel.classList.add('hidden');
+        panel.innerHTML = '';
+
+        try {
+            const res = await fetch('/api/users/digest/preview', {
+                headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+            });
+
+            if (res.status === 401) {
+                window.location.href = 'portal.html#login';
+                return;
+            }
+
+            const data = await res.json();
+            if (!res.ok) {
+                panel.textContent = (data && data.error) || 'Could not build the preview.';
+                panel.classList.remove('hidden');
+                return;
+            }
+
+            const heading = document.createElement('p');
+            heading.className = 'font-semibold text-gray-900 mb-2';
+            heading.textContent = data.hasContent
+                ? 'Your next digest would include:'
+                : 'Nothing to report right now, so no digest would be sent.';
+            panel.appendChild(heading);
+
+            if (data.hasContent) {
+                panel.appendChild(line('Unread messages', data.digest.unreadMessages));
+                panel.appendChild(line('Unread notifications', data.digest.unreadNotifications));
+                panel.appendChild(line('Mentorship requests waiting', data.digest.pendingMentorshipRequests));
+                panel.appendChild(line('New reviews', data.digest.newReviews));
+                panel.appendChild(line('New job postings', data.digest.newJobs));
+                panel.appendChild(line('New group posts', data.digest.groupPosts));
+
+                if (data.digest.upcomingEvents.length) {
+                    const events = document.createElement('p');
+                    events.className = 'mt-2 text-xs text-gray-500';
+                    events.textContent = 'Coming up: ' + data.digest.upcomingEvents.map(function (event) {
+                        return event.title + ' (' + new Date(event.date).toLocaleDateString('en-IN') + ')';
+                    }).join(', ');
+                    panel.appendChild(events);
+                }
+            }
+
+            panel.classList.remove('hidden');
+        } catch (error) {
+            panel.textContent = 'Network error. Please try again.';
+            panel.classList.remove('hidden');
+        } finally {
+            button.disabled = false;
+        }
+    });
 })();
