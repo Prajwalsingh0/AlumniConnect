@@ -1,130 +1,144 @@
 # AlumniConnect
 
-Alumni network platform for a university: alumni/student profiles, events with registration, a job board, donation campaigns, community stories, real-time chat, alumni search, group forums, and direct messaging — with a dedicated admin panel.
+A home for a university's alumni and students — a place to find each other, mentor,
+chat, join groups, attend events, share stories and give back.
 
-## Tech Stack
+It runs as a single website: a public side for everyone, member features once you
+sign in, and a separate admin area for running the network.
 
-- **Backend:** Node.js, Express, Mongoose (MongoDB), Socket.IO
-- **Frontend:** Static HTML/CSS/JS (Tailwind via CDN) served by Express
-- **Auth:** JWT (Bearer tokens), bcrypt password hashing, in-memory rate limiting on login/register/password-reset/verification endpoints
+![Node.js](https://img.shields.io/badge/Node.js-18%2B-3c873a)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB-4faa41)
 
-## Getting Started
+---
+
+## What you can do
+
+**As a visitor**
+
+- Browse the landing page, upcoming events, the job board, campaigns and alumni stories
+- Ask the little assistant in the corner how anything works
+
+**As a member**
+
+- Build a profile — experience, education, skills, privacy settings — and appear in the directory
+- Search the directory by year, department, degree, location or mentoring availability
+- Chat with other alumni in real time, with typing indicators and read receipts
+- Join groups, start discussions, and keep private groups off the public list
+- Request a mentor, manage your mentorships, and schedule sessions with confirmed times
+- Leave reviews for mentors or mentees once a mentorship is complete
+- Register for events (with a reminder the day before) and post jobs
+- Support campaigns and see your own giving history
+- Get notified in-app, choose exactly which alerts you want, and switch the weekly email digest on or off
+
+**As an admin**
+
+- Manage members, events, jobs and campaigns
+- See moderation views for mentorships and chat threads — and every look at a
+  thread is written to an audit log
+
+---
+
+## Quick start
+
+You need **Node.js 18+** and a **MongoDB** instance (local or Atlas).
 
 ```bash
 cd alumni-website
 npm install
-copy .env.example .env        # then edit values (Windows) / cp .env.example .env (macOS/Linux)
-npm run seed                  # creates collections and seeds demo data if the DB is empty
-node scripts/create-admin.js  # creates/promotes the admin account (set ADMIN_EMAIL / ADMIN_PASSWORD in .env first)
 
-> **Admin access:** the Admin Panel link only appears for accounts whose `role` is `admin`.
-> Promote an existing account with `ADMIN_EMAIL=you@example.com npm run create-admin` (or create one);
-> visiting `admin.html` without an admin session now redirects to `admin-login.html`.
-npm start                     # serves http://localhost:3000
+# Windows
+copy .env.example .env
+# macOS / Linux
+cp .env.example .env
+
+npm run seed                  # creates collections and seeds demo data (only when the database is empty)
+npm start                     # http://localhost:3000
 ```
 
-Requirements: Node.js 18+, a running MongoDB instance (local or Atlas). Without MongoDB the server still starts, but database features return errors.
+**Want an admin account?** Create one (or promote an existing account) with:
 
-## Environment Variables
+```bash
+npm run create-admin
+```
 
-See `alumni-website/.env.example`. Key variables:
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `.env` first. The Admin Panel link only
+shows up for accounts whose role is `admin`; visiting `admin.html` without an
+admin session sends you to the admin login.
 
-| Variable | Purpose |
+---
+
+## Configuration
+
+All settings live in `alumni-website/.env` — see `.env.example` for the full list.
+
+| Setting | What it's for |
 |---|---|
-| `PORT` | HTTP port (default 3000) |
-| `MONGODB_URI` | MongoDB connection string |
-| `JWT_SECRET` / `JWT_EXPIRE` | Token signing secret / lifetime |
-| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Credentials used by `scripts/create-admin.js` |
-| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_USER` / `EMAIL_PASSWORD` | SMTP for verification & reset emails (optional) |
-| `FRONTEND_URL` | Base URL used in email links |
+| `PORT` | Which port the site runs on (default 3000) |
+| `MONGODB_URI` | Your database connection string |
+| `JWT_SECRET` / `JWT_EXPIRE` | Signs sign-in tokens; change the secret for any real deployment |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Used by `npm run create-admin` |
+| `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_USER` / `EMAIL_PASSWORD` | Optional. Needed for verification emails, password resets, event reminders and digests |
+| `FRONTEND_URL` | Base URL used inside emailed links |
+| `CHATBOT_API_URL` / `CHATBOT_API_KEY` / `CHATBOT_MODEL` | Optional. Use a hosted AI model for the assistant instead of the built-in knowledge base |
 
-## Main Pages
+**Email is optional.** Without it the site works fine — accounts are verified
+automatically so nobody gets locked out, and reminders and digests simply don't
+send.
 
-| Page | Purpose |
+---
+
+## The pages
+
+| Page | What it's for |
 |---|---|
-| `index.html` | Landing page |
-| `alumni.html` | Alumni directory (search, filters, pagination) |
-| `chat.html` | Real-time chat (conversations, typing, unread badges) |
-| `groups.html` | Alumni groups & forum (browse, join, discussions) |
-| `assistant` (floating widget) | AI website assistant on every page (feature guide) |
-| `mentorship.html` | Mentorship dashboard (requests, active mentorships, chat) |
-| `portal.html` | Login / registration |
-| `profile.html` / `edit-profile.html` | Own profile (view / edit, privacy settings, skills) |
-| `events.html` | Event calendar + registration |
-| `jobs.html` | Job board + applications |
-| `donations.html` | Fundraising campaigns + donations |
-| `stories.html` | Alumni stories + story submission |
+| `index.html` | Landing page with live network activity |
+| `portal.html` | Sign in, register, reset a password |
+| `alumni.html` | Alumni directory with filters |
+| `profile.html` / `edit-profile.html` | Your profile, and editing it |
+| `mentorship.html` | Requests, active mentorships, sessions, chat |
+| `chat.html` | Real-time conversations |
+| `groups.html` | Groups and their discussions |
+| `events.html` | Events and registration |
+| `jobs.html` | Job board and applications |
+| `donations.html` | Campaigns and giving history |
+| `stories.html` | Alumni stories and submissions |
 | `about.html` | Mission, gallery, news |
-| `admin.html` / `admin-login.html` | Admin panel (users, events, jobs, campaigns) |
+| `admin.html` / `admin-login.html` | Admin panel and its sign-in |
+| *(floating widget)* | The assistant, on every page |
 
-## API Overview
+---
 
-All endpoints are under `/api`:
+## For developers
 
-- `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`
-- `GET/PUT /api/users/profile`, `POST /api/users/profile/image`, `PUT /api/users/password`
-- `GET /api/home` — public homepage data: live member/job/story counts, upcoming events, latest stories, recently joined alumni
-- `GET /api/users/directory` — paginated alumni listing (`page`, `limit` ≤ 48, `q`, `graduationYear`, `department`, `degree`, `location`, `mentorship=available`, `sort`: `name_asc`/`name_desc`/`newest`/`grad_year`)
-- `GET /api/users/directory/facets` — distinct filter values from real user data
-- `GET /api/users/public/:userId`, `GET /api/users/directory`, `GET /api/users/search`
-- `POST /api/users/skills/:skillName/endorse`
-- `DELETE /api/users/me` - delete your own account (password + typed confirmation); the account is anonymised and every session token stops working
-- `GET/PUT /api/users/notification-preferences` - per-type notification opt-outs (mentorship, messages, reviews)
-- Event reminders - registered attendees get a notification the day before a published event starts (checked every 15 minutes; opt out via the `reminders` preference)
-- Weekly email digest - unread messages, pending requests, reviews, group activity and upcoming events; personal activity only, so quiet members are skipped (needs EMAIL_USER/EMAIL_PASSWORD to actually send; `GET /api/users/digest/preview` shows the content without sending)
-- `GET /api/events`, `GET /api/events/:id`, `POST/DELETE /api/events/:id/register`, `GET /api/events/user/registrations`
-- `GET /api/jobs`, `GET /api/jobs/:id`, `POST /api/jobs`, `POST /api/jobs/:id/apply`
-- `GET /api/jobs/mine` — own postings in any status; `PATCH /api/jobs/:id/status` (owner/admin: published/closed); `DELETE /api/jobs/:id` (owner/admin)
-- `GET /api/donations/campaigns`, `POST /api/donations/campaigns`, `POST /api/donations/donate`
-- `GET /api/donations/mine` — own donation history with total given
-- `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`
-- `GET /api/stories`, `GET /api/stories/:id`, `POST /api/stories`; `DELETE /api/stories/:id` (author/admin)
-- `POST /api/mentorships` — request mentorship (`mentorId` + `message`)
-- `GET/POST /api/sessions`, `GET /api/sessions/mine`, `GET /api/sessions/mentorship/:id`, `PATCH /api/sessions/:id/confirm|decline|cancel` - scheduling sessions inside an accepted mentorship
-- `GET /api/mentorships` — own mentorships (`status`, `role`, `page`, `limit`)
-- `GET /api/mentorships/requests/received` / `requests/sent` — pending inbox
-- `GET /api/mentorships/status/:userId` — relationship state for the profile CTA
-- `POST /api/reviews` — review the other participant of a completed mentorship (rating 1-5, optional comment); `GET /api/reviews/mine`; `GET /api/reviews/user/:userId` (public rating summary + latest reviews)
-- `GET/PATCH /api/mentorships/:id` — detail (participants only); `accept`/`reject` (mentor), `cancel` (mentee), `complete` (either participant)
-- `GET/POST /api/messages/conversations`, `GET /api/messages/conversations/:conversationId` (cursor paginated via `before` + `limit`)
-- `POST /api/messages/conversations/:conversationId/read` — mark conversation read (server-persisted)
-- `DELETE /api/messages/:messageId` - delete a message for yourself only (stays visible to the other participant)
-- `GET /api/messages/unread/count` — total unread messages for the navbar badge
-- `GET /api/notifications` - own notifications (`page`, `limit`, `unread=true`)
-- `GET /api/notifications/unread/count`, `POST /api/notifications/:id/read`, `POST /api/notifications/read-all`
-- `POST /api/chatbot` — website assistant (auth; per-user rate limit; provider abstraction with optional OpenAI-compatible API via `CHATBOT_API_URL`/`CHATBOT_API_KEY`/`CHATBOT_MODEL`, local knowledge-base fallback)
-- `GET/POST /api/groups`, `POST /api/groups/:id/join`, `GET/POST /api/groups/:id/posts`
-- `PATCH /api/groups/:id`, `DELETE /api/groups/:id`, `POST /api/groups/:id/leave`, `DELETE /api/groups/:id/posts/:postId`, `PATCH /api/groups/:id/posts/:postId/pin` - group management and post moderation (owner or group admin; private groups are unlisted)
-- Admin (role `admin` required): `/api/admin/stats`, `/api/admin/users`, `/api/admin/events`, `/api/admin/jobs`, `/api/admin/campaigns`
-- `GET /api/admin/mentorships`, `GET /api/admin/conversations`, `GET /api/admin/conversations/:id`, `GET /api/admin/audit-log` - moderation oversight; reading a thread writes an audit entry
+- **Backend:** Node.js, Express, Mongoose (MongoDB), Socket.IO
+- **Frontend:** static HTML, Tailwind (CDN) and plain JavaScript, served by Express
+- **Auth:** JWT bearer tokens, bcrypt password hashing, and in-memory rate limits
+  on sign-in, registration, password reset and email verification
+- **Docs:** see [docs/API.md](docs/API.md) for the full endpoint reference, the
+  Socket.IO events and the data rules
 
-## Socket.IO Events
+### Handy commands
 
-Real-time messaging runs on Socket.IO with JWT authentication (`auth.token`):
-
-| Event | Direction | Payload | Purpose |
-|---|---|---|---|
-| `send_message` | client → server | `{ conversationId, recipientId, content }` | Send (participant-checked, server-validated) |
-| `message_sent` | server → client | Message | Acknowledgement to the sender |
-| `new_message` | server → client | Message | Delivery to the recipient |
-| `typing` | both ways | `{ conversationId, isTyping }` | Typing indicator (relayed to the other participant only) |
-| `messages_read` | server → client | `{ conversationId, readBy, readAt }` | Read receipt after the recipient marks read |
-| `notification` | server > client | `{ id, type, refId, message, createdAt, read }` | Mentorship lifecycle notification (request/accepted/rejected/cancelled/completed) |
-| `error` | server → client | `{ message }` | Validation/authorization failures |
-
-Message content is validated server-side (non-empty, ≤ 5000 chars); sender identity is always derived from the JWT; only conversation participants can send, read history, mark read, or receive relays.
-
-## Scripts
-
-| Command | Purpose |
+| Command | What it does |
 |---|---|
 | `npm start` | Start the server |
-| `npm run dev` | Start with nodemon (auto-restart) |
-| `npm run seed` | Create collections + seed demo data (only when the database is empty) |
-| `npm run create-admin` | Create or promote the admin user |
-| `npm run test:directory` | Run the directory API test suite (server must be running) |
-| `npm run test:mentorship` | Run the mentorship API test suite (server must be running) |
-| `npm run test:chat` | Run the chat/messaging test suite, including Socket.IO (server must be running) |
-| `npm run test:chatbot` | Run the assistant test suite (server must be running) |
-| `npm run test:home` | Run the homepage data API test suite (server must be running) |
-| `npm run check-mongodb` | Verify MongoDB connectivity |
+| `npm run dev` | Start with auto-restart |
+| `npm run seed` | Create collections and seed demo data |
+| `npm run create-admin` | Create or promote an admin |
+| `npm run check-mongodb` | Check the database connection |
+| `npm run test:directory` / `test:mentorship` / `test:chat` / `test:chatbot` / `test:home` | Run a test suite (server and seeded database required) |
+
+### Project layout
+
+```
+AlumniConnect/
+├── alumni-website/
+│   ├── config/       database connection
+│   ├── middleware/   auth, uploads, rate limiting
+│   ├── models/       Mongoose schemas
+│   ├── routes/       API endpoints
+│   ├── services/     email, notifications, reminders, digests, assistant
+│   ├── scripts/      seed, admin creation, test suites
+│   └── public/       the website itself
+└── docs/             developer documentation
+```
