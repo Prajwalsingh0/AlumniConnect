@@ -95,6 +95,7 @@ All endpoints are under `/api`:
 - `GET/POST /api/groups`, `POST /api/groups/:id/join`, `GET/POST /api/groups/:id/posts`
 - `PATCH /api/groups/:id`, `DELETE /api/groups/:id`, `POST /api/groups/:id/leave`, `DELETE /api/groups/:id/posts/:postId`, `PATCH /api/groups/:id/posts/:postId/pin` - group management and post moderation (owner or group admin; private groups are unlisted)
 - Admin (role `admin` required): `/api/admin/stats`, `/api/admin/users`, `/api/admin/events`, `/api/admin/jobs`, `/api/admin/campaigns`
+- `GET /api/admin/mentorships`, `GET /api/admin/conversations`, `GET /api/admin/conversations/:id`, `GET /api/admin/audit-log` - moderation oversight; reading a thread writes an audit entry
 
 ## Socket.IO Events
 
