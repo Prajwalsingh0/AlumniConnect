@@ -82,8 +82,63 @@ const sendPasswordResetEmail = async (email, token) => {
   await getTransporter().sendMail(mailOptions);
 };
 
+/**
+ * Whether SMTP details are present. Callers use this to skip work quietly
+ * instead of catching a configuration error per recipient.
+ */
+const isEmailConfigured = () => !!(process.env.EMAIL_USER && process.env.EMAIL_PASSWORD);
+
+const escapeHtml = (value) => String(value === null || value === undefined ? '' : value)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#039;');
+
+/**
+ * Send the periodic activity digest.
+ * @param {string} email - recipient
+ * @param {string} name - recipient's display name
+ * @param {object} digest - output of buildDigest
+ * @param {object} options - { now }
+ */
+const sendDigestEmail = async (email, name, digest, { now = new Date() } = {}) => {
+  const lines = [];
+
+  if (digest.unreadMessages > 0) lines.push(`${digest.unreadMessages} unread message${digest.unreadMessages === 1 ? '' : 's'}`);
+  if (digest.unreadNotifications > 0) lines.push(`${digest.unreadNotifications} new notification${digest.unreadNotifications === 1 ? '' : 's'}`);
+  if (digest.pendingMentorshipRequests > 0) lines.push(`${digest.pendingMentorshipRequests} mentorship request${digest.pendingMentorshipRequests === 1 ? '' : 's'} waiting for you`);
+  if (digest.newReviews > 0) lines.push(`${digest.newReviews} new review${digest.newReviews === 1 ? '' : 's'}`);
+  if (digest.newJobs > 0) lines.push(`${digest.newJobs} new job posting${digest.newJobs === 1 ? '' : 's'}`);
+  if (digest.groupPosts > 0) lines.push(`${digest.groupPosts} new group post${digest.groupPosts === 1 ? '' : 's'}`);
+
+  const eventLines = (digest.upcomingEvents || [])
+    .map((event) => `<li>${escapeHtml(event.title)} - ${escapeHtml(new Date(event.date).toLocaleString('en-IN'))}${event.isVirtual ? ' (online)' : ''}</li>`)
+    .join('');
+
+  const baseUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Your alumni network digest',
+    html: `
+      <h1>Your alumni digest</h1>
+      <p>Hello ${escapeHtml(name || 'there')}, here is what happened since ${escapeHtml(digest.since.toLocaleDateString('en-IN'))}.</p>
+      ${lines.length ? `<ul>${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>` : '<p>No new activity.</p>'}
+      ${eventLines ? `<h2>Coming up</h2><ul>${eventLines}</ul>` : ''}
+      <p><a href="${baseUrl}/portal.html">Open the alumni portal</a></p>
+      <p style="color:#6b7280;font-size:12px">You can turn this digest off in your notification settings.</p>
+    `
+  };
+
+  await getTransporter().sendMail(mailOptions);
+};
+
 module.exports = {
   generateVerificationToken,
   sendVerificationEmail,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendDigestEmail,
+  isEmailConfigured
 };
