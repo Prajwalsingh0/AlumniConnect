@@ -25,6 +25,7 @@ const adminRoutes = require('./routes/admin');
 const { createNotification } = require('./services/notificationService');
 const notificationService = require('./services/notificationService');
 const { startEventReminderScheduler } = require('./services/reminderService');
+const { startDigestScheduler } = require('./services/digestService');
 
 const http = require('http');
 const socketIO = require('socket.io');
@@ -205,6 +206,9 @@ notificationService.setIo(io);
 
 // Remind attendees about events that are about to start
 startEventReminderScheduler();
+
+// Send the weekly activity digest to members who want it
+startDigestScheduler();
 
 // Socket.io authentication middleware
 io.use(async (socket, next) => {

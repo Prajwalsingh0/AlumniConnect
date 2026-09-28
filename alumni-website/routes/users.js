@@ -587,7 +587,7 @@ router.delete('/me', authenticateToken, accountDeletionLimit, async (req, res) =
 });
 
 // The preference keys a member can control
-const NOTIFICATION_PREFERENCE_KEYS = ['mentorship', 'messages', 'reviews', 'reminders'];
+const NOTIFICATION_PREFERENCE_KEYS = ['mentorship', 'messages', 'reviews', 'reminders', 'digests'];
 
 function readNotificationPreferences(user) {
   const stored = (user && user.notificationPreferences) || {};
@@ -654,6 +654,31 @@ router.put('/notification-preferences', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Update notification preferences error:', error);
     res.status(500).json({ error: 'Failed to save notification preferences' });
+  }
+});
+
+// What the next digest email would say, so a member can judge the setting
+router.get('/digest/preview', authenticateToken, async (req, res) => {
+  try {
+    const { buildDigest } = require('../services/digestService');
+    const digest = await buildDigest(req.user.userId);
+
+    res.json({
+      hasContent: digest.hasContent,
+      since: digest.since,
+      digest: {
+        unreadMessages: digest.unreadMessages,
+        unreadNotifications: digest.unreadNotifications,
+        pendingMentorshipRequests: digest.pendingMentorshipRequests,
+        newReviews: digest.newReviews,
+        newJobs: digest.newJobs,
+        groupPosts: digest.groupPosts,
+        upcomingEvents: digest.upcomingEvents
+      }
+    });
+  } catch (error) {
+    console.error('Digest preview error:', error);
+    res.status(500).json({ error: 'Failed to build the digest preview' });
   }
 });
 

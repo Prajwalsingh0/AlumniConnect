@@ -112,8 +112,10 @@ const userSchema = new mongoose.Schema({
     mentorship: { type: Boolean, default: true },
     messages: { type: Boolean, default: true },
     reviews: { type: Boolean, default: true },
-    reminders: { type: Boolean, default: true }
+    reminders: { type: Boolean, default: true },
+    digests: { type: Boolean, default: true }
   },
+  lastDigestAt: Date,
   emailVerified: {
     type: Boolean,
     default: false
